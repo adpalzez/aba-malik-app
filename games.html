@@ -1,183 +1,162 @@
+     </html> «القائد ابا مالك ))«^€€£            
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مملكة صلاح الدين الأيوبي - أبا مالك</title>
+    <title>مملكة صلاح الدين - الواقعية الكاملة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
-        body { font-family: 'Cairo', sans-serif; background: radial-gradient(circle, #111827 0%, #000000 100%); }
-        .stat-card { transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.1); }
-        .stat-card:hover { transform: translateY(-5px); border-color: #eab308; }
-        .btn-action { transition: all 0.2s active; }
-        .btn-action:active { transform: scale(0.95); }
-        .upgrade-badge { font-size: 0.7rem; background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; position: absolute; top: -5px; right: -5px; }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: url('https://i.ibb.co/pBhzxHdM/1000027317.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .overlay { background: rgba(0, 0, 0, 0.85); min-height: 100 screen; }
+        .knight-img { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 3px solid #eab308; }
+        .resource-card { background: rgba(31, 41, 55, 0.8); backdrop-filter: blur(10px); border: 1px solid #4b5563; }
+        .attack-anim { animation: shake 0.5s; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 100% { transform: translateX(0); } }
     </style>
 </head>
-<body class="text-white p-4 min-h-screen">
+<body class="text-white">
 
-    <header class="text-center mb-6 bg-gray-900/80 backdrop-blur-md p-6 rounded-3xl border-b-4 border-yellow-600 shadow-2xl animate__animated animate__fadeInDown">
-        <div class="relative inline-block">
-            <img src="https://img.icons8.com/color/96/castle.png" class="mx-auto mb-2" alt="Castle Icon">
-            <span class="absolute bottom-0 right-0 bg-yellow-600 text-black text-xs font-bold px-2 py-1 rounded-lg">إصدار القائد</span>
+<div class="overlay p-4 min-h-screen">
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundjay.com/free-music/iron-man-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <header class="text-center mb-6 animate__animated animate__fadeIn">
+        <h1 class="text-4xl font-black text-yellow-500 mb-2 shadow-lg">مملكة صلاح الدين الأيوبي</h1>
+        <div class="flex justify-center gap-4 mb-4">
+            <button onclick="toggleMusic()" class="bg-yellow-600 text-black px-4 py-1 rounded-full text-xs font-bold">
+                <i class="fas fa-music"></i> تشغيل/إيقاف الموسيقى
+            </button>
         </div>
-        <h1 class="text-4xl font-black text-yellow-500 mb-2">مملكة صلاح الدين</h1>
-        <p id="rankDisplay" class="text-blue-400 font-bold tracking-widest uppercase">الرتبة: متطوع ناشئ</p>
+        <p id="rankDisplay" class="text-blue-400 font-bold tracking-widest">القائد العسكري: أبا مالك</p>
     </header>
 
-    <section class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 animate__animated animate__fadeIn">
-        <div class="stat-card text-center p-3 bg-gray-900 rounded-2xl shadow-inner">
-            <span class="text-3xl">💰</span>
-            <div class="text-xs text-yellow-500 font-bold uppercase">الذهب</div>
-            <div id="goldCount" class="text-2xl font-black text-white">100</div>
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="resource-card p-4 rounded-2xl text-center">
+            <img src="https://img.icons8.com/color/48/gold-bars.png" class="mx-auto mb-2">
+            <div id="goldCount" class="text-2xl font-bold">100</div>
+            <span class="text-xs text-yellow-500">خزينة الذهب</span>
         </div>
-        <div class="stat-card text-center p-3 bg-gray-900 rounded-2xl shadow-inner">
-            <span class="text-3xl">🌲</span>
-            <div class="text-xs text-amber-500 font-bold uppercase">الخشب</div>
-            <div id="woodCount" class="text-2xl font-black text-white">100</div>
+        <div class="resource-card p-4 rounded-2xl text-center">
+            <img src="https://img.icons8.com/color/48/wood-log.png" class="mx-auto mb-2">
+            <div id="woodCount" class="text-2xl font-bold">100</div>
+            <span class="text-xs text-amber-500">مخزن الخشب</span>
         </div>
-        <div class="stat-card text-center p-3 bg-gray-900 rounded-2xl shadow-inner">
-            <span class="text-3xl">⚔️</span>
-            <div class="text-xs text-red-500 font-bold uppercase">الجيش</div>
-            <div id="armyCount" class="text-2xl font-black text-white">0</div>
+        <div class="resource-card p-4 rounded-2xl text-center">
+            <img src="https://img.icons8.com/color/48/crusader.png" class="mx-auto mb-2">
+            <div id="armyCount" class="text-2xl font-bold">0</div>
+            <span class="text-xs text-red-500">الجيش النظامي</span>
         </div>
-        <div class="stat-card text-center p-3 bg-gray-900 rounded-2xl shadow-inner">
-            <span class="text-3xl">🛡️</span>
-            <div class="text-xs text-blue-500 font-bold uppercase">القلاع</div>
-            <div id="castleCount" class="text-2xl font-black text-white">0</div>
+        <div class="resource-card p-4 rounded-2xl text-center">
+            <img src="https://img.icons8.com/color/48/castle.png" class="mx-auto mb-2">
+            <div id="castleCount" class="text-2xl font-bold">0</div>
+            <span class="text-xs text-blue-500">القلاع المشيدة</span>
         </div>
     </section>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        
-        <div class="space-y-4">
-            <div class="bg-gray-900/50 p-5 rounded-3xl border border-gray-800">
-                <h2 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="fas fa-tools text-yellow-500"></i> معسكر الإنتاج</h2>
-                <div class="grid grid-cols-1 gap-3">
-                    <button onclick="collectResource('gold')" class="btn-action w-full bg-yellow-600 hover:bg-yellow-500 text-black font-black py-4 rounded-2xl flex flex-col items-center shadow-lg relative">
-                        <span>💰 جمع الذهب (<span id="goldPerClick">10</span>+)</span>
-                        <span class="text-[10px] opacity-70">اضغط للجمع السريع</span>
-                    </button>
-                    <button onclick="collectResource('wood')" class="btn-action w-full bg-amber-800 hover:bg-amber-700 text-white font-black py-4 rounded-2xl flex flex-col items-center shadow-lg">
-                        <span>🌲 قطع الخشب (<span id="woodPerClick">10</span>+)</span>
-                        <span class="text-[10px] opacity-70">تجهيز الموارد للبناء</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-blue-900/20 p-5 rounded-3xl border border-blue-900/30">
-                <h2 class="text-lg font-bold mb-4 text-blue-400">تطوير الأدوات (التعمير السريع)</h2>
-                <button onclick="upgradeTools()" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-sm transition-all mb-2 shadow-lg">
-                    ⚒️ ترقية الفؤوس والمناجم (💰<span id="upgradeCost">150</span>)
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-gray-800/60 p-6 rounded-3xl border-2 border-yellow-700">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-hammer"></i> العمليات والإنتاج</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="produce('gold')" class="bg-yellow-600 hover:bg-yellow-500 p-4 rounded-xl font-bold text-black shadow-xl transition active:scale-95">
+                    <i class="fas fa-coins text-2xl mb-1"></i><br>سك الذهب
+                </button>
+                <button onclick="produce('wood')" class="bg-amber-800 hover:bg-amber-700 p-4 rounded-xl font-bold text-white shadow-xl transition active:scale-95">
+                    <i class="fas fa-tree text-2xl mb-1"></i><br>جمع الخشب
                 </button>
             </div>
         </div>
 
-        <div class="space-y-4">
-            <div class="bg-red-900/20 p-5 rounded-3xl border border-red-900/30">
-                <h2 class="text-lg font-bold mb-4 text-red-500">مقر القيادة العسكرية</h2>
-                <div class="space-y-3">
-                    <button onclick="buildArmy()" class="btn-action w-full bg-red-700 hover:bg-red-600 text-white font-black py-5 rounded-2xl shadow-xl border-b-4 border-red-900">
-                        ⚔️ تدريب فرقة مشاة (💰50)
-                    </button>
-                    <button onclick="buildCastle()" class="btn-action w-full bg-indigo-700 hover:bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl border-b-4 border-indigo-900">
-                        🛡️ تشييد قلعة حصينة (💰200 | 🌲200)
-                    </button>
-                </div>
-            </div>
-            
-            <div id="bonusAlert" class="hidden animate__animated animate__bounceIn bg-green-600 text-white p-3 rounded-xl text-center font-bold">
-                🎊 منحة من القائد صلاح الدين: +50 ذهب!
+        <div class="bg-gray-800/60 p-6 rounded-3xl border-2 border-red-900">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-fist-raised"></i> التجنيد (الواقعي)</h2>
+            <div class="space-y-4">
+                <button onclick="buyUnit('army')" class="w-full bg-red-700 hover:bg-red-600 p-4 rounded-xl font-bold flex justify-between items-center px-8 border-b-4 border-red-950">
+                    <div class="flex items-center gap-3">
+                        <img src="https://img.icons8.com/color/48/swordsman.png" width="30">
+                        <span>تدريب محارب</span>
+                    </div>
+                    <span>💰 50</span>
+                </button>
+                <button onclick="buyUnit('castle')" class="w-full bg-blue-700 hover:bg-blue-600 p-4 rounded-xl font-bold flex justify-between items-center px-8 border-b-4 border-blue-950">
+                    <div class="flex items-center gap-3">
+                        <img src="https://img.icons8.com/color/48/fortress.png" width="30">
+                        <span>بناء قلعة</span>
+                    </div>
+                    <span>💰 200 | 🌲 200</span>
+                </button>
             </div>
         </div>
     </div>
 
-    <footer class="text-center mt-10 pb-6">
-        <a href="index.html" class="inline-flex items-center gap-2 bg-white text-black px-10 py-4 rounded-2xl font-black shadow-2xl hover:bg-yellow-500 transition-all">
-            <i class="fas fa-home"></i> العودة للمحفظة الرئيسية
+    <div class="mt-8 bg-black/40 p-6 rounded-3xl">
+        <h3 class="text-center font-bold text-yellow-500 mb-4">استعراض القوات العسكرية</h3>
+        <div id="armyVisuals" class="flex flex-wrap justify-center gap-2">
+            </div>
+    </div>
+
+    <footer class="text-center mt-10">
+        <a href="index.html" class="inline-block bg-white text-black px-12 py-3 rounded-2xl font-black shadow-2xl hover:bg-yellow-500">
+            العودة للديوان
         </a>
     </footer>
+</div>
 
-    <script>
-        let gold = 100;
-        let wood = 100;
-        let army = 0;
-        let castles = 0;
-        let clickPower = 10;
-        let upgradeCost = 150;
+<script>
+    let gold = 100; let wood = 100; let army = 0; let castles = 0;
+    const music = document.getElementById('bgMusic');
 
-        function updateDisplay() {
-            document.getElementById('goldCount').innerText = Math.floor(gold);
-            document.getElementById('woodCount').innerText = Math.floor(wood);
-            document.getElementById('armyCount').innerText = army;
-            document.getElementById('castleCount').innerText = castles;
-            document.getElementById('goldPerClick').innerText = clickPower;
-            document.getElementById('woodPerClick').innerText = clickPower;
-            document.getElementById('upgradeCost').innerText = upgradeCost;
-            updateRank();
+    function toggleMusic() {
+        if (music.paused) music.play();
+        else music.pause();
+    }
+
+    function produce(type) {
+        if (type === 'gold') gold += 10;
+        else wood += 10;
+        playEffect('https://www.soundjay.com/buttons/button-37.mp3');
+        update();
+    }
+
+    function buyUnit(type) {
+        if (type === 'army' && gold >= 50) {
+            gold -= 50; army++;
+            addSoldierIcon();
+            playEffect('https://www.soundjay.com/mechanical/iron-gate-close-1.mp3');
+        } else if (type === 'castle' && gold >= 200 && wood >= 200) {
+            gold -= 200; wood -= 200; castles++;
+        } else {
+            alert("الموارد غير كافية يا سيدي القائد!");
         }
+        update();
+    }
 
-        function collectResource(type) {
-            if (type === 'gold') gold += clickPower;
-            if (type === 'wood') wood += clickPower;
-            
-            // فرصة 5% للحصول على مكافأة عشوائية
-            if (Math.random() < 0.05) {
-                gold += 50;
-                showBonus();
-            }
-            updateDisplay();
-        }
+    function addSoldierIcon() {
+        const div = document.getElementById('armyVisuals');
+        const img = document.createElement('img');
+        img.src = "https://img.icons8.com/color/96/knight.png";
+        img.className = "w-12 h-12 animate__animated animate__zoomIn";
+        div.appendChild(img);
+    }
 
-        function upgradeTools() {
-            if (gold >= upgradeCost) {
-                gold -= upgradeCost;
-                clickPower += 5;
-                upgradeCost = Math.floor(upgradeCost * 1.5);
-                updateDisplay();
-            } else {
-                alert("الذهب لا يكفي للتطوير!");
-            }
-        }
+    function playEffect(url) {
+        new Audio(url).play();
+    }
 
-        function buildArmy() {
-            if (gold >= 50) {
-                gold -= 50;
-                army += 1;
-                updateDisplay();
-            } else {
-                alert("اجمع المزيد من الذهب لتدريب الجيش!");
-            }
-        }
+    function update() {
+        document.getElementById('goldCount').innerText = gold;
+        document.getElementById('woodCount').innerText = wood;
+        document.getElementById('armyCount').innerText = army;
+        document.getElementById('castleCount').innerText = castles;
+    }
+</script>
 
-        function buildCastle() {
-            if (gold >= 200 && wood >= 200) {
-                gold -= 200;
-                wood -= 200;
-                castles += 1;
-                updateDisplay();
-            } else {
-                alert("الموارد غير كافية لبناء قلعة!");
-            }
-        }
-
-        function updateRank() {
-            let rank = "متطوع ناشئ";
-            if (army >= 10) rank = "قائد فصيل";
-            if (army >= 50) rank = "أمير عسكري";
-            if (castles >= 5) rank = "سلطان القلاع";
-            if (army >= 100 && castles >= 10) rank = "أسد المملكة";
-            document.getElementById('rankDisplay').innerText = "الرتبة: " + rank;
-        }
-
-        function showBonus() {
-            const alert = document.getElementById('bonusAlert');
-            alert.classList.remove('hidden');
-            setTimeout(() => alert.classList.add('hidden'), 2000);
-        }
-    </script>
 </body>
-                        </html> «القائد ابا مالك »
-            
+</html>

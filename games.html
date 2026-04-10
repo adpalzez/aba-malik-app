@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مملكة صلاح الدين الايوبي - أبا مالك</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* إضافة خط عربي جميل من جوجل */
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white p-5">
+
+    <header class="text-center mb-8 bg-gray-800 p-5 rounded-xl border border-yellow-600 shadow-2xl">
+        <img src="https://img.icons8.com/color/96/castle.png" class="mx-auto mb-4" alt="Castle Icon">
+        <h1 class="text-3xl font-bold text-yellow-500">مملكة صلاح الدين الايوبي</h1>
+        <p class="text-gray-300">ابنِ قلعتك، واجمع جيشك، ودافع عن المملكة بروح القائد أبا مالك العقيلي.</p>
+    </header>
+
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 bg-gray-800 p-5 rounded-lg">
+        <div class="text-center p-4 bg-yellow-900 rounded-lg">
+            <span class="text-4xl">💰</span>
+            <div class="text-sm">الذهب</div>
+            <div id="goldCount" class="text-3xl font-bold">100</div>
+        </div>
+        <div class="text-center p-4 bg-amber-900 rounded-lg">
+            <span class="text-4xl">🌲</span>
+            <div class="text-sm">الخشب</div>
+            <div id="woodCount" class="text-3xl font-bold">100</div>
+        </div>
+        <div class="text-center p-4 bg-red-900 rounded-lg">
+            <span class="text-4xl">⚔️</span>
+            <div class="text-sm">الجيش</div>
+            <div id="armyCount" class="text-3xl font-bold">0</div>
+        </div>
+        <div class="text-center p-4 bg-blue-900 rounded-lg">
+            <span class="text-4xl">🛡️</span>
+            <div class="text-sm">القلاع</div>
+            <div id="castleCount" class="text-3xl font-bold">0</div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+            <h2 class="text-xl font-semibold mb-5 text-gray-100">جمع الموارد الأساسية</h2>
+            <div class="flex space-x-4">
+                <button onclick="collectResource('gold')" class="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-3 px-6 rounded-lg flex-1">
+                    جمع الذهب (+10)
+                </button>
+                <button onclick="collectResource('wood')" class="bg-amber-700 hover:bg-amber-800 text-white font-bold py-3 px-6 rounded-lg flex-1 ml-4">
+                    قطع الخشب (+10)
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+            <h2 class="text-xl font-semibold mb-5 text-gray-100">بناء المملكة</h2>
+            <div class="space-y-4">
+                <button onclick="buildArmy()" class="bg-red-700 hover:bg-red-800 text-white font-bold py-3 px-6 rounded-lg w-full">
+                    تدريب جندي (⚔️ +1) | التكلفة: 💰50
+                </button>
+                <button onclick="buildCastle()" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg w-full">
+                    بناء قلعة (🛡️ +1) | التكلفة: 💰200, 🌲200
+                </button>
+            </div>
+        </div>
+    </section>
+    
+    <div class="text-center mt-10">
+        <a href="index.html" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-6 rounded-full font-bold transition">
+            العودة للمحفظة الرئيسية
+        </a>
+    </div>
+
+    <script>
+        // المتغيرات الأساسية للموارد
+        let gold = 100;
+        let wood = 100;
+        let army = 0;
+        let castles = 0;
+
+        // دالة تحديث الأرقام في الشاشة
+        function updateDisplay() {
+            document.getElementById('goldCount').innerText = gold;
+            document.getElementById('woodCount').innerText = wood;
+            document.getElementById('armyCount').innerText = army;
+            document.getElementById('castleCount').innerText = castles;
+        }
+
+        // دالة جمع الموارد
+        function collectResource(type) {
+            if (type === 'gold') {
+                gold += 10;
+            } else if (type === 'wood') {
+                wood += 10;
+            }
+            updateDisplay();
+        }
+
+        // دالة تدريب الجيش
+        function buildArmy() {
+            if (gold >= 50) {
+                gold -= 50;
+                army += 1;
+                updateDisplay();
+                alert("تم تدريب جندي جديد لجيش القائد صلاح الدين!");
+            } else {
+                alert("الذهب لا يكفي لتدريب الجيش. اجمع المزيد من الذهب.");
+            }
+        }
+
+        // دالة بناء القلعة
+        function buildCastle() {
+            if (gold >= 200 && wood >= 200) {
+                gold -= 200;
+                wood -= 200;
+                castles += 1;
+                updateDisplay();
+                alert("تم بناء قلعة جديدة لحماية مملكة أبا مالك العقيلي!");
+            } else {
+                alert("الذهب أو الخشب لا يكفي لبناء القلعة. اجمع المزيد من الموارد.");
+            }
+        }
+    </script>
+</body>
+  </html>
+          

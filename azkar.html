@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>أذكار أبا مالك - الموسوعة الكاملة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --bg-main: #0a0a0a; --bg-card: #161616; --green-glow: #10b981; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-main); color: #e5e7eb; transition: 0.3s; scroll-behavior: smooth; }
+        .world-header { background: linear-gradient(180deg, #10b981 0%, #059669 100%); border-radius: 0 0 40px 40px; padding: 25px 20px 50px 20px; }
+        .date-box { background: rgba(255, 255, 255, 0.15); border-radius: 15px; padding: 10px; backdrop-filter: blur(5px); }
+        .category-card { border-radius: 24px; padding: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.3s; }
+        .category-card:active { transform: scale(0.95); }
+        .zekr-item { background: var(--bg-card); border-radius: 25px; margin-bottom: 18px; padding: 22px; border: 1px solid #252525; position: relative; }
+        .completed { opacity: 0.3; transform: scale(0.98); border-color: #10b981; }
+        .nav-bottom { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); max-width: 450px; width: 100%; background: #121212; display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid #222; z-index: 100; }
+        .settings-overlay { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; border-radius: 35px 35px 0 0; transform: translateY(100%); transition: 0.4s; z-index: 200; border-top: 4px solid #10b981; }
+        .show-settings { transform: translateY(0); }
+    </style>
+</head>
+<body class="pb-32" onload="updateDateTime()">
+
+    <div class="max-w-[450px] mx-auto min-h-screen">
+        <header class="world-header text-white">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="toggleSettings()" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fas fa-sliders-h"></i></button>
+                <div class="text-center">
+                    <h1 class="text-xl font-black">أذكار أبا مالك</h1>
+                    <p class="text-[9px] opacity-70 tracking-widest uppercase">The Holy Fortress</p>
+                </div>
+                <button onclick="location.reload()" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fas fa-sync-alt"></i></button>
+            </div>
+
+            <div class="date-box flex justify-between items-center text-center text-xs">
+                <div class="flex-1 text-right pr-2">
+                    <p class="opacity-70 mb-1">الميلادي</p>
+                    <p id="gDate" class="font-bold"></p>
+                </div>
+                <div class="h-8 w-[1px] bg-white/20"></div>
+                <div class="flex-1 text-left pl-2">
+                    <p class="opacity-70 mb-1">الهجري</p>
+                    <p id="hDate" class="font-bold"></p>
+                </div>
+            </div>
+        </header>
+
+        <main class="px-5 -mt-8">
+            <div class="bg-white rounded-[30px] p-6 shadow-2xl mb-8 flex items-center gap-4 text-black">
+                <div class="bg-blue-100 p-4 rounded-2xl"><i class="fas fa-cloud-sun text-blue-500 text-2xl"></i></div>
+                <div>
+                    <h2 class="text-xl font-black text-green-700">مرحباً بك</h2>
+                    <p id="timeMsg" class="text-gray-500 text-sm font-bold"></p>
+                </div>
+            </div>
+
+            <div id="mainGrid" class="grid grid-cols-2 gap-4">
+                <div onclick="renderSection('morning')" class="category-card bg-orange-500/10 text-orange-500">
+                    <i class="fas fa-sun text-3xl"></i><span class="font-black text-sm">ورد الصباح</span>
+                </div>
+                <div onclick="renderSection('evening')" class="category-card bg-purple-500/10 text-purple-600">
+                    <i class="fas fa-moon text-3xl"></i><span class="font-black text-sm">ورد المساء</span>
+                </div>
+                <div onclick="renderSection('sleep')" class="category-card bg-blue-500/10 text-blue-500">
+                    <i class="fas fa-bed text-3xl"></i><span class="font-black text-sm">أذكار النوم</span>
+                </div>
+                <div onclick="renderSection('hadith')" class="category-card bg-rose-500/10 text-rose-500">
+                    <i class="fas fa-heart text-3xl"></i><span class="font-black text-sm">أحاديث</span>
+                </div>
+                <div onclick="openCounter()" class="category-card bg-emerald-500/10 text-emerald-500 col-span-2 py-5 flex-row">
+                    <i class="fas fa-fingerprint text-2xl"></i><span class="font-black mr-2">المسبحة الإلكترونية</span>
+                </div>
+            </div>
+
+            <div id="listView" class="hidden">
+                <div id="listItems"></div>
+                <button onclick="closeList()" class="w-full py-5 bg-green-600 text-white rounded-3xl font-black mt-4 shadow-xl mb-10">العودة للرئيسية</button>
+            </div>
+        </main>
+
+        <div id="settBox" class="settings-overlay p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-xl font-black text-green-500">التحكم بالتطبيق</h3>
+                <button onclick="toggleSettings()" class="text-3xl text-gray-500">&times;</button>
+            </div>
+            <p class="text-xs text-gray-400 mb-4">حجم خط الأذكار:</p>
+            <div class="flex gap-2 bg-gray-800 p-2 rounded-2xl mb-8">
+                <button onclick="setFont(16)" class="flex-1 py-3 rounded-xl hover:bg-green-600 text-sm">صغير</button>
+                <button onclick="setFont(22)" class="flex-1 py-3 bg-green-600 rounded-xl text-sm">متوسط</button>
+                <button onclick="setFont(28)" class="flex-1 py-3 rounded-xl hover:bg-green-600 text-sm">كبير</button>
+            </div>
+        </div>
+
+        <nav class="nav-bottom">
+            <i class="fas fa-home text-green-500 text-xl cursor-pointer" onclick="closeList()"></i>
+            <i class="fas fa-book-open text-gray-600 cursor-pointer" onclick="renderSection('hadith')"></i>
+            <i class="fas fa-sliders-h text-gray-600 cursor-pointer" onclick="toggleSettings()"></i>
+        </nav>
+    </div>
+
+    <script>
+        const AZKAR_DB = {
+            morning: [
+                {t: "آية الكرسي: «اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلا نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ».", c: 1},
+                {t: "سورة الإخلاص: «قُلْ هُوَ اللَّهُ أَحَدٌ * اللَّهُ الصَّمَدُ * لَمْ يَلِدْ وَلَمْ يُولَدْ * وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ».", c: 3},
+                {t: "سورة الفلق: «قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ * مِن شَرِّ مَا خَلَقَ * وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ * وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ * وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ».", c: 3},
+                {t: "سورة الناس: «قُلْ أَعُوذُ بِرَبِّ النَّاسِ * مَلِكِ النَّاسِ * إِلَهِ النَّاسِ * مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ * الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ * مِنَ الْجِنَّةِ وَالنَّاسِ».", c: 3},
+                {t: "«أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ».", c: 1},
+                
+                {t: "سيد الاستغفار: «اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ».", c: 1},
+                
+                {t: "«بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ».", c: 3},
+                {t: "«رَضِيتُ بِاللَّهِ رَبَّاً، وَبِالْإِسْلَامِ دِيناً، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نَبِيّاً».", c: 3},
+                {t: "«اللَّهُمَّ أَنْتَ رَبِّي لا إِلَهَ إِلا أَنْتَ ، عَلَيْكَ تَوَكَّلْتُ ، وَأَنْتَ رَبُّ الْعَرْشِ الْكَرِيمِ ، مَا شَاءَ اللَّهُ كَانَ ، وَمَا لَمْ يَشَأْ لَمْ يَكُنْ ، وَلا حَوْلَ وَلا قُوَّةَ إِلا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ ، أَعْلَمُ أَنَّ اللَّهَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ ، وَأَنَّ اللَّهَ قَدْ أَحَاطَ بِكُلِّ شَيْءٍ عِلْمًا ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي ، وَمِنْ شَرِّ كُلِّ دَابَّةٍ أَنْتَ آخِذٌ بِنَاصِيَتِهَا ، إِنَّ رَبِّي عَلَى صِرَاطٍ مُسْتَقِيمٍ».", c: 1},
+              {t: "«حَسْبِـيَ اللّهُ لا إلهَ إلّا هُوَ عَلَـيهِ تَوَكَّـلتُ وَهُوَ رَبُّ العَرْشِ العَظـيم..", c: 7},
+                {t: "«لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ».", c: 100}
+            ],
+            evening: [
+                                {t: "آية الكرسي: «اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلا نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ».", c: 1},
+              
+           {t: "سورة الإخلاص: «قُلْ هُوَ اللَّهُ أَحَدٌ * اللَّهُ الصَّمَدُ * لَمْ يَلِدْ وَلَمْ يُولَدْ * وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ».", c: 3},
+            {t: "سورة الفلق: «قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ * مِن شَرِّ مَا خَلَقَ * وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ * وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ * وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ».", c: 3},
+              
+         {t: "سورة الناس: «قُلْ أَعُوذُ بِرَبِّ النَّاسِ * مَلِكِ النَّاسِ * إِلَهِ النَّاسِ * مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ * الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ * مِنَ الْجِنَّةِ وَالنَّاسِ».", c: 3},
+     {t: "«أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ، وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ».", c: 1},
+     {t: "سيد الاستغفار: «اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ».", c: 1},
+     
+  {t: "«حَسْبِـيَ اللّهُ لا إلهَ إلّا هُوَ عَلَـيهِ تَوَكَّـلتُ وَهُوَ رَبُّ العَرْشِ العَظـيم..", c: 7},
+      {t: "«بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ».", c: 3},
+       {t: "«اللَّهُمَّ أَنْتَ رَبِّي لا إِلَهَ إِلا أَنْتَ ، عَلَيْكَ تَوَكَّلْتُ ، وَأَنْتَ رَبُّ الْعَرْشِ الْكَرِيمِ ، مَا شَاءَ اللَّهُ كَانَ ، وَمَا لَمْ يَشَأْ لَمْ يَكُنْ ، وَلا حَوْلَ وَلا قُوَّةَ إِلا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ ، أَعْلَمُ أَنَّ اللَّهَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ ، وَأَنَّ اللَّهَ قَدْ أَحَاطَ بِكُلِّ شَيْءٍ عِلْمًا ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي ، وَمِنْ شَرِّ كُلِّ دَابَّةٍ أَنْتَ آخِذٌ بِنَاصِيَتِهَا ، إِنَّ رَبِّي عَلَى صِرَاطٍ مُسْتَقِيمٍ».", c: 1},   
+      {t: "«سُبْحَانَ اللهِ وَبِحَمْدِهِ».", c: 100}
+            ],
+            sleep: [
+                {t: "«بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ».", c: 1},
+                
+                {t: "سورة الملك (المنجية من عذاب القبر).", c: 1},
+                {t: "«اللهم قني عذابك يوم تبعث عبادك».", c: 3}
+            ],
+            hadith: [
+                {t: "قال ﷺ: «خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ»", s: "رواه البخاري"},
+                {t: "قال ﷺ: «كلمتان خفيفتان على اللسان، ثقيلتان في الميزان: سبحان الله وبحمده، سبحان الله العظيم»", s: "متفق عليه"}
+            ]
+        };
+
+        let currentSize = 22;
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('gDate').innerText = now.toLocaleDateString('ar-EG', {day:'numeric', month:'long', year:'numeric'});
+            try {
+                document.getElementById('hDate').innerText = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-uma', {day:'numeric', month:'long', year:'numeric'}).format(now);
+            } catch(e) {
+                document.getElementById('hDate').innerText = "جاري التحميل...";
+            }
+            
+            const hr = now.getHours();
+            const msg = document.getElementById('timeMsg');
+            if(hr < 12) msg.innerText = "صباح مفعم بالذكر والطاعة";
+            else if(hr < 18) msg.innerText = "مساء عامر بذكر الله";
+            else msg.innerText = "ليلة هادئة في حفظ الله";
+        }
+
+        function renderSection(type) {
+            document.getElementById('mainGrid').classList.add('hidden');
+            document.getElementById('listView').classList.remove('hidden');
+            const container = document.getElementById('listItems');
+            container.innerHTML = '';
+            
+            AZKAR_DB[type].forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'zekr-item shadow-lg';
+                div.id = `zekr-${index}`;
+                div.innerHTML = `
+                    <p style="font-size: ${currentSize}px" class="font-bold leading-relaxed mb-6 text-right">${item.t}</p>
+                    <div class="flex justify-between items-center">
+                        <button onclick="share('${item.t.replace(/'/g, "\\'")}')" class="text-gray-400 text-xl w-10 h-10 bg-white/5 rounded-full flex items-center justify-center"><i class="fas fa-share-alt"></i></button>
+                        ${item.c ? `<button onclick="doCount(this, 'zekr-${index}')" class="px-10 py-2 bg-green-500 text-white rounded-2xl font-black text-2xl shadow-lg shadow-green-900/30">${item.c}</button>` : ''}
+                    </div>
+                    ${item.s ? `<p class="text-[10px] text-rose-500 mt-2 font-bold">${item.s}</p>` : ''}
+                `;
+                container.appendChild(div);
+            });
+            window.scrollTo(0,0);
+        }
+
+        function doCount(btn, id) {
+            let n = parseInt(btn.innerText);
+            if(n > 1) { 
+                btn.innerText = n - 1; 
+                if(navigator.vibrate) navigator.vibrate(40);
+            } else {
+                btn.innerText = "✓";
+                btn.classList.replace('bg-green-500', 'bg-gray-700');
+                btn.classList.add('text-gray-400');
+                if(id !== 'none') document.getElementById(id).classList.add('completed');
+                if(navigator.vibrate) navigator.vibrate(100);
+            }
+        }
+
+        function closeList() {
+            document.getElementById('listView').classList.add('hidden');
+            document.getElementById('mainGrid').classList.remove('hidden');
+        }
+
+        function toggleSettings() {
+            document.getElementById('settBox').classList.toggle('show-settings');
+        }
+
+        function setFont(s) {
+            currentSize = s;
+            alert("تم تغيير حجم الخط");
+            toggleSettings();
+        }
+
+        function share(t) {
+            if(navigator.share) {
+                navigator.share({text: t});
+            } else {
+                navigator.clipboard.writeText(t);
+                alert("تم نسخ النص");
+            }
+        }
+function startDigitalClock() {
+    const clockElement = document.getElementById('digitalClock');
+    const amPmElement = document.getElementById('timeAmPm');
+
+    function update() {
+        const now = new Date();
+        let hours = now.getHours();
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'مساءً' : 'صباحاً';
+
+        hours = hours % 12;
+        hours = hours ? hours : 12; // الساعة 0 تصبح 12
+        const strHours = String(hours).padStart(2, '0');
+
+        clockElement.innerText = `${strHours}:${minutes}:${seconds}`;
+        amPmElement.innerText = ampm;
+    }
+
+    update();
+    setInterval(update, 1000);
+}
+
+
+window.addEventListener('load', startDigitalClock);
+
+        function openCounter() {
+            alert("المسبحة قيد التطوير حالياً");
+        }
+    </script>
+</body>
+                  </html>
+  

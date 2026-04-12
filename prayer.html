@@ -10,133 +10,185 @@
     <style>
         body { font-family: 'Cairo', sans-serif; background-color: #064e3b; color: white; margin: 0; padding: 0; }
         .header-gradient { background: linear-gradient(180deg, #134e4a 0%, #064e3b 100%); border-radius: 0 0 40px 40px; }
-        .prayer-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 25px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        .active-prayer { background: #fbbf24; color: #064e3b; transform: scale(1.05); }
-        .info-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
-        .donation-btn { background: linear-gradient(90deg, #ca8a04, #eab308); transition: 0.3s; color: #000; font-weight: 900; }
-        .donation-btn:active { transform: scale(0.95); }
-        #compassCircle { transition: transform 0.2s ease-out; display: inline-block; }
+        /* تحسين شكل الكروت لتطابق الصورة */
+        .prayer-card { background: #f8fafc; color: #1e293b; border-radius: 20px; transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.1); }
+        .active-prayer { background: #fbbf24 !important; color: #064e3b !important; transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .countdown-display { background: rgba(0,0,0,0.4); border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 25px; }
+        .nav-item { transition: 0.3s; opacity: 0.6; }
+        .nav-item.active { opacity: 1; color: #fbbf24; }
     </style>
 </head>
-<body class="pb-24">
-
-    <div class="max-w-[450px] mx-auto min-h-screen">
+<body class="pb-32"> <div class="max-w-[450px] mx-auto min-h-screen">
         
         <header class="header-gradient p-6 text-center shadow-2xl">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-start mb-6">
                 <div class="text-right">
-                    <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">توقيت القاهرة</p>
-                    <p id="currentTime" class="text-sm font-black text-white"></p>
+                    <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">التوقيت الحالي</p>
+                    <p id="currentTime" class="text-md font-black text-white">00:00:00</p>
                 </div>
-                <i class="fas fa-mosque text-3xl text-yellow-500"></i>
+                <i class="fas fa-mosque text-4xl text-yellow-500 drop-shadow-lg"></i>
                 <div class="text-left">
                     <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">الهوية</p>
-                    <p class="text-sm font-black text-white">أبا مالك العقيلي</p>
+                    <p class="text-md font-black text-white">أبا مالك العقيلي</p>
                 </div>
             </div>
 
-            <div class="bg-black/40 rounded-3xl p-4 border border-white/10">
-                <div class="flex flex-col gap-2">
-                    <div class="flex items-center justify-between bg-emerald-900/30 p-2 rounded-xl border border-emerald-500/20">
-                        <span class="text-[10px] text-emerald-300 font-bold">التاريخ الهجري:</span>
-                        <span id="hDateFull" class="text-md font-black text-yellow-500"></span>
-                    </div>
-                    <div class="flex items-center justify-between bg-white/5 p-2 rounded-xl border border-white/5">
-                        <span class="text-[10px] text-gray-400 font-bold">التاريخ الميلادي:</span>
-                        <span id="gDateFull" class="text-md font-black text-white"></span>
-                    </div>
+            <div class="countdown-display p-5 mb-6 shadow-inner">
+                <p id="nextPrayerLabel" class="text-xs text-emerald-300 font-bold mb-2 italic">جاري الحساب...</p>
+                <div id="countdownTimer" class="text-3xl font-black tracking-widest text-white">00 : 00 : 00</div>
+            </div>
+
+            <div class="bg-black/30 rounded-3xl p-4 border border-white/10 flex justify-between items-center text-sm">
+                <div class="text-right">
+                    <p id="hDate" class="text-yellow-500 font-black"></p>
+                    <p id="gDate" class="text-white/60 text-[10px]"></p>
+                </div>
+                <div class="text-left text-[10px] font-bold text-emerald-400 uppercase">
+                    <p>الهجري</p>
+                    <p>الميلادي</p>
                 </div>
             </div>
         </header>
 
-        <main class="px-5 mt-6">
-            <div class="bg-white rounded-[35px] p-6 shadow-2xl mb-8 text-black">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-black text-emerald-800">مواقيت الصلاة</h2>
-                    <span class="text-xs bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold">القاهرة</span>
+        <main class="px-5 mt-8">
+            <div class="bg-white rounded-[40px] p-6 shadow-2xl mb-8">
+                <div class="flex justify-between items-center mb-5 px-2">
+                    <h2 class="text-xl font-black text-emerald-900">مواقيت الصلاة</h2>
+                    <span id="locationTag" class="text-[10px] bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold italic shadow-sm">تحديد تلقائي...</span>
                 </div>
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="prayer-card bg-emerald-50 p-3 text-center rounded-2xl border border-emerald-100">
-                        <p class="text-[10px] text-emerald-600 font-bold">الفجر</p>
-                        <p class="font-black text-lg">04:12</p>
+                
+                <div id="prayerGrid" class="grid grid-cols-3 gap-3">
                     </div>
-                    <div class="prayer-card bg-emerald-50 p-3 text-center rounded-2xl border border-emerald-100 active-prayer shadow-lg">
-                        <p class="text-[10px] font-bold">الظهر</p>
-                        <p class="font-black text-lg">11:58</p>
-                    </div>
-                    <div class="prayer-card bg-emerald-50 p-3 text-center rounded-2xl border border-emerald-100">
-                        <p class="text-[10px] text-emerald-600 font-bold">العصر</p>
-                        <p class="font-black text-lg">03:32</p>
-                    </div>
-                </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4 mb-8">
-                <button onclick="initCompass()" class="bg-emerald-800/50 p-6 rounded-3xl border border-emerald-700 text-center shadow-lg active:scale-95 transition relative">
-                    <div id="compassCircle">
-                        <i class="fas fa-compass text-4xl text-yellow-400 mb-2"></i>
-                    </div>
-                    <p class="font-bold text-sm block">اتجاه القبلة</p>
-                    <p id="dirStatus" class="text-[8px] text-emerald-300 mt-1 italic">اضغط للتفعيل</p>
+                <button onclick="activateCompass()" class="bg-emerald-800/40 p-5 rounded-[30px] border border-emerald-700 text-center active:scale-95 transition">
+                    <i id="compassIcon" class="fas fa-compass text-3xl text-yellow-400 mb-2"></i>
+                    <p class="font-bold text-xs">اتجاه القبلة</p>
                 </button>
 
-                <a href="https://quran.com/ar" target="_blank" class="bg-emerald-800/50 p-6 rounded-3xl border border-emerald-700 text-center shadow-lg active:scale-95 transition">
-                    <i class="fas fa-book-quran text-4xl text-yellow-400 mb-2"></i>
-                    <p class="font-bold text-sm">المصحف الكريم</p>
-                    <p class="text-[8px] text-emerald-300 mt-1 italic">فتح المصحف</p>
+                <a href="https://quran.com/ar" target="_blank" class="bg-emerald-800/40 p-5 rounded-[30px] border border-emerald-700 text-center active:scale-95 transition">
+                    <i class="fas fa-book-quran text-3xl text-yellow-400 mb-2"></i>
+                    <p class="font-bold text-xs">المصحف الكريم</p>
                 </a>
             </div>
-
-            <section class="info-card rounded-[30px] p-6 mb-8 border-t-4 border-yellow-600">
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="bg-yellow-600/20 p-3 rounded-2xl"><i class="fas fa-hand-holding-heart text-2xl text-yellow-500"></i></div>
-                    <div>
-                        <h2 class="text-lg font-black text-white">صدقة جارية</h2>
-                        <p class="text-[10px] text-gray-400">ساهم في بناء بيوت الله</p>
-                    </div>
-                </div>
-                <button class="donation-btn w-full py-4 rounded-2xl shadow-xl flex items-center justify-center gap-2">
-                    <i class="fas fa-heart"></i> تبرع الآن للمسجد
-                </button>
-            </section>
         </main>
 
-        <nav class="fixed bottom-0 left-0 right-0 bg-[#042f2e] p-4 flex justify-around border-t border-white/5 z-50">
-            <a href="index.html" class="flex flex-col items-center gap-1 text-gray-500"><i class="fas fa-home"></i><span class="text-[8px]">الرئيسية</span></a>
-            <div class="flex flex-col items-center gap-1 text-yellow-500"><i class="fas fa-mosque"></i><span class="text-[8px]">المسجد</span></div>
+        <nav class="fixed bottom-0 left-0 right-0 bg-[#042f2e]/95 backdrop-blur-md p-4 flex justify-around border-t border-white/5 z-[100]">
+            <a href="index.html" class="nav-item flex flex-col items-center gap-1">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-[9px] font-bold">الرئيسية</span>
+            </a>
+            <div class="nav-item active flex flex-col items-center gap-1">
+                <i class="fas fa-mosque text-xl"></i>
+                <span class="text-[9px] font-bold">المسجد</span>
+            </div>
         </nav>
     </div>
 
     <script>
-        // تحديث الوقت والتواريخ
-        function updateAllDates() {
-            const now = new Date();
-            document.getElementById('currentTime').innerText = now.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true});
-            document.getElementById('gDateFull').innerText = now.toLocaleDateString('ar-EG', {day:'numeric', month:'long', year:'numeric'});
-            document.getElementById('hDateFull').innerText = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-uma', {day:'numeric', month:'long', year:'numeric'}).format(now);
-        }
-        updateAllDates();
-        setInterval(updateAllDates, 1000);
+        let timings = {};
 
-        // تشغيل البوصلة
-        let isCompassOn = false;
-        function initCompass() {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(state => { if(state === 'granted') startTracking(); });
-            } else { startTracking(); }
+        async function initApp() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async (p) => await getLivePrayers(p.coords.latitude, p.coords.longitude),
+                    async () => {
+                        await getLivePrayers(30.0444, 31.2357);
+                        document.getElementById('locationTag').innerText = "القاهرة (افتراضي)";
+                    }
+                );
+            }
         }
-        function startTracking() {
-            if (isCompassOn) return;
-            window.addEventListener('deviceorientationabsolute', (e) => {
-                let heading = e.alpha || e.webkitCompassHeading;
-                if (heading) {
-                    isCompassOn = true;
-                    document.getElementById('compassCircle').style.transform = `rotate(${-heading}deg)`;
-                    document.getElementById('dirStatus').innerText = "البوصلة تعمل";
+
+        async function getLivePrayers(lat, lon) {
+            try {
+                const res = await fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=5`);
+                const data = await res.json();
+                timings = data.data.timings;
+                
+                renderUI(data.data);
+                startEngine();
+            } catch (e) { console.error("Error fetching data"); }
+        }
+
+        function renderUI(data) {
+            const grid = document.getElementById('prayerGrid');
+            const pList = [
+                {n:'الفجر', t:timings.Fajr, id:'Fajr'},
+                {n:'الشروق', t:timings.Sunrise, id:'Sunrise'},
+                {n:'الظهر', t:timings.Dhuhr, id:'Dhuhr'},
+                {n:'العصر', t:timings.Asr, id:'Asr'},
+                {n:'المغرب', t:timings.Maghrib, id:'Maghrib'},
+                {n:'العشاء', t:timings.Isha, id:'Isha'}
+            ];
+
+            grid.innerHTML = pList.map(p => `
+                <div id="card-${p.id}" class="prayer-card p-4 text-center shadow-sm">
+                    <p class="text-[10px] font-bold text-emerald-600 mb-1">${p.n}</p>
+                    <p class="font-black text-lg">${p.t.substring(0,5)}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('hDate').innerText = `${data.date.hijri.day} ${data.date.hijri.month.ar} ${data.date.hijri.year}`;
+            document.getElementById('gDate').innerText = data.date.gregorian.date;
+        }
+
+        function startEngine() {
+            setInterval(() => {
+                const now = new Date();
+                const prayers = [
+                    {n:'الفجر', t:timings.Fajr, id:'Fajr'},
+                    {n:'الظهر', t:timings.Dhuhr, id:'Dhuhr'},
+                    {n:'العصر', t:timings.Asr, id:'Asr'},
+                    {n:'المغرب', t:timings.Maghrib, id:'Maghrib'},
+                    {n:'العشاء', t:timings.Isha, id:'Isha'}
+                ];
+
+                let next = null;
+                let currentIdx = -1;
+
+                prayers.forEach((p, i) => {
+                    const [h, m] = p.t.split(':');
+                    const d = new Date(); d.setHours(h, m, 0);
+                    if (d > now && !next) next = { ...p, d };
+                    if (now > d) currentIdx = i;
+                });
+
+                // تمييز الكارت النشط
+                document.querySelectorAll('.prayer-card').forEach(c => c.classList.remove('active-prayer'));
+                if (currentIdx !== -1) document.getElementById(`card-${prayers[currentIdx].id}`).classList.add('active-prayer');
+
+                if (!next) {
+                    const [h, m] = prayers[0].t.split(':');
+                    const d = new Date(); d.setDate(d.getDate()+1); d.setHours(h, m, 0);
+                    next = { ...prayers[0], d };
                 }
-            }, true);
+
+                const diff = next.d - now;
+                const hrs = Math.floor(diff / 3600000);
+                const mins = Math.floor((diff % 3600000) / 60000);
+                const secs = Math.floor((diff % 60000) / 1000);
+
+                document.getElementById('nextPrayerLabel').innerText = `باقي على صلاة ${next.n}`;
+                document.getElementById('countdownTimer').innerText = 
+                    `${String(hrs).padStart(2,'0')} : ${String(mins).padStart(2,'0')} : ${String(secs).padStart(2,'0')}`;
+                
+                document.getElementById('currentTime').innerText = now.toLocaleTimeString('ar-EG');
+            }, 1000);
         }
+
+        function activateCompass() {
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientationabsolute', (e) => {
+                    let heading = e.alpha || e.webkitCompassHeading;
+                    document.getElementById('compassIcon').style.transform = `rotate(${-heading}deg)`;
+                }, true);
+            }
+        }
+
+        initApp();
     </script>
 </body>
-                          </html>
-  
+    </html>
+    

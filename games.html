@@ -1,10 +1,9 @@
-     </html> «القائد ابا مالك ))«^€€£            
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مملكة صلاح الدين - الواقعية الكاملة</title>
+    <title>مملكة صلاح الدين - القائد أبا مالك</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -14,97 +13,91 @@
             font-family: 'Cairo', sans-serif; 
             background: url('https://i.ibb.co/pBhzxHdM/1000027317.jpg') no-repeat center center fixed;
             background-size: cover;
+            overflow-x: hidden;
         }
-        .overlay { background: rgba(0, 0, 0, 0.85); min-height: 100 screen; }
-        .knight-img { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 3px solid #eab308; }
-        .resource-card { background: rgba(31, 41, 55, 0.8); backdrop-filter: blur(10px); border: 1px solid #4b5563; }
+        .overlay { background: rgba(0, 0, 0, 0.85); min-height: 100vh; }
+        .resource-card { background: rgba(31, 41, 55, 0.8); backdrop-filter: blur(10px); border: 1px solid #4b5563; transition: 0.3s; }
+        .resource-card:hover { transform: translateY(-5px); border-color: #eab308; }
         .attack-anim { animation: shake 0.5s; }
-        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 100% { transform: translateX(0); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); background: rgba(220, 38, 38, 0.2); } 75% { transform: translateX(10px); } }
     </style>
 </head>
 <body class="text-white">
 
-<div class="overlay p-4 min-h-screen">
+<div class="overlay p-4">
     <audio id="bgMusic" loop>
         <source src="https://www.soundjay.com/free-music/iron-man-1.mp3" type="audio/mpeg">
     </audio>
 
-    <header class="text-center mb-6 animate__animated animate__fadeIn">
-        <h1 class="text-4xl font-black text-yellow-500 mb-2 shadow-lg">مملكة صلاح الدين الأيوبي</h1>
+    <header class="text-center mb-6 animate__animated animate__fadeInDown">
+        <h1 class="text-4xl font-black text-yellow-500 mb-2 drop-shadow-2xl">مملكة صلاح الدين الأيوبي</h1>
         <div class="flex justify-center gap-4 mb-4">
-            <button onclick="toggleMusic()" class="bg-yellow-600 text-black px-4 py-1 rounded-full text-xs font-bold">
-                <i class="fas fa-music"></i> تشغيل/إيقاف الموسيقى
+            <button onclick="toggleMusic()" class="bg-yellow-600 hover:bg-yellow-500 text-black px-6 py-2 rounded-full text-xs font-bold transition">
+                <i class="fas fa-music"></i> الموسيقى الملكية
             </button>
         </div>
-        <p id="rankDisplay" class="text-blue-400 font-bold tracking-widest">القائد العسكري: أبا مالك</p>
+        <p id="rankDisplay" class="text-blue-400 font-bold tracking-widest text-lg">القائد العسكري: أبا مالك</p>
     </header>
 
     <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div class="resource-card p-4 rounded-2xl text-center">
             <img src="https://img.icons8.com/color/48/gold-bars.png" class="mx-auto mb-2">
             <div id="goldCount" class="text-2xl font-bold">100</div>
-            <span class="text-xs text-yellow-500">خزينة الذهب</span>
+            <span class="text-xs text-yellow-500 font-bold">خزينة الذهب</span>
         </div>
         <div class="resource-card p-4 rounded-2xl text-center">
             <img src="https://img.icons8.com/color/48/wood-log.png" class="mx-auto mb-2">
             <div id="woodCount" class="text-2xl font-bold">100</div>
-            <span class="text-xs text-amber-500">مخزن الخشب</span>
+            <span class="text-xs text-amber-500 font-bold">مخزن الخشب</span>
         </div>
         <div class="resource-card p-4 rounded-2xl text-center">
             <img src="https://img.icons8.com/color/48/crusader.png" class="mx-auto mb-2">
             <div id="armyCount" class="text-2xl font-bold">0</div>
-            <span class="text-xs text-red-500">الجيش النظامي</span>
+            <span class="text-xs text-red-500 font-bold">الجيش النظامي</span>
         </div>
         <div class="resource-card p-4 rounded-2xl text-center">
             <img src="https://img.icons8.com/color/48/castle.png" class="mx-auto mb-2">
             <div id="castleCount" class="text-2xl font-bold">0</div>
-            <span class="text-xs text-blue-500">القلاع المشيدة</span>
+            <span class="text-xs text-blue-500 font-bold">القلاع المشيدة</span>
         </div>
     </section>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-gray-800/60 p-6 rounded-3xl border-2 border-yellow-700">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-hammer"></i> العمليات والإنتاج</h2>
+        <div class="bg-gray-800/60 p-6 rounded-3xl border-2 border-yellow-700 shadow-xl">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-hammer text-yellow-500"></i> الإنتاج اليومي</h2>
             <div class="grid grid-cols-2 gap-4">
-                <button onclick="produce('gold')" class="bg-yellow-600 hover:bg-yellow-500 p-4 rounded-xl font-bold text-black shadow-xl transition active:scale-95">
-                    <i class="fas fa-coins text-2xl mb-1"></i><br>سك الذهب
+                <button onclick="produce('gold')" class="bg-yellow-600 hover:bg-yellow-500 p-6 rounded-2xl font-bold text-black shadow-lg transition active:scale-90">
+                    <i class="fas fa-coins text-3xl mb-2"></i><br>سك الذهب
                 </button>
-                <button onclick="produce('wood')" class="bg-amber-800 hover:bg-amber-700 p-4 rounded-xl font-bold text-white shadow-xl transition active:scale-95">
-                    <i class="fas fa-tree text-2xl mb-1"></i><br>جمع الخشب
+                <button onclick="produce('wood')" class="bg-amber-800 hover:bg-amber-700 p-6 rounded-2xl font-bold text-white shadow-lg transition active:scale-90">
+                    <i class="fas fa-tree text-3xl mb-2"></i><br>جمع الخشب
                 </button>
             </div>
         </div>
 
-        <div class="bg-gray-800/60 p-6 rounded-3xl border-2 border-red-900">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-fist-raised"></i> التجنيد (الواقعي)</h2>
+        <div class="bg-gray-800/60 p-6 rounded-3xl border-2 border-red-900 shadow-xl">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-fist-raised text-red-500"></i> التجهيزات العسكرية</h2>
             <div class="space-y-4">
-                <button onclick="buyUnit('army')" class="w-full bg-red-700 hover:bg-red-600 p-4 rounded-xl font-bold flex justify-between items-center px-8 border-b-4 border-red-950">
-                    <div class="flex items-center gap-3">
-                        <img src="https://img.icons8.com/color/48/swordsman.png" width="30">
-                        <span>تدريب محارب</span>
-                    </div>
-                    <span>💰 50</span>
+                <button onclick="buyUnit('army')" class="w-full bg-red-700 hover:bg-red-600 p-4 rounded-2xl font-bold flex justify-between items-center px-8 border-b-4 border-red-950 transition active:scale-95">
+                    <div class="flex items-center gap-3"><i class="fas fa-user-shield text-xl"></i><span>تدريب محارب</span></div>
+                    <span class="bg-black/30 px-3 py-1 rounded-lg">💰 50</span>
                 </button>
-                <button onclick="buyUnit('castle')" class="w-full bg-blue-700 hover:bg-blue-600 p-4 rounded-xl font-bold flex justify-between items-center px-8 border-b-4 border-blue-950">
-                    <div class="flex items-center gap-3">
-                        <img src="https://img.icons8.com/color/48/fortress.png" width="30">
-                        <span>بناء قلعة</span>
-                    </div>
-                    <span>💰 200 | 🌲 200</span>
+                <button onclick="buyUnit('castle')" class="w-full bg-blue-700 hover:bg-blue-600 p-4 rounded-2xl font-bold flex justify-between items-center px-8 border-b-4 border-blue-950 transition active:scale-95">
+                    <div class="flex items-center gap-3"><i class="fas fa-fortress text-xl"></i><span>بناء قلعة</span></div>
+                    <span class="bg-black/30 px-3 py-1 rounded-lg text-xs font-light tracking-tighter text-blue-200 uppercase tracking-widest">💰 200 | 🌲 200</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <div class="mt-8 bg-black/40 p-6 rounded-3xl">
-        <h3 class="text-center font-bold text-yellow-500 mb-4">استعراض القوات العسكرية</h3>
-        <div id="armyVisuals" class="flex flex-wrap justify-center gap-2">
-            </div>
+    <div class="mt-8 bg-black/40 p-6 rounded-3xl border border-white/5">
+        <h3 class="text-center font-bold text-yellow-500 mb-4 tracking-widest uppercase text-sm italic">تشكيلات الجيش في الميدان</h3>
+        <div id="armyVisuals" class="flex flex-wrap justify-center gap-2 min-h-[50px]"></div>
     </div>
 
-    <footer class="text-center mt-10">
-        <a href="index.html" class="inline-block bg-white text-black px-12 py-3 rounded-2xl font-black shadow-2xl hover:bg-yellow-500">
-            العودة للديوان
+    <footer class="text-center mt-10 pb-10">
+        <a href="index.html" class="inline-block bg-white text-black px-12 py-3 rounded-2xl font-black shadow-2xl hover:bg-yellow-500 transition active:scale-90">
+            العودة للديوان العام
         </a>
     </footer>
 </div>
@@ -113,14 +106,26 @@
     let gold = 100; let wood = 100; let army = 0; let castles = 0;
     const music = document.getElementById('bgMusic');
 
+    // تحميل البيانات المحفوظة
+    window.onload = () => {
+        const savedData = JSON.parse(localStorage.getItem('saladin_save'));
+        if (savedData) {
+            gold = savedData.gold; wood = savedData.wood; 
+            army = savedData.army; castles = savedData.castles;
+            for(let i=0; i<army; i++) addSoldierIcon();
+            update();
+        }
+        scheduleAttack();
+    };
+
     function toggleMusic() {
-        if (music.paused) music.play();
+        if (music.paused) music.play().catch(e => console.log("تطلب المتصفحات تفاعلاً لتشغيل الصوت"));
         else music.pause();
     }
 
     function produce(type) {
         if (type === 'gold') gold += 10;
-        else wood += 10;
+        else wood += 15;
         playEffect('https://www.soundjay.com/buttons/button-37.mp3');
         update();
     }
@@ -132,22 +137,71 @@
             playEffect('https://www.soundjay.com/mechanical/iron-gate-close-1.mp3');
         } else if (type === 'castle' && gold >= 200 && wood >= 200) {
             gold -= 200; wood -= 200; castles++;
+            playEffect('https://www.soundjay.com/mechanical/door-bolt-1.mp3');
         } else {
+            triggerShake();
             alert("الموارد غير كافية يا سيدي القائد!");
+            return;
         }
         update();
+    }
+
+    function triggerShake() {
+        document.body.classList.add('attack-anim');
+        setTimeout(() => document.body.classList.remove('attack-anim'), 500);
     }
 
     function addSoldierIcon() {
         const div = document.getElementById('armyVisuals');
         const img = document.createElement('img');
         img.src = "https://img.icons8.com/color/96/knight.png";
-        img.className = "w-12 h-12 animate__animated animate__zoomIn";
+        img.className = "w-8 h-8 md:w-10 md:h-10 animate__animated animate__zoomIn";
         div.appendChild(img);
     }
 
+    function scheduleAttack() {
+        const time = Math.random() * (60000 - 30000) + 30000;
+        setTimeout(() => { launchAttack(); }, time);
+    }
+
+    function launchAttack() {
+        if (army === 0 && castles === 0) { scheduleAttack(); return; }
+        
+        const enemyPower = Math.floor(Math.random() * (castles + 5)) + 1;
+        triggerShake();
+        playEffect('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
+
+        setTimeout(() => {
+            if (confirm(`⚠️ تحذير! هجوم من قطاع الطرق بقوة ${enemyPower}!\nهل تقبل المواجهة بجيشك؟`)) {
+                if (army >= enemyPower) {
+                    const winGold = enemyPower * 20;
+                    gold += winGold; army -= Math.floor(enemyPower/2);
+                    alert(`✅ نصر مؤزر! غنمنا ${winGold} ذهبة. خسرنا ${Math.floor(enemyPower/2)} جندياً.`);
+                    refreshArmyIcons();
+                } else {
+                    gold = Math.max(0, gold - 100); army = 0;
+                    alert("❌ هزيمة قاسية! نُهبت الخزينة وقُضي على الجيش.");
+                    refreshArmyIcons();
+                }
+            } else {
+                gold = Math.max(0, gold - 50);
+                alert("دفعنا 50 ذهبة كجزية لتجنب القتال.");
+            }
+            update();
+            scheduleAttack();
+        }, 500);
+    }
+
+    function refreshArmyIcons() {
+        const div = document.getElementById('armyVisuals');
+        div.innerHTML = '';
+        for(let i=0; i<army; i++) addSoldierIcon();
+    }
+
     function playEffect(url) {
-        new Audio(url).play();
+        const audio = new Audio(url);
+        audio.volume = 0.4;
+        audio.play();
     }
 
     function update() {
@@ -155,8 +209,18 @@
         document.getElementById('woodCount').innerText = wood;
         document.getElementById('armyCount').innerText = army;
         document.getElementById('castleCount').innerText = castles;
+        
+        // تحديث الرتبة
+        const rank = document.getElementById('rankDisplay');
+        if (castles >= 10) rank.innerText = "رتبة العرش: السلطان أبا مالك الفاتح";
+        else if (castles >= 5) rank.innerText = "رتبة العرش: الأمير أبا مالك";
+        else if (army >= 20) rank.innerText = "رتبة العرش: القائد الأعلى أبا مالك";
+        
+        // حفظ البيانات
+        localStorage.setItem('saladin_save', JSON.stringify({gold, wood, army, castles}));
     }
 </script>
 
 </body>
-</html>
+                 </html>
+                 

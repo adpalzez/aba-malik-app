@@ -118,6 +118,17 @@
         </div>
     </div>
 
+    <div id="wisdomModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate__animated animate__fadeIn">
+        <div class="glass p-8 max-w-sm w-full text-center border-2 border-yellow-500/50 relative">
+            <button onclick="closeWisdom()" class="absolute top-4 left-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+            <i class="fas fa-quote-right text-yellow-500 text-3xl mb-4"></i>
+            <div id="wisdomText" class="text-2xl font-black leading-relaxed text-white mb-6 animate__animated animate__pulse"></div>
+            <button onclick="closeWisdom()" class="bg-yellow-600 text-black px-8 py-2 rounded-full font-bold text-sm shadow-lg active:scale-95 transition">اعتززت بهذه الحكمة</button>
+        </div>
+    </div>
+
     <footer class="relative z-10 w-full text-center pb-8 animate__animated animate__fadeIn">
         <div class="glass inline-block px-6 py-2">
             <p class="text-[10px] md:text-xs text-gray-300 font-bold tracking-widest leading-relaxed">
@@ -131,17 +142,33 @@
         const siteUrl = "https://adpalzez.github.io/my-web-portfolio/"; 
         const shareText = "السلام عليكم، أدعوك لزيارة تطبيق أبا مالك العقيلي: ";
 
-        // قائمة الحِكم المحدثة
-        const wisdoms = [
+        // الحكم الفرعية
+        const subWisdoms = [
             "من استشار، شارك الناس في عقولهم.",
             "العدل أساس الملك.",
             "القائد الناجح هو من يصنع قادة، لا أتباعاً.",
             "العلم في الصغر كالنقش في الحجر."
         ];
+        // الحكمة الأساسية
+        const mainWisdom = "كُنْ مَاهِراً لِيَحْتَاجَكَ النَّاس، وَكُنْ هَيِّناً لِيُحِبَّكَ النَّاس.";
 
         function showWisdom() {
-            const randomIndex = Math.floor(Math.random() * wisdoms.length);
-            alert("حكمة القائد: " + wisdoms[randomIndex]);
+            const modal = document.getElementById('wisdomModal');
+            const textZone = document.getElementById('wisdomText');
+            
+            // احتمال 70% تظهر الحكمة الأساسية كقاعدة صلبة للتطبيق
+            const isMain = Math.random() > 0.3;
+            const selectedText = isMain ? mainWisdom : subWisdoms[Math.floor(Math.random() * subWisdoms.length)];
+            
+            textZone.innerHTML = selectedText;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeWisdom() {
+            const modal = document.getElementById('wisdomModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         }
 
         function shareToWhatsApp() {
@@ -182,5 +209,4 @@
         }
     </script>
 </body>
-        </html>
-    
+</html>

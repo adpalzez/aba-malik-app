@@ -44,7 +44,7 @@ An integrated web application that combines spiritual, entertainment, and profes
 
 ## 👨‍💻 المطور | The Developer
 **أبا مالك العقيلي (Abdulaziz Hussein)**
-- 🏗️ مشرف تركيبات حديد تسليح (Steel Fixer Supervisor) بخبرة 14 عاماً.
+- 🏗️ مشرف  بخبرة 14 عاماً.
 - 💻 مهتم بتطوير الويب وبناء الأدوات الرقمية المفيدة.
 
 ---

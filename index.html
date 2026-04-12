@@ -27,13 +27,14 @@
         .dollar-btn { background-color: #22c55e; color: #fff; }
         .gold-btn { background-color: #f1d592; color: #000; }
         .mosque-btn { background: linear-gradient(90deg, #064e3b, #065f46); color: #fff; }
-        .games-btn { background: linear-gradient(to r, #b45309, #78350f); border: 1px solid #f59e0b; color: white; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+        .games-btn { background: linear-gradient(to r, #064e3b, #065f46); border: 1px solid #10b981; color: white; }
+        .gallery-btn { background: linear-gradient(to r, #78350f, #b45309); border: 1px solid #d97706; color: white; }
+        .wisdom-btn { background: linear-gradient(to r, #4c1d95, #312e81); border: 1px solid #a78bfa; color: white; }
         .install-btn { background: linear-gradient(135deg, #6366f1, #4338ca); color: #fff; display: none; }
-        .fb-btn { background-color: #1877f2; color: #fff; }
         .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
     </style>
 </head>
-<body class="bg-black text-white min-h-screen bg-image">
+<body class="bg-black text-white min-h-screen bg-image flex flex-col items-center">
 
     <button id="themeToggle" class="theme-toggle glass">
         <i id="themeIcon" class="fas fa-sun text-yellow-400 text-xl"></i>
@@ -45,7 +46,7 @@
         <h1 class="text-2xl font-black tracking-widest uppercase animate__animated animate__fadeInDown">ABA MALIK AL-AQILI</h1>
     </nav>
 
-    <div class="relative z-10 container mx-auto px-6 py-4 flex flex-col items-center">
+    <div class="relative z-10 container mx-auto px-6 py-4 flex flex-col items-center flex-grow">
         <div class="glass p-8 w-full max-w-md text-center shadow-2xl mb-12 animate__animated animate__zoomIn">
             <h2 class="text-5xl font-black mb-1">أبا مالك</h2>
             <h3 class="text-2xl font-bold text-blue-400 mb-8">العقيلي</h3>
@@ -55,11 +56,18 @@
                     <span>ركن المسجد والمواقيت</span>
                     <i class="fas fa-mosque text-yellow-400 text-xl"></i>
                 </a>
-
                 <a href="azkar.html" class="bg-emerald-900/80 border border-emerald-500/30 w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95 text-white">
                     <span>موسوعة أذكار أبا مالك</span>
                     <i class="fas fa-book-reader text-yellow-400 text-xl"></i>
                 </a>
+                <a href="gallery.html" class="gallery-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95 border border-orange-400/30">
+                    <span>معرض الأعمال الإبداعية</span>
+                    <i class="fas fa-microchip text-yellow-500 text-xl"></i>
+                </a>
+                <button onclick="showWisdom()" class="wisdom-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95">
+                    <span>حكمة اليوم</span>
+                    <i class="fas fa-lightbulb text-yellow-400 text-xl"></i>
+                </button>
             </div>
             
             <div class="grid grid-cols-1 gap-4 mb-8">
@@ -74,9 +82,8 @@
             </div>
 
             <div class="mb-8">
-                <a href="games.html" class="games-btn w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-bold text-sm shadow-xl transition active:scale-95 animate__animated animate__pulse animate__infinite">
-                    <i class="fas fa-chess-rook text-xl"></i> 
-                    دخول مملكة صلاح الدين
+                <a href="games.html" class="games-btn w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-bold text-sm shadow-xl transition active:scale-95">
+                    <i class="fas fa-chess-rook text-xl"></i> دخول مملكة صلاح الدين
                 </a>
             </div>
 
@@ -105,46 +112,45 @@
                 <i class="fas fa-download"></i> تثبيت التطبيق
             </button>
 
-            <a href="https://www.facebook.com/share/1NhmGTxvxJ/" target="_blank" rel="noopener" class="fb-btn w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-lg transition active:scale-95 text-white">
+            <a href="https://www.facebook.com/share/1NhmGTxvxJ/" target="_blank" rel="noopener" class="fb-btn w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-lg transition active:scale-95 text-white bg-blue-600">
                 <i class="fab fa-facebook-f"></i> حساب فيسبوك
             </a>
         </div>
-
-        <div id="gallery" class="w-full max-w-6xl pb-20">
-            <div class="text-center mb-10">
-                <div class="inline-block px-8 py-3 rounded-full border border-white/20 bg-black/40 backdrop-blur-md">
-                    <h3 class="text-2xl font-bold text-blue-400">معرض الأعمال الإبداعية</h3>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="glass p-2 hover:scale-105 transition-transform duration-300">
-                    <img src="https://i.ibb.co/Mytpm3Vx/image.jpg" class="w-full h-72 object-cover rounded-[30px]">
-                    <p class="text-center py-3 text-xs font-bold text-yellow-500">دائرة تحويل 12 فولت إلى 220 فولت</p>
-                </div>
-                <div class="glass p-2 hover:scale-105 transition-transform duration-300">
-                    <img src="https://i.ibb.co/tMLx6586/image.jpg" class="w-full h-72 object-cover rounded-[30px]">
-                    <p class="text-center py-3 text-xs font-bold text-blue-400">مخطط هندسي لدائرة تيار مستمر</p>
-                </div>
-                <div class="glass p-2 hover:scale-105 transition-transform duration-300">
-                    <img src="https://i.ibb.co/PZGLZQn2/image.jpg" class="w-full h-72 object-cover rounded-[30px]">
-                    <p class="text-center py-3 text-xs font-bold text-emerald-400">تصاميم ومونتاج أبا مالك</p>
-                </div>
-            </div>
-        </div>
     </div>
+
+    <footer class="relative z-10 w-full text-center pb-8 animate__animated animate__fadeIn">
+        <div class="glass inline-block px-6 py-2">
+            <p class="text-[10px] md:text-xs text-gray-300 font-bold tracking-widest leading-relaxed">
+                جميع الحقوق محفوظة © ٢٠٢٦ | صُمم بواسطة 
+                <span class="text-blue-400">عبد العزيز حسين عبد العزيز علي</span>
+            </p>
+        </div>
+    </footer>
 
     <script>
         const siteUrl = "https://adpalzez.github.io/my-web-portfolio/"; 
-        const shareText = "السلام عليكم، أدعوك لزيارة تطبيق أبا مالك العقيلي (ركن المسجد ومملكة صلاح الدين): ";
+        const shareText = "السلام عليكم، أدعوك لزيارة تطبيق أبا مالك العقيلي: ";
+
+        // قائمة الحِكم المحدثة
+        const wisdoms = [
+            "من استشار، شارك الناس في عقولهم.",
+            "العدل أساس الملك.",
+            "القائد الناجح هو من يصنع قادة، لا أتباعاً.",
+            "العلم في الصغر كالنقش في الحجر."
+        ];
+
+        function showWisdom() {
+            const randomIndex = Math.floor(Math.random() * wisdoms.length);
+            alert("حكمة القائد: " + wisdoms[randomIndex]);
+        }
 
         function shareToWhatsApp() {
-            const url = `https://wa.me/?text=${encodeURIComponent(shareText + siteUrl)}`;
-            window.open(url, '_blank');
+            window.open(`https://wa.me/?text=${encodeURIComponent(shareText + siteUrl)}`, '_blank');
         }
 
         function copySiteLink() {
             navigator.clipboard.writeText(siteUrl).then(() => {
-                alert("تم نسخ رابط الموقع بنجاح يا سيدي القائد!");
+                alert("تم نسخ رابط الموقع بنجاح!");
             });
         }
 
@@ -156,7 +162,6 @@
         installBtn.addEventListener('click', async () => {
             if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; }
         });
-        window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
 
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
@@ -167,17 +172,15 @@
         });
         function enableLightMode() {
             body.classList.add('light-mode');
-            themeIcon.classList.replace('fa-sun', 'fa-moon');
-            themeIcon.classList.replace('text-yellow-400', 'text-gray-600');
+            themeIcon.classList.replace('fa-sun', 'fa-moon'); themeIcon.classList.replace('text-yellow-400', 'text-gray-600');
             localStorage.setItem('theme', 'light');
         }
         function disableLightMode() {
             body.classList.remove('light-mode');
-            themeIcon.classList.replace('fa-moon', 'fa-sun');
-            themeIcon.classList.replace('text-gray-600', 'text-yellow-400');
+            themeIcon.classList.replace('fa-moon', 'fa-sun'); themeIcon.classList.replace('text-gray-600', 'text-yellow-400');
             localStorage.setItem('theme', 'dark');
         }
     </script>
 </body>
-                        </html>
-                    
+        </html>
+    

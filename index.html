@@ -12,6 +12,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
@@ -41,11 +42,11 @@
     <div class="fixed inset-0 bg-black/30 z-0"></div>
 
     <nav class="p-6 relative z-50 text-center">
-        <h1 class="text-2xl font-black tracking-widest uppercase">ABA MALIK AL-AQILI</h1>
+        <h1 class="text-2xl font-black tracking-widest uppercase animate__animated animate__fadeInDown">ABA MALIK AL-AQILI</h1>
     </nav>
 
     <div class="relative z-10 container mx-auto px-6 py-4 flex flex-col items-center">
-        <div class="glass p-8 w-full max-w-md text-center shadow-2xl mb-12">
+        <div class="glass p-8 w-full max-w-md text-center shadow-2xl mb-12 animate__animated animate__zoomIn">
             <h2 class="text-5xl font-black mb-1">أبا مالك</h2>
             <h3 class="text-2xl font-bold text-blue-400 mb-8">العقيلي</h3>
             
@@ -88,6 +89,18 @@
                 </a>
             </div>
 
+            <div class="flex flex-col items-center gap-4 py-6 border-t border-white/10 mt-4">
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">شارك التطبيق مع أحبابك</p>
+                <div class="flex gap-4">
+                    <button onclick="shareToWhatsApp()" class="bg-green-600 hover:bg-green-500 p-4 rounded-full shadow-lg transition active:scale-90 flex items-center justify-center w-14 h-14">
+                        <i class="fab fa-whatsapp text-2xl text-white"></i>
+                    </button>
+                    <button onclick="copySiteLink()" class="bg-blue-600 hover:bg-blue-500 p-4 rounded-full shadow-lg transition active:scale-90 flex items-center justify-center w-14 h-14">
+                        <i class="fas fa-link text-2xl text-white"></i>
+                    </button>
+                </div>
+            </div>
+
             <button id="installBtn" class="install-btn w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm shadow-xl mb-6 transition active:scale-95">
                 <i class="fas fa-download"></i> تثبيت التطبيق
             </button>
@@ -98,7 +111,11 @@
         </div>
 
         <div id="gallery" class="w-full max-w-6xl pb-20">
-            <div class="text-center mb-10"><div class="inline-block px-8 py-3 rounded-full border border-white/20 bg-black/40 backdrop-blur-md"><h3 class="text-2xl font-bold text-blue-400">معرض الأعمال الإبداعية</h3></div></div>
+            <div class="text-center mb-10">
+                <div class="inline-block px-8 py-3 rounded-full border border-white/20 bg-black/40 backdrop-blur-md">
+                    <h3 class="text-2xl font-bold text-blue-400">معرض الأعمال الإبداعية</h3>
+                </div>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div class="glass p-2 hover:scale-105 transition-transform duration-300"><img src="https://i.ibb.co/Mytpm3Vx/image.jpg" class="w-full h-72 object-cover rounded-[30px]"></div>
                 <div class="glass p-2 hover:scale-105 transition-transform duration-300"><img src="https://i.ibb.co/tMLx6586/image.jpg" class="w-full h-72 object-cover rounded-[30px]"></div>
@@ -108,6 +125,22 @@
     </div>
 
     <script>
+        // --- أكواد الروابط والمشاركة ---
+        const siteUrl = "https://adpalzez.github.io/my-web-portfolio/"; 
+        const shareText = "السلام عليكم، أدعوك لزيارة تطبيق أبا مالك العقيلي (ركن المسجد ومملكة صلاح الدين): ";
+
+        function shareToWhatsApp() {
+            const url = `https://wa.me/?text=${encodeURIComponent(shareText + siteUrl)}`;
+            window.open(url, '_blank');
+        }
+
+        function copySiteLink() {
+            navigator.clipboard.writeText(siteUrl).then(() => {
+                alert("تم نسخ رابط الموقع بنجاح يا سيدي القائد!");
+            });
+        }
+
+        // --- نظام التثبيت PWA ---
         let deferredPrompt;
         const installBtn = document.getElementById('installBtn');
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -118,6 +151,7 @@
         });
         window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
 
+        // --- نظام الثيم (ليلي/نهاري) ---
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
         const body = document.body;
@@ -139,34 +173,4 @@
         }
     </script>
 </body>
-                    </html>
-                 <div class="flex flex-col items-center gap-4 mt-8 animate__animated animate__fadeInUp">
-    <p class="text-xs text-gray-400">شارك الخير مع أحبابك</p>
-    
-    <div class="flex gap-4">
-        <button onclick="shareToWhatsApp()" class="bg-green-600 hover:bg-green-500 p-3 rounded-full shadow-lg transition active:scale-90">
-            <i class="fab fa-whatsapp text-2xl text-white"></i>
-        </button>
-
-        <button onclick="copySiteLink()" class="bg-blue-600 hover:bg-blue-500 p-3 rounded-full shadow-lg transition active:scale-90">
-            <i class="fas fa-link text-2xl text-white"></i>
-        </button>
-    </div>
-</div>
-
-<script>
-    const siteUrl = "https://adpalzez.github.io/my-web-portfolio/"; // رابط موقعك من إعدادات GitHub
-    const shareText = "السلام عليكم، أدعوك لزيارة تطبيق أبا مالك العقيلي (ركن المسجد ومملكة صلاح الدين): ";
-
-    function shareToWhatsApp() {
-        const url = `https://wa.me/?text=${encodeURIComponent(shareText + siteUrl)}`;
-        window.open(url, '_blank');
-    }
-
-    function copySiteLink() {
-        navigator.clipboard.writeText(siteUrl).then(() => {
-            alert("تم نسخ رابط الموقع بنجاح يا سيدي القائد!");
-        });
-    }
-</script>
-
+</html>

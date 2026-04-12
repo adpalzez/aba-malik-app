@@ -223,4 +223,66 @@
 
 </body>
                  </html>
-                 
+              <div class="glass p-6 mb-8 border-t-4 border-red-600 animate__animated animate__fadeIn">
+    <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-black text-white">غرفة عمليات القائد</h3>
+        <span class="bg-red-600 text-xs px-3 py-1 rounded-full animate-pulse">حالة الحرب: نشطة</span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+        <div class="bg-black/40 p-4 rounded-3xl border border-white/5">
+            <p class="text-[10px] text-gray-400 uppercase">قوة الجيش</p>
+            <p id="armyPower" class="text-3xl font-black text-red-500">150</p>
+        </div>
+        <div class="bg-black/40 p-4 rounded-3xl border border-white/5">
+            <p class="text-[10px] text-gray-400 uppercase">مستوى الهيبة</p>
+            <p id="prestige" class="text-3xl font-black text-purple-500">1</p>
+        </div>
+    </div>
+</div>
+
+<div class="space-y-4">
+    <button onclick="trainElite()" class="w-full bg-gradient-to-r from-blue-900 to-blue-700 p-5 rounded-2xl font-bold flex justify-between items-center hover:brightness-125 transition">
+        <span>تدريب فرقة نُخبة</span>
+        <i class="fas fa-shield-alt text-xl"></i>
+    </button>
+
+    <button id="attackBtn" onclick="executeAttack()" class="w-full bg-gradient-to-r from-red-900 to-red-600 p-6 rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(220,38,38,0.5)] flex justify-center items-center gap-3 active:scale-95 transition">
+        <i class="fas fa-fire"></i>
+        شن هجوم كاسح
+    </button>
+</div>
+
+<script>
+    let power = 150;
+    let prestige = 1;
+
+    function trainElite() {
+        // إضافة منطق خصم الموارد هنا (ذهب/خشب)
+        power += 50;
+        document.getElementById('armyPower').innerText = power;
+        showToast("تم تدريب فرقة جديدة يا أبا مالك!");
+    }
+
+    function executeAttack() {
+        const btn = document.getElementById('attackBtn');
+        btn.disabled = true;
+        btn.innerHTML = "جاري القتال...";
+        
+        setTimeout(() => {
+            let win = Math.random() > 0.4;
+            if(win) {
+                prestige++;
+                document.getElementById('prestige').innerText = prestige;
+                alert("نصر ساحق! ارتفعت هيبة مملكتك في الأصقاع.");
+            } else {
+                power = Math.max(0, power - 30);
+                document.getElementById('armyPower').innerText = power;
+                alert("انسحاب تكتيكي.. أعد ترتيب الصفوف.");
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-fire"></i> شن هجوم كاسح';
+        }, 1500);
+    }
+</script>
+

@@ -56,3 +56,17 @@ An integrated web application that combines spiritual, entertainment, and profes
 ## ⭐ دعم المشروع
 إذا وجدت هذا العمل مفيداً، لا تنسَ الضغط على زر **Star** في الأعلى لدعم التطوير المستمر!
 ---
+---
+
+## ⭐ ادعم المشروع (Stars)
+إذا وجدت هذا التطبيق مفيداً في حياتك اليومية أو العملية، يمكنك التعبير عن تقديرك من خلال:
+1. الضغط على زر **Star** في أعلى الصفحة.
+2. مشاركة الرابط مع الزملاء والأصدقاء.
+
+> "كل نجمة تضعها هي دافع لنا لتطوير ركن المسجد ومملكة صلاح الدين بشكل أفضل."
+
+---
+
+## 📊 حالة المشروع
+![GitHub stars](https://img.shields.io/github/stars/adpalzez/my-web-portfolio?style=social)
+![GitHub activity](https://img.shields.io/github/last-commit/adpalzez/my-web-portfolio)

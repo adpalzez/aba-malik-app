@@ -27,7 +27,7 @@
         .dollar-btn { background-color: #22c55e; color: #fff; }
         .gold-btn { background-color: #f1d592; color: #000; }
         .mosque-btn { background: linear-gradient(90deg, #064e3b, #065f46); color: #fff; }
-        .games-btn { background: linear-gradient(to r, #b45309, #78350f); border: 1px solid #f59e0b; color: white; }
+        .games-btn { background: linear-gradient(to r, #b45309, #78350f); border: 1px solid #f59e0b; color: white; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
         .install-btn { background: linear-gradient(135deg, #6366f1, #4338ca); color: #fff; display: none; }
         .fb-btn { background-color: #1877f2; color: #fff; }
         .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
@@ -74,7 +74,7 @@
             </div>
 
             <div class="mb-8">
-                <a href="games.html" class="games-btn w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-bold text-sm shadow-xl transition active:scale-95">
+                <a href="games.html" class="games-btn w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-bold text-sm shadow-xl transition active:scale-95 animate__animated animate__pulse animate__infinite">
                     <i class="fas fa-chess-rook text-xl"></i> 
                     دخول مملكة صلاح الدين
                 </a>
@@ -117,15 +117,23 @@
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="glass p-2 hover:scale-105 transition-transform duration-300"><img src="https://i.ibb.co/Mytpm3Vx/image.jpg" class="w-full h-72 object-cover rounded-[30px]"></div>
-                <div class="glass p-2 hover:scale-105 transition-transform duration-300"><img src="https://i.ibb.co/tMLx6586/image.jpg" class="w-full h-72 object-cover rounded-[30px]"></div>
-                <div class="glass p-2 hover:scale-105 transition-transform duration-300"><img src="https://i.ibb.co/PZGLZQn2/image.jpg" class="w-full h-72 object-cover rounded-[30px]"></div>
+                <div class="glass p-2 hover:scale-105 transition-transform duration-300">
+                    <img src="https://i.ibb.co/Mytpm3Vx/image.jpg" class="w-full h-72 object-cover rounded-[30px]">
+                    <p class="text-center py-3 text-xs font-bold text-yellow-500">دائرة تحويل 12 فولت إلى 220 فولت</p>
+                </div>
+                <div class="glass p-2 hover:scale-105 transition-transform duration-300">
+                    <img src="https://i.ibb.co/tMLx6586/image.jpg" class="w-full h-72 object-cover rounded-[30px]">
+                    <p class="text-center py-3 text-xs font-bold text-blue-400">مخطط هندسي لدائرة تيار مستمر</p>
+                </div>
+                <div class="glass p-2 hover:scale-105 transition-transform duration-300">
+                    <img src="https://i.ibb.co/PZGLZQn2/image.jpg" class="w-full h-72 object-cover rounded-[30px]">
+                    <p class="text-center py-3 text-xs font-bold text-emerald-400">تصاميم ومونتاج أبا مالك</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- أكواد الروابط والمشاركة ---
         const siteUrl = "https://adpalzez.github.io/my-web-portfolio/"; 
         const shareText = "السلام عليكم، أدعوك لزيارة تطبيق أبا مالك العقيلي (ركن المسجد ومملكة صلاح الدين): ";
 
@@ -140,7 +148,6 @@
             });
         }
 
-        // --- نظام التثبيت PWA ---
         let deferredPrompt;
         const installBtn = document.getElementById('installBtn');
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -151,7 +158,6 @@
         });
         window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
 
-        // --- نظام الثيم (ليلي/نهاري) ---
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
         const body = document.body;
@@ -173,4 +179,5 @@
         }
     </script>
 </body>
-</html>
+                        </html>
+                    

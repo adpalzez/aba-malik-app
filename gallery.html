@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معرض أعمال أبا مالك الإبداعية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: #000 url('https://i.ibb.co/pBhzxHdM/1000027317.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .overlay { background: rgba(0, 0, 0, 0.8); min-height: 100vh; padding: 2rem; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px; }
+    </style>
+</head>
+<body class="text-white">
+    <div class="overlay">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-black text-blue-400 mb-2">معرض الأعمال الإبداعية</h1>
+            <p class="text-gray-400">توثيق لمشاريع الهندسة الإلكترونية والتصميم البصري</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="glass group relative overflow-hidden p-3 transition-all duration-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]">
+                <div class="relative overflow-hidden rounded-[30px]">
+                    <img src="https://i.ibb.co/Mytpm3Vx/image.jpg" class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-center items-center p-6 text-center">
+                        <h4 class="text-yellow-500 font-bold mb-2">محول طاقة (Inverter)</h4>
+                        <p class="text-xs text-gray-200 mb-4">دائرة تحويل 12 فولت إلى 220 فولت لأداء مستقر.</p>
+                        <button class="bg-blue-600 text-white px-6 py-2 rounded-full text-xs font-bold">فحص المخطط</button>
+                    </div>
+                </div>
+                <p class="text-center mt-4 font-bold text-blue-400">منظومة تحويل التيار</p>
+            </div>
+
+            <div class="glass group relative overflow-hidden p-3 transition-all duration-500 hover:shadow-[0_0_30px_rgba(245,158,11,0.5)]">
+                <div class="relative overflow-hidden rounded-[30px]">
+                    <img src="https://i.ibb.co/tMLx6586/image.jpg" class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-center items-center p-6 text-center">
+                        <h4 class="text-blue-400 font-bold mb-2">هندسة الدوائر</h4>
+                        <p class="text-xs text-gray-200 mb-4">تصميم مخططات دقيقة للدوائر الإلكترونية المطبوعة.</p>
+                        <button class="bg-yellow-600 text-black px-6 py-2 rounded-full text-xs font-bold">التفاصيل</button>
+                    </div>
+                </div>
+                <p class="text-center mt-4 font-bold text-yellow-500">المخططات الهندسية</p>
+            </div>
+
+            <div class="glass group relative overflow-hidden p-3 transition-all duration-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]">
+                <div class="relative overflow-hidden rounded-[30px]">
+                    <img src="https://i.ibb.co/PZGLZQn2/image.jpg" class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-center items-center p-6 text-center">
+                        <h4 class="text-emerald-400 font-bold mb-2">التصميم البصري</h4>
+                        <p class="text-xs text-gray-200 mb-4">دمج الفن مع التقنية في تصاميم صباحية بلمسات إبداعية.</p>
+                        <button class="bg-emerald-600 text-white px-6 py-2 rounded-full text-xs font-bold">عرض التصميم</button>
+                    </div>
+                </div>
+                <p class="text-center mt-4 font-bold text-emerald-400">الإبداع البصري</p>
+            </div>
+        </div>
+
+        <footer class="text-center mt-12">
+            <a href="index.html" class="inline-block bg-white text-black px-10 py-3 rounded-2xl font-black shadow-xl hover:bg-blue-400 transition">العودة للرئيسية</a>
+        </footer>
+    </div>
+</body>
+      </html>
+                          

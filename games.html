@@ -18,6 +18,7 @@
         .overlay { background: rgba(0, 0, 0, 0.85); min-height: 100vh; }
         .resource-card { background: rgba(31, 41, 55, 0.8); backdrop-filter: blur(10px); border: 1px solid #4b5563; transition: 0.3s; }
         .resource-card:hover { transform: translateY(-5px); border-color: #eab308; }
+        .glass { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .attack-anim { animation: shake 0.5s; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); background: rgba(220, 38, 38, 0.2); } 75% { transform: translateX(10px); } }
     </style>
@@ -25,18 +26,9 @@
 <body class="text-white">
 
 <div class="overlay p-4">
-    <audio id="bgMusic" loop>
-        <source src="https://www.soundjay.com/free-music/iron-man-1.mp3" type="audio/mpeg">
-    </audio>
-
     <header class="text-center mb-6 animate__animated animate__fadeInDown">
         <h1 class="text-4xl font-black text-yellow-500 mb-2 drop-shadow-2xl">مملكة صلاح الدين الأيوبي</h1>
-        <div class="flex justify-center gap-4 mb-4">
-            <button onclick="toggleMusic()" class="bg-yellow-600 hover:bg-yellow-500 text-black px-6 py-2 rounded-full text-xs font-bold transition">
-                <i class="fas fa-music"></i> الموسيقى الملكية
-            </button>
-        </div>
-        <p id="rankDisplay" class="text-blue-400 font-bold tracking-widest text-lg">القائد العسكري: أبا مالك</p>
+        <p id="rankDisplay" class="text-blue-400 font-bold tracking-widest text-lg transition-all duration-500">القائد العسكري: أبا مالك</p>
     </header>
 
     <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -63,15 +55,42 @@
     </section>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-gray-800/60 p-6 rounded-3xl border-2 border-yellow-700 shadow-xl">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-hammer text-yellow-500"></i> الإنتاج اليومي</h2>
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="produce('gold')" class="bg-yellow-600 hover:bg-yellow-500 p-6 rounded-2xl font-bold text-black shadow-lg transition active:scale-90">
-                    <i class="fas fa-coins text-3xl mb-2"></i><br>سك الذهب
-                </button>
-                <button onclick="produce('wood')" class="bg-amber-800 hover:bg-amber-700 p-6 rounded-2xl font-bold text-white shadow-lg transition active:scale-90">
-                    <i class="fas fa-tree text-3xl mb-2"></i><br>جمع الخشب
-                </button>
+        <div class="space-y-6">
+            <div class="bg-gray-800/60 p-6 rounded-3xl border-2 border-yellow-700 shadow-xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-hammer text-yellow-500"></i> الإنتاج اليومي</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="produce('gold')" class="bg-yellow-600 hover:bg-yellow-500 p-6 rounded-2xl font-bold text-black shadow-lg transition active:scale-90">سك الذهب</button>
+                    <button onclick="produce('wood')" class="bg-amber-800 hover:bg-amber-700 p-6 rounded-2xl font-bold text-white shadow-lg transition active:scale-90">جمع الخشب</button>
+                </div>
+            </div>
+            
+            <div class="glass p-6 rounded-3xl border-t-4 border-red-600 animate__animated animate__fadeIn">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-black text-white">غرفة عمليات القائد</h3>
+                    <div class="flex gap-2">
+                        <button onclick="resetGame()" class="text-[10px] bg-white/10 hover:bg-red-900 px-2 py-1 rounded text-white transition">ضبط المملكة</button>
+                        <span class="bg-red-600 text-[10px] px-3 py-1 rounded-full animate-pulse uppercase">حالة الحرب: نشطة</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-black/40 p-4 rounded-2xl border border-white/5 text-center">
+                        <p class="text-[10px] text-gray-400 uppercase">قوة الجيش</p>
+                        <p id="armyPower" class="text-2xl font-black text-red-500">150</p>
+                    </div>
+                    <div class="bg-black/40 p-4 rounded-2xl border border-white/5 text-center">
+                        <p class="text-[10px] text-gray-400 uppercase">مستوى الهيبة</p>
+                        <p id="prestige" class="text-2xl font-black text-purple-500">1</p>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <button onclick="trainElite()" class="w-full bg-gradient-to-r from-blue-900 to-blue-700 p-4 rounded-xl font-bold flex justify-between items-center hover:brightness-125 transition">
+                        <span>تدريب فرقة نُخبة (💰100)</span>
+                        <i class="fas fa-shield-alt"></i>
+                    </button>
+                    <button id="attackBtn" onclick="executeAttack()" class="w-full bg-gradient-to-r from-red-900 to-red-600 p-4 rounded-xl font-black text-lg shadow-lg flex justify-center items-center gap-3 active:scale-95 transition">
+                        <i class="fas fa-fire"></i> شن هجوم كاسح
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -79,129 +98,121 @@
             <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-fist-raised text-red-500"></i> التجهيزات العسكرية</h2>
             <div class="space-y-4">
                 <button onclick="buyUnit('army')" class="w-full bg-red-700 hover:bg-red-600 p-4 rounded-2xl font-bold flex justify-between items-center px-8 border-b-4 border-red-950 transition active:scale-95">
-                    <div class="flex items-center gap-3"><i class="fas fa-user-shield text-xl"></i><span>تدريب محارب</span></div>
+                    <div class="flex items-center gap-3"><span>تدريب محارب</span></div>
                     <span class="bg-black/30 px-3 py-1 rounded-lg">💰 50</span>
                 </button>
                 <button onclick="buyUnit('castle')" class="w-full bg-blue-700 hover:bg-blue-600 p-4 rounded-2xl font-bold flex justify-between items-center px-8 border-b-4 border-blue-950 transition active:scale-95">
-                    <div class="flex items-center gap-3"><i class="fas fa-fortress text-xl"></i><span>بناء قلعة</span></div>
-                    <span class="bg-black/30 px-3 py-1 rounded-lg text-xs font-light tracking-tighter text-blue-200 uppercase tracking-widest">💰 200 | 🌲 200</span>
+                    <div class="flex items-center gap-3"><span>بناء قلعة</span></div>
+                    <span class="bg-black/30 px-3 py-1 rounded-lg text-[10px]">💰 200 | 🌲 200</span>
                 </button>
+            </div>
+            <div class="mt-8 bg-black/40 p-4 rounded-2xl border border-white/5 min-h-[150px]">
+                <h3 class="text-center font-bold text-yellow-500 mb-4 text-xs italic">تشكيلات الجيش في الميدان</h3>
+                <div id="armyVisuals" class="flex flex-wrap justify-center gap-2"></div>
             </div>
         </div>
     </div>
 
-    <div class="mt-8 bg-black/40 p-6 rounded-3xl border border-white/5">
-        <h3 class="text-center font-bold text-yellow-500 mb-4 tracking-widest uppercase text-sm italic">تشكيلات الجيش في الميدان</h3>
-        <div id="armyVisuals" class="flex flex-wrap justify-center gap-2 min-h-[50px]"></div>
-    </div>
-
     <footer class="text-center mt-10 pb-10">
-        <a href="index.html" class="inline-block bg-white text-black px-12 py-3 rounded-2xl font-black shadow-2xl hover:bg-yellow-500 transition active:scale-90">
-            العودة للديوان العام
-        </a>
+        <a href="index.html" class="inline-block bg-white text-black px-12 py-3 rounded-2xl font-black shadow-2xl hover:bg-yellow-500 transition">العودة للديوان العام</a>
     </footer>
 </div>
 
 <script>
-    let gold = 100; let wood = 100; let army = 0; let castles = 0;
-    const music = document.getElementById('bgMusic');
+    let gold, wood, army, castles, power, prestige;
 
-    // تحميل البيانات المحفوظة
-    window.onload = () => {
-        const savedData = JSON.parse(localStorage.getItem('saladin_save'));
+    // تشغيل عند تحميل الصفحة لاسترجاع البيانات
+    window.onload = function() {
+        const savedData = JSON.parse(localStorage.getItem('aba_malik_kingdom'));
         if (savedData) {
-            gold = savedData.gold; wood = savedData.wood; 
+            gold = savedData.gold; wood = savedData.wood;
             army = savedData.army; castles = savedData.castles;
-            for(let i=0; i<army; i++) addSoldierIcon();
-            update();
+            power = savedData.power || (army * 10 + castles * 100 + 150);
+            prestige = savedData.prestige;
+            refreshArmyIcons(); 
+        } else {
+            resetToDefault();
         }
-        scheduleAttack();
+        update();
     };
 
-    function toggleMusic() {
-        if (music.paused) music.play().catch(e => console.log("تطلب المتصفحات تفاعلاً لتشغيل الصوت"));
-        else music.pause();
+    function resetToDefault() {
+        gold = 100; wood = 100; army = 0; castles = 0; power = 150; prestige = 1;
+        document.getElementById('armyVisuals').innerHTML = '';
+    }
+
+    function resetGame() {
+        if(confirm("سيدي القائد، هل أنت متأكد من مسح تقدم المملكة والبدء من الصفر؟")) {
+            resetToDefault();
+            saveData();
+            update();
+        }
     }
 
     function produce(type) {
         if (type === 'gold') gold += 10;
         else wood += 15;
-        playEffect('https://www.soundjay.com/buttons/button-37.mp3');
         update();
     }
 
     function buyUnit(type) {
         if (type === 'army' && gold >= 50) {
-            gold -= 50; army++;
-            addSoldierIcon();
-            playEffect('https://www.soundjay.com/mechanical/iron-gate-close-1.mp3');
+            gold -= 50; army++; power += 10;
+            addSoldierIcon(true);
         } else if (type === 'castle' && gold >= 200 && wood >= 200) {
-            gold -= 200; wood -= 200; castles++;
-            playEffect('https://www.soundjay.com/mechanical/door-bolt-1.mp3');
+            gold -= 200; wood -= 200; castles++; power += 100;
         } else {
-            triggerShake();
-            alert("الموارد غير كافية يا سيدي القائد!");
-            return;
+            alert("الموارد غير كافية!"); return;
         }
         update();
     }
 
-    function triggerShake() {
-        document.body.classList.add('attack-anim');
-        setTimeout(() => document.body.classList.remove('attack-anim'), 500);
+    function trainElite() {
+        if (gold >= 100) {
+            gold -= 100; power += 50;
+            alert("تم تدريب فرقة نُخبة يا أبا مالك!");
+            update();
+        } else { alert("الذهب لا يكفي لتدريب النخبة!"); }
     }
 
-    function addSoldierIcon() {
+    function executeAttack() {
+        if (power < 100) { alert("جيشك ضعيف جداً للهجوم!"); return; }
+        const btn = document.getElementById('attackBtn');
+        btn.disabled = true; btn.innerHTML = "جاري القتال...";
+        document.body.classList.add('attack-anim');
+        
+        setTimeout(() => {
+            document.body.classList.remove('attack-anim');
+            let win = Math.random() > 0.4;
+            if(win) {
+                prestige++; gold += 150;
+                alert("نصر ساحق! غنمنا 150 ذهبة وارتفعت هيبتك.");
+            } else {
+                power = Math.max(0, power - 30);
+                alert("تراجعنا تكتيكياً.. خسرنا بعض القوة.");
+            }
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-fire"></i> شن هجوم كاسح';
+            update();
+        }, 1500);
+    }
+
+    function addSoldierIcon(isNew) {
         const div = document.getElementById('armyVisuals');
         const img = document.createElement('img');
         img.src = "https://img.icons8.com/color/96/knight.png";
-        img.className = "w-8 h-8 md:w-10 md:h-10 animate__animated animate__zoomIn";
+        img.className = "w-8 h-8 " + (isNew ? "animate__animated animate__zoomIn" : "");
         div.appendChild(img);
-    }
-
-    function scheduleAttack() {
-        const time = Math.random() * (60000 - 30000) + 30000;
-        setTimeout(() => { launchAttack(); }, time);
-    }
-
-    function launchAttack() {
-        if (army === 0 && castles === 0) { scheduleAttack(); return; }
-        
-        const enemyPower = Math.floor(Math.random() * (castles + 5)) + 1;
-        triggerShake();
-        playEffect('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
-
-        setTimeout(() => {
-            if (confirm(`⚠️ تحذير! هجوم من قطاع الطرق بقوة ${enemyPower}!\nهل تقبل المواجهة بجيشك؟`)) {
-                if (army >= enemyPower) {
-                    const winGold = enemyPower * 20;
-                    gold += winGold; army -= Math.floor(enemyPower/2);
-                    alert(`✅ نصر مؤزر! غنمنا ${winGold} ذهبة. خسرنا ${Math.floor(enemyPower/2)} جندياً.`);
-                    refreshArmyIcons();
-                } else {
-                    gold = Math.max(0, gold - 100); army = 0;
-                    alert("❌ هزيمة قاسية! نُهبت الخزينة وقُضي على الجيش.");
-                    refreshArmyIcons();
-                }
-            } else {
-                gold = Math.max(0, gold - 50);
-                alert("دفعنا 50 ذهبة كجزية لتجنب القتال.");
-            }
-            update();
-            scheduleAttack();
-        }, 500);
     }
 
     function refreshArmyIcons() {
         const div = document.getElementById('armyVisuals');
         div.innerHTML = '';
-        for(let i=0; i<army; i++) addSoldierIcon();
+        for(let i=0; i<army; i++) addSoldierIcon(false);
     }
 
-    function playEffect(url) {
-        const audio = new Audio(url);
-        audio.volume = 0.4;
-        audio.play();
+    function saveData() {
+        const gameData = { gold, wood, army, castles, power, prestige };
+        localStorage.setItem('aba_malik_kingdom', JSON.stringify(gameData));
     }
 
     function update() {
@@ -209,80 +220,21 @@
         document.getElementById('woodCount').innerText = wood;
         document.getElementById('armyCount').innerText = army;
         document.getElementById('castleCount').innerText = castles;
-        
-        // تحديث الرتبة
-        const rank = document.getElementById('rankDisplay');
-        if (castles >= 10) rank.innerText = "رتبة العرش: السلطان أبا مالك الفاتح";
-        else if (castles >= 5) rank.innerText = "رتبة العرش: الأمير أبا مالك";
-        else if (army >= 20) rank.innerText = "رتبة العرش: القائد الأعلى أبا مالك";
-        
-        // حفظ البيانات
-        localStorage.setItem('saladin_save', JSON.stringify({gold, wood, army, castles}));
-    }
-</script>
-
-</body>
-                 </html>
-              <div class="glass p-6 mb-8 border-t-4 border-red-600 animate__animated animate__fadeIn">
-    <div class="flex justify-between items-center mb-6">
-        <h3 class="text-xl font-black text-white">غرفة عمليات القائد</h3>
-        <span class="bg-red-600 text-xs px-3 py-1 rounded-full animate-pulse">حالة الحرب: نشطة</span>
-    </div>
-
-    <div class="grid grid-cols-2 gap-6">
-        <div class="bg-black/40 p-4 rounded-3xl border border-white/5">
-            <p class="text-[10px] text-gray-400 uppercase">قوة الجيش</p>
-            <p id="armyPower" class="text-3xl font-black text-red-500">150</p>
-        </div>
-        <div class="bg-black/40 p-4 rounded-3xl border border-white/5">
-            <p class="text-[10px] text-gray-400 uppercase">مستوى الهيبة</p>
-            <p id="prestige" class="text-3xl font-black text-purple-500">1</p>
-        </div>
-    </div>
-</div>
-
-<div class="space-y-4">
-    <button onclick="trainElite()" class="w-full bg-gradient-to-r from-blue-900 to-blue-700 p-5 rounded-2xl font-bold flex justify-between items-center hover:brightness-125 transition">
-        <span>تدريب فرقة نُخبة</span>
-        <i class="fas fa-shield-alt text-xl"></i>
-    </button>
-
-    <button id="attackBtn" onclick="executeAttack()" class="w-full bg-gradient-to-r from-red-900 to-red-600 p-6 rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(220,38,38,0.5)] flex justify-center items-center gap-3 active:scale-95 transition">
-        <i class="fas fa-fire"></i>
-        شن هجوم كاسح
-    </button>
-</div>
-
-<script>
-    let power = 150;
-    let prestige = 1;
-
-    function trainElite() {
-        // إضافة منطق خصم الموارد هنا (ذهب/خشب)
-        power += 50;
         document.getElementById('armyPower').innerText = power;
-        showToast("تم تدريب فرقة جديدة يا أبا مالك!");
-    }
-
-    function executeAttack() {
-        const btn = document.getElementById('attackBtn');
-        btn.disabled = true;
-        btn.innerHTML = "جاري القتال...";
+        document.getElementById('prestige').innerText = prestige;
         
-        setTimeout(() => {
-            let win = Math.random() > 0.4;
-            if(win) {
-                prestige++;
-                document.getElementById('prestige').innerText = prestige;
-                alert("نصر ساحق! ارتفعت هيبة مملكتك في الأصقاع.");
-            } else {
-                power = Math.max(0, power - 30);
-                document.getElementById('armyPower').innerText = power;
-                alert("انسحاب تكتيكي.. أعد ترتيب الصفوف.");
-            }
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-fire"></i> شن هجوم كاسح';
-        }, 1500);
+        const rank = document.getElementById('rankDisplay');
+        if (castles >= 10) {
+            rank.innerText = "رتبة العرش: السلطان أبا مالك الفاتح";
+            rank.className = "text-yellow-400 font-black tracking-widest text-xl animate__animated animate__tada animate__infinite";
+        } else if (castles >= 5) {
+            rank.innerText = "رتبة العرش: الأمير أبا مالك";
+            rank.className = "text-blue-400 font-bold tracking-widest text-lg";
+        } else if (prestige >= 5) {
+            rank.innerText = "رتبة العرش: القائد المهاب أبا مالك";
+        }
+        saveData(); // الحفظ التلقائي عند كل تغيير
     }
 </script>
-
+</body>
+</html>

@@ -15,101 +15,94 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Cairo', sans-serif; scroll-behavior: smooth; }
-        .glass { 
-            background: rgba(255, 255, 255, 0.12); 
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            border-radius: 40px;
-        }
-        .bg-image {
-            background-image: url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); 
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
+        body { font-family: 'Cairo', sans-serif; scroll-behavior: smooth; transition: background-color 0.5s ease, color 0.5s ease; }
+        .glass { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 40px; transition: all 0.5s ease; }
+        .bg-image { background-image: url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); background-size: cover; background-position: center; background-attachment: fixed; transition: background 0.5s ease; }
+        
+        body.light-mode { background-color: #f0f2f5; color: #1a1a1a; }
+        body.light-mode .bg-image { background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); }
+        body.light-mode .glass { background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.1); color: #1a1a1a; }
+        
         .dollar-btn { background-color: #22c55e; color: #fff; }
         .gold-btn { background-color: #f1d592; color: #000; }
         .mosque-btn { background: linear-gradient(90deg, #064e3b, #065f46); color: #fff; }
         .games-btn { background: linear-gradient(to r, #b45309, #78350f); border: 1px solid #f59e0b; color: white; }
         .install-btn { background: linear-gradient(135deg, #6366f1, #4338ca); color: #fff; display: none; }
         .fb-btn { background-color: #1877f2; color: #fff; }
+        .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen bg-image">
 
+    <button id="themeToggle" class="theme-toggle glass">
+        <i id="themeIcon" class="fas fa-sun text-yellow-400 text-xl"></i>
+    </button>
+
     <div class="fixed inset-0 bg-black/30 z-0"></div>
 
     <nav class="p-6 relative z-50 text-center">
-        <h1 class="text-2xl font-black tracking-widest text-white uppercase">ABA MALIK AL-AQILI</h1>
+        <h1 class="text-2xl font-black tracking-widest uppercase">ABA MALIK AL-AQILI</h1>
     </nav>
 
     <div class="relative z-10 container mx-auto px-6 py-4 flex flex-col items-center">
-        
         <div class="glass p-8 w-full max-w-md text-center shadow-2xl mb-12">
             <h2 class="text-5xl font-black mb-1">أبا مالك</h2>
-            <h3 class="text-2xl font-bold text-blue-400 mb-6">العقيلي</h3>
+            <h3 class="text-2xl font-bold text-blue-400 mb-8">العقيلي</h3>
             
-            <div class="mb-4">
-                <a href="games.html" class="games-btn w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm shadow-xl transition active:scale-95">
-                    <i class="fas fa-chess-rook"></i> 
-                    دخول مملكة صلاح الدين
-                </a>
-            </div>
-
-            <div class="mb-4">
+            <div class="flex flex-col gap-5 mb-8">
                 <a href="prayer.html" class="mosque-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95 border border-emerald-400/30">
                     <span>ركن المسجد والمواقيت</span>
                     <i class="fas fa-mosque text-yellow-400 text-xl"></i>
                 </a>
+
+                <a href="azkar.html" class="bg-emerald-900/80 border border-emerald-500/30 w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95 text-white">
+                    <span>موسوعة أذكار أبا مالك</span>
+                    <i class="fas fa-book-reader text-yellow-400 text-xl"></i>
+                </a>
             </div>
-<div class="mb-4">
-    <a href="azkar.html" class="bg-emerald-900/80 border border-emerald-500/30 w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95 text-white">
-        <span>موسوعة أذكار أبا مالك</span>
-        <i class="fas fa-book-reader text-yellow-400 text-xl"></i>
-    </a>
-</div>
             
-            <div class="grid grid-cols-1 gap-3 mb-6">
-                <a href="https://www.google.com/search?q=سعر+الدولار+اليوم+في+مصر" target="_blank" class="dollar-btn flex items-center justify-between px-6 py-3 rounded-full font-bold text-xs shadow-md transition active:scale-95">
+            <div class="grid grid-cols-1 gap-4 mb-8">
+                <a href="https://www.google.com/search?q=سعر+الدولار+اليوم+في+مصر" target="_blank" rel="noopener" class="dollar-btn flex items-center justify-between px-6 py-4 rounded-full font-bold text-xs shadow-md transition active:scale-95">
                     <span>سعر الدولار اليوم</span>
                     <i class="fas fa-dollar-sign"></i>
                 </a>
-                <a href="https://www.gold-price-today.com/egypt/" target="_blank" class="gold-btn flex items-center justify-between px-6 py-3 rounded-full font-bold text-xs shadow-md transition active:scale-95">
+                <a href="https://www.gold-price-today.com/egypt/" target="_blank" rel="noopener" class="gold-btn flex items-center justify-between px-6 py-4 rounded-full font-bold text-xs shadow-md transition active:scale-95">
                     <span>أسعار الذهب الآن</span>
                     <i class="fas fa-coins"></i>
                 </a>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <a href="https://wa.me/201113412908" target="_blank" class="bg-[#2ecc71] flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-xs shadow-md transition active:scale-95 text-white">
+            <div class="mb-8">
+                <a href="games.html" class="games-btn w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-bold text-sm shadow-xl transition active:scale-95">
+                    <i class="fas fa-chess-rook text-xl"></i> 
+                    دخول مملكة صلاح الدين
+                </a>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <a href="https://wa.me/201113412908" target="_blank" rel="noopener" class="bg-[#2ecc71] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-xs shadow-md transition active:scale-95 text-white">
                     <i class="fab fa-whatsapp"></i> واتساب
                 </a>
-                <a href="tel:+201113412908" class="bg-white text-black flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-xs shadow-md transition active:scale-95">
+                <a href="tel:+201113412908" class="bg-white text-black flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-xs shadow-md transition active:scale-95">
                     <i class="fas fa-phone-alt"></i> اتصال
                 </a>
             </div>
 
-            <button id="installBtn" class="install-btn w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm shadow-xl mb-4 transition active:scale-95">
+            <button id="installBtn" class="install-btn w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm shadow-xl mb-6 transition active:scale-95">
                 <i class="fas fa-download"></i> تثبيت التطبيق
             </button>
 
-            <a href="https://www.facebook.com/share/1NhmGTxvxJ/" target="_blank" class="fb-btn w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-lg transition active:scale-95 text-white">
+            <a href="https://www.facebook.com/share/1NhmGTxvxJ/" target="_blank" rel="noopener" class="fb-btn w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-lg transition active:scale-95 text-white">
                 <i class="fab fa-facebook-f"></i> حساب فيسبوك
             </a>
         </div>
 
         <div id="gallery" class="w-full max-w-6xl pb-20">
-            <div class="text-center mb-10">
-                <div class="inline-block px-8 py-3 rounded-full border border-white/20 bg-black/40 backdrop-blur-md">
-                    <h3 class="text-2xl font-bold text-blue-400">معرض الأعمال الإبداعية</h3>
-                </div>
-            </div>
-
+            <div class="text-center mb-10"><div class="inline-block px-8 py-3 rounded-full border border-white/20 bg-black/40 backdrop-blur-md"><h3 class="text-2xl font-bold text-blue-400">معرض الأعمال الإبداعية</h3></div></div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="glass p-2"><img src="https://i.ibb.co/Mytpm3Vx/image.jpg" class="w-full h-72 object-cover rounded-[30px]"></div>
-                <div class="glass p-2"><img src="https://i.ibb.co/tMLx6586/image.jpg" class="w-full h-72 object-cover rounded-[30px]"></div>
-                <div class="glass p-2"><img src="https://i.ibb.co/PZGLZQn2/image.jpg" class="w-full h-72 object-cover rounded-[30px]"></div>
+                <div class="glass p-2 hover:scale-105 transition-transform duration-300"><img src="https://i.ibb.co/Mytpm3Vx/image.jpg" class="w-full h-72 object-cover rounded-[30px]"></div>
+                <div class="glass p-2 hover:scale-105 transition-transform duration-300"><img src="https://i.ibb.co/tMLx6586/image.jpg" class="w-full h-72 object-cover rounded-[30px]"></div>
+                <div class="glass p-2 hover:scale-105 transition-transform duration-300"><img src="https://i.ibb.co/PZGLZQn2/image.jpg" class="w-full h-72 object-cover rounded-[30px]"></div>
             </div>
         </div>
     </div>
@@ -118,17 +111,32 @@
         let deferredPrompt;
         const installBtn = document.getElementById('installBtn');
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.style.display = 'flex';
+            e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'flex';
         });
         installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt = null;
-                installBtn.style.display = 'none';
-            }
+            if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; }
         });
+        window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
+
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+        if (localStorage.getItem('theme') === 'light') enableLightMode();
+        themeToggle.addEventListener('click', () => {
+            body.classList.contains('light-mode') ? disableLightMode() : enableLightMode();
+        });
+        function enableLightMode() {
+            body.classList.add('light-mode');
+            themeIcon.classList.replace('fa-sun', 'fa-moon');
+            themeIcon.classList.replace('text-yellow-400', 'text-gray-600');
+            localStorage.setItem('theme', 'light');
+        }
+        function disableLightMode() {
+            body.classList.remove('light-mode');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+            themeIcon.classList.replace('text-gray-600', 'text-yellow-400');
+            localStorage.setItem('theme', 'dark');
+        }
     </script>
 </body>
                     </html>

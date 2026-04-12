@@ -52,3 +52,7 @@ An integrated web application that combines spiritual, entertainment, and profes
 ## 🌟 اترك نجمة | Leave a Star
 إذا أعجبك المشروع، لا تتردد في الضغط على زر **Star** لدعم استمرار التطوير!
 *If you like this project, feel free to drop a **Star**!*
+---
+## ⭐ دعم المشروع
+إذا وجدت هذا العمل مفيداً، لا تنسَ الضغط على زر **Star** في الأعلى لدعم التطوير المستمر!
+---

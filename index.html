@@ -24,7 +24,6 @@
         body.light-mode .bg-image { background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); }
         body.light-mode .glass { background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.1); color: #1a1a1a; }
         
-        /* ألوان الأزرار المحدثة */
         .mosque-btn { background: linear-gradient(90deg, #166534, #15803d); border: 1px solid #16a34a; color: white; }
         .azkar-btn { background: linear-gradient(90deg, #1e3a8a, #1d4ed8); border: 1px solid #2563eb; color: white; }
         .gallery-btn { background: linear-gradient(90deg, #b45309, #d97706); border: 1px solid #f97316; color: white; }
@@ -55,31 +54,25 @@
             
             <div class="flex flex-col gap-5 mb-8">
                 <a href="prayer.html" class="mosque-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95">
-                    <span>ركن المسجد والمواقيت</span>
-                    <i class="fas fa-mosque text-yellow-400 text-xl"></i>
+                    <span>ركن المسجد والمواقيت</span><i class="fas fa-mosque text-yellow-400 text-xl"></i>
                 </a>
                 <a href="azkar.html" class="azkar-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95">
-                    <span>موسوعة أذكار أبا مالك</span>
-                    <i class="fas fa-book-reader text-yellow-400 text-xl"></i>
+                    <span>موسوعة أذكار أبا مالك</span><i class="fas fa-book-reader text-yellow-400 text-xl"></i>
                 </a>
                 <a href="gallery.html" class="gallery-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95">
-                    <span>معرض الأعمال الإبداعية</span>
-                    <i class="fas fa-microchip text-yellow-500 text-xl"></i>
+                    <span>معرض الأعمال الإبداعية</span><i class="fas fa-microchip text-yellow-500 text-xl"></i>
                 </a>
                 <button onclick="showWisdom()" class="wisdom-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95">
-                    <span>حكمة اليوم</span>
-                    <i class="fas fa-lightbulb text-yellow-400 text-xl"></i>
+                    <span>حكمة اليوم</span><i class="fas fa-lightbulb text-yellow-400 text-xl"></i>
                 </button>
             </div>
             
             <div class="grid grid-cols-1 gap-4 mb-8">
-                <a href="https://www.google.com/search?q=سعر+الدولار+اليوم+في+مصر" target="_blank" class="dollar-btn flex items-center justify-between px-6 py-4 rounded-full font-bold text-xs shadow-md transition active:scale-95">
-                    <span>سعر الدولار اليوم</span>
-                    <i class="fas fa-dollar-sign"></i>
+                <a href="https://www.google.com/search?q=سعر+الدولار+اليوم+في+مصر" target="_blank" class="dollar-btn flex items-center justify-between px-6 py-4 rounded-full font-bold text-xs shadow-md">
+                    <span>سعر الدولار اليوم</span><i class="fas fa-dollar-sign"></i>
                 </a>
-                <a href="https://www.gold-price-today.com/egypt/" target="_blank" class="gold-btn flex items-center justify-between px-6 py-4 rounded-full font-bold text-xs shadow-md transition active:scale-95">
-                    <span>أسعار الذهب الآن</span>
-                    <i class="fas fa-coins"></i>
+                <a href="https://www.gold-price-today.com/egypt/" target="_blank" class="gold-btn flex items-center justify-between px-6 py-4 rounded-full font-bold text-xs shadow-md">
+                    <span>أسعار الذهب الآن</span><i class="fas fa-coins"></i>
                 </a>
             </div>
 
@@ -100,7 +93,7 @@
         </div>
     </div>
 
-    <div id="wisdomModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate__animated animate__fadeIn">
+    <div id="wisdomModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
         <div class="glass p-8 max-w-sm w-full text-center border-2 border-yellow-500/50 relative">
             <button onclick="closeWisdom()" class="absolute top-4 left-4 text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
             <i class="fas fa-quote-right text-yellow-500 text-3xl mb-4"></i>
@@ -109,41 +102,40 @@
         </div>
     </div>
 
-    <footer class="relative z-10 w-full text-center pb-8 animate__animated animate__fadeIn">
+    <footer class="relative z-10 w-full text-center pb-8">
         <div class="glass inline-block px-6 py-2">
-            <p class="text-[10px] md:text-xs text-gray-300 font-bold tracking-widest leading-relaxed">
-                جميع الحقوق محفوظة © ٢٠٢٦ | صُمم بواسطة 
-                <span class="text-blue-400">عبد العزيز حسين عبد العزيز علي</span>
+            <p class="text-[10px] text-gray-300 font-bold tracking-widest">
+                جميع الحقوق محفوظة © ٢٠٢٦ | صُمم بواسطة <span class="text-blue-400">عبد العزيز حسين عبد العزيز علي</span>
             </p>
         </div>
     </footer>
 
     <script>
-        const subWisdoms = ["من استشار، شارك الناس في عقولهم.", "العدل أساس الملك.", "القائد الناجح هو من يصنع قادة، لا أتباعاً.", "العلم في الصغر كالنقش في الحجر."];
+        // الأكواد البرمجية للوظائف
+        const subWisdoms = ["من استشار، شارك الناس في عقولهم.", "العدل أساس الملك.", "القائد الناجح هو من يصنع قادة، لا أتباعاً."];
         const mainWisdom = "كُنْ مَاهِراً لِيَحْتَاجَكَ النَّاس، وَكُنْ هَيِّناً لِيُحِبَّكَ النَّاس.";
 
         function showWisdom() {
             const modal = document.getElementById('wisdomModal');
             const textZone = document.getElementById('wisdomText');
-            const isMain = Math.random() > 0.3;
-            textZone.innerHTML = isMain ? mainWisdom : subWisdoms[Math.floor(Math.random() * subWisdoms.length)];
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            textZone.innerHTML = Math.random() > 0.3 ? mainWisdom : subWisdoms[Math.floor(Math.random() * subWisdoms.length)];
+            modal.classList.remove('hidden'); modal.classList.add('flex');
         }
-
-        function closeWisdom() {
-            const modal = document.getElementById('wisdomModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
+        function closeWisdom() { document.getElementById('wisdomModal').classList.add('hidden'); }
 
         const themeToggle = document.getElementById('themeToggle');
         themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('light-mode');
             const icon = document.getElementById('themeIcon');
-            icon.classList.toggle('fa-sun');
-            icon.classList.toggle('fa-moon');
+            icon.classList.toggle('fa-sun'); icon.classList.toggle('fa-moon');
         });
+
+        // تشغيل ميزة العمل بدون إنترنت
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log("تطبيق أبا مالك جاهز أوفلاين"));
+        }
     </script>
 </body>
-</html>
+                </html>
+                                                                         

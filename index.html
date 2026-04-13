@@ -28,33 +28,20 @@
         .azkar-btn { background: linear-gradient(90deg, #1e3a8a, #1d4ed8); border: 1px solid #2563eb; color: white; }
         .gallery-btn { background: linear-gradient(90deg, #b45309, #d97706); border: 1px solid #f97316; color: white; }
         .wisdom-btn { background: linear-gradient(90deg, #581c87, #6d28d9); border: 1px solid #8b5cf6; color: white; }
-        
-        /* تصميم زر المشاركات العائم في أسفل اليسار */
-        .post-btn-fixed { 
-            position: fixed; 
-            bottom: 30px; 
-            left: 20px; 
-            z-index: 1000;
-            background: linear-gradient(90deg, #dc2626, #991b1b); 
-            border: 2px solid #ef4444; 
-            color: white; 
-            width: 60px; 
-            height: 60px; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.5);
-            transition: all 0.3s ease;
-        }
-        .post-btn-fixed:active { transform: scale(0.9); }
-        
-        .dollar-btn { background: linear-gradient(90deg, #15803d, #166534); border: 1px solid #22c55e; color: white; }
-        .gold-btn { background: linear-gradient(90deg, #b59410, #d9b11e); border: 1px solid #eab308; color: #000; }
         .games-btn { background: linear-gradient(to r, #064e3b, #065f46); border: 1px solid #10b981; color: white; }
-        
+
+        /* الأزرار العائمة في الأسفل */
+        .post-btn-fixed { 
+            position: fixed; bottom: 30px; left: 20px; z-index: 1000;
+            background: linear-gradient(90deg, #dc2626, #991b1b); 
+            border: 2px solid #ef4444; color: white; 
+            width: 60px; height: 60px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.5);
+        }
         #installBtn { position: fixed; bottom: 30px; right: 20px; z-index: 1000; display: none; }
-        .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        
+        .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen bg-image flex flex-col items-center">
@@ -96,15 +83,6 @@
                     <span>حكمة اليوم</span><i class="fas fa-lightbulb text-yellow-400 text-xl"></i>
                 </button>
             </div>
-            
-            <div class="grid grid-cols-1 gap-4 mb-8">
-                <a href="https://www.google.com/search?q=سعر+الدولار+اليوم+في+مصر" target="_blank" class="dollar-btn flex items-center justify-between px-6 py-4 rounded-full font-bold text-xs shadow-md">
-                    <span>سعر الدولار اليوم</span><i class="fas fa-dollar-sign"></i>
-                </a>
-                <a href="https://www.gold-price-today.com/egypt/" target="_blank" class="gold-btn flex items-center justify-between px-6 py-4 rounded-full font-bold text-xs shadow-md">
-                    <span>أسعار الذهب الآن</span><i class="fas fa-coins"></i>
-                </a>
-            </div>
 
             <div class="mb-8">
                 <a href="games.html" class="games-btn w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-bold text-sm shadow-xl transition active:scale-95">
@@ -142,7 +120,7 @@
 
     <script>
         const subWisdoms = ["من استشار، شارك الناس في عقولهم.", "العدل أساس الملك.", "القائد الناجح هو من يصنع قادة، لا أتباعاً."];
-        const mainWisdom = "كُنْ مَاهِراً لِيَحْتَاجَكَ النَّاس، وَكُنْ هَيِّناً لِيُحِبَّكَ النَّاس.";
+        const mainWisdom = "كُنْ مَاهِراً لِيَحْتَاجَكَ النَّاس, وَكُنْ هَيِّناً لِيُحِبَّكَ النَّاس.";
 
         function showWisdom() {
             const modal = document.getElementById('wisdomModal');
@@ -162,4 +140,5 @@
     
     <script src="install.js"></script>
 </body>
-</html>
+                        </html>
+    

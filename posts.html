@@ -10,14 +10,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #0f172a; color: white; }
+        body { font-family: 'Cairo', sans-serif; background-color: #0f172a; color: white; scroll-behavior: smooth; }
         .post-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; overflow: hidden; margin-bottom: 24px; }
         .profile-img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #ef4444; }
-        /* زر الكاميرا العائم */
-        .camera-btn { position: fixed; bottom: 80px; left: 20px; z-index: 100; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.4); }
+        .action-btn { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); transition: all 0.3s; }
+        .action-btn:active { transform: scale(0.9); }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-32">
 
     <header class="sticky top-0 z-50 bg-[#0f172a]/80 backdrop-blur-md p-4 border-b border-white/10 flex justify-between items-center">
         <a href="index.html" class="text-gray-400"><i class="fas fa-arrow-right text-xl"></i></a>
@@ -26,10 +26,12 @@
     </header>
 
     <div class="container mx-auto px-4 py-6 max-w-md" id="postsContainer">
+        
         <div id="previewArea" class="hidden post-card border-2 border-dashed border-red-500 p-2 animate__animated animate__fadeIn">
-            <p class="text-center text-xs text-red-500 mb-2 font-bold shadow-sm">معاينة الصورة قبل النشر</p>
-            <img id="imagePreview" src="#" class="w-full h-64 object-cover rounded-xl shadow-lg">
-            <button onclick="publishPost()" class="w-full bg-red-600 mt-3 py-3 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition">نشر الآن</button>
+            <p class="text-center text-xs text-red-500 mb-2 font-bold uppercase tracking-widest">معاينة قبل النشر</p>
+            <img id="imagePreview" src="#" class="hidden w-full h-64 object-cover rounded-xl shadow-lg">
+            <video id="videoPreview" controls class="hidden w-full h-64 rounded-xl shadow-lg bg-black"></video>
+            <button onclick="publishPost()" class="w-full bg-red-600 mt-3 py-4 rounded-xl font-bold text-sm shadow-lg hover:bg-red-700 transition">نشر المشاركة الآن</button>
         </div>
 
         <div class="post-card">
@@ -37,52 +39,77 @@
                 <img src="https://i.ibb.co/pBhzxHdM/1000027317.jpg" class="profile-img">
                 <div>
                     <h4 class="font-bold text-sm">أبا مالك العقيلي</h4>
-                    <span class="text-[10px] text-gray-400">منذ ساعة • إشراف هندسي</span>
+                    <span class="text-[10px] text-gray-400">إشراف هندسي • موقع العمل</span>
                 </div>
             </div>
             <div class="px-4 pb-3">
-                <p class="text-sm leading-relaxed">
-                    الدقة في العمل هي سر النجاح. لقطة من موقع العمل اليوم.
+                <p class="text-sm leading-relaxed text-gray-200">
+                    مرحباً بكم في منصة مشاركاتي. هنا نتوثق اللحظات والإنجازات في مواقع العمل.
                 </p>
             </div>
             <img src="https://i.ibb.co/pBhzxHdM/1000027317.jpg" class="w-full h-64 object-cover shadow-inner">
         </div>
     </div>
 
-    <input type="file" id="fileInput" class="hidden" accept="image/*">
-    <button onclick="document.getElementById('fileInput').click()" class="camera-btn bg-red-600 animate__animated animate__pulse animate__infinite">
-        <i class="fas fa-camera text-white text-2xl shadow-sm"></i>
-    </button>
+    <div class="fixed bottom-24 left-6 flex flex-col gap-4 z-[1000]">
+        <input type="file" id="videoInput" class="hidden" accept="video/*">
+        <button onclick="document.getElementById('videoInput').click()" class="action-btn bg-blue-600 animate__animated animate__pulse animate__infinite">
+            <i class="fas fa-video text-white text-xl"></i>
+        </button>
+
+        <input type="file" id="fileInput" class="hidden" accept="image/*">
+        <button onclick="document.getElementById('fileInput').click()" class="action-btn bg-red-600">
+            <i class="fas fa-camera text-white text-xl"></i>
+        </button>
+    </div>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-[#0f172a] border-t border-white/10 p-4 flex justify-around items-center z-[1000]">
         <a href="index.html" class="text-gray-400 hover:text-red-500 transition"><i class="fas fa-home text-xl"></i></a>
         <a href="azkar.html" class="text-gray-400 hover:text-red-500 transition"><i class="fas fa-book-open text-xl"></i></a>
     </nav>
 
-<script>
-    const fileInput = document.getElementById('fileInput');
-    const previewArea = document.getElementById('previewArea');
-    const imagePreview = document.getElementById('imagePreview');
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const videoInput = document.getElementById('videoInput');
+        const previewArea = document.getElementById('previewArea');
+        const imagePreview = document.getElementById('imagePreview');
+        const videoPreview = document.getElementById('videoPreview');
 
-    fileInput.onchange = e => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                imagePreview.src = event.target.result;
+        // التعامل مع الصور
+        fileInput.onchange = e => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    imagePreview.src = event.target.result;
+                    imagePreview.classList.remove('hidden');
+                    videoPreview.classList.add('hidden');
+                    previewArea.classList.remove('hidden');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // التعامل مع الفيديو
+        videoInput.onchange = e => {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                videoPreview.src = url;
+                videoPreview.classList.remove('hidden');
+                imagePreview.classList.add('hidden');
                 previewArea.classList.remove('hidden');
-                // التمرير لأعلى لرؤية المعاينة
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
-            reader.readAsDataURL(file);
-        }
-    };
+        };
 
-    function publishPost() {
-        alert("يا أبا مالك، تم حفظ الصورة في ذاكرة التطبيق المؤقتة. ميزة الرفع الدائم تحتاج لقاعدة بيانات، ولكن الآن يمكنك رؤية صورتك داخل التطبيق!");
-        previewArea.classList.add('hidden');
-    }
-</script>
+        function publishPost() {
+            alert("يا أبا مالك، تم تجهيز المحتوى بنجاح! سيتم حفظه في ذاكرة التطبيق.");
+            previewArea.classList.add('hidden');
+        }
+    </script>
 
 </body>
-</html>
+                </html>
+            

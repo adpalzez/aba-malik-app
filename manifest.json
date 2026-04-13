@@ -1,23 +1,17 @@
 {
+  "name": "أبا مالك العقيلي",
   "short_name": "أبا مالك",
-  "name": "محفظة أبا مالك العقيلي",
-  "description": "التطبيق الشامل لأعمال وخدمات أبا مالك العقيلي",
+  "description": "التطبيق الشامل لأبا مالك العقيلي - أذكار، حكم، وأعمال",
   "start_url": "./index.html",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#064e3b",
-  "theme_color": "#064e3b",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "icons": [
     {
-      "src": "IMG-20251213-WA0000.jpg",
-      "sizes": "192x192",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "IMG-20251213-WA0000.jpg",
+      "src": "https://i.ibb.co/pBhzxHdM/1000027317.jpg",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/jpg",
+      "purpose": "any maskable"
     }
   ]
 }

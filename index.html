@@ -39,8 +39,25 @@
             display: flex; align-items: center; justify-content: center; 
             box-shadow: 0 10px 20px rgba(220, 38, 38, 0.5);
         }
+
+        /* تصميم الإشعار الصغير */
+        .badge {
+            position: absolute; top: -5px; right: -5px;
+            background-color: #ef4444; color: white;
+            font-size: 10px; font-weight: bold;
+            width: 22px; height: 22px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #0f172a;
+            animation: pulse-badge 2s infinite;
+        }
+
+        @keyframes pulse-badge {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
         #installBtn { position: fixed; bottom: 30px; right: 20px; z-index: 1000; display: none; }
-        
         .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     </style>
 </head>
@@ -56,6 +73,7 @@
 
     <a href="posts.html" class="post-btn-fixed animate__animated animate__bounceIn">
         <i class="fas fa-share-alt text-xl"></i>
+        <span class="badge">1</span>
     </a>
 
     <div class="fixed inset-0 bg-black/30 z-0"></div>
@@ -119,7 +137,7 @@
     </footer>
 
     <script>
-        const subWisdoms = ["من استشار، شارك الناس في عقولهم.", "العدل أساس الملك.", "القائد الناجح هو من يصنع قادة، لا أتباعاً."];
+        const subWisdoms = ["من استشار، شارك الناس في عقولهم.", "العدل أساس الملك.", "القائد الناجح هو من يصنع قادة."];
         const mainWisdom = "كُنْ مَاهِراً لِيَحْتَاجَكَ النَّاس, وَكُنْ هَيِّناً لِيُحِبَّكَ النَّاس.";
 
         function showWisdom() {
@@ -140,5 +158,5 @@
     
     <script src="install.js"></script>
 </body>
-                        </html>
+    </html>
     

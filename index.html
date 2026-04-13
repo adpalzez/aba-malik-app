@@ -28,14 +28,33 @@
         .azkar-btn { background: linear-gradient(90deg, #1e3a8a, #1d4ed8); border: 1px solid #2563eb; color: white; }
         .gallery-btn { background: linear-gradient(90deg, #b45309, #d97706); border: 1px solid #f97316; color: white; }
         .wisdom-btn { background: linear-gradient(90deg, #581c87, #6d28d9); border: 1px solid #8b5cf6; color: white; }
+        
+        /* تصميم زر المشاركات العائم في أسفل اليسار */
+        .post-btn-fixed { 
+            position: fixed; 
+            bottom: 30px; 
+            left: 20px; 
+            z-index: 1000;
+            background: linear-gradient(90deg, #dc2626, #991b1b); 
+            border: 2px solid #ef4444; 
+            color: white; 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.5);
+            transition: all 0.3s ease;
+        }
+        .post-btn-fixed:active { transform: scale(0.9); }
+        
         .dollar-btn { background: linear-gradient(90deg, #15803d, #166534); border: 1px solid #22c55e; color: white; }
         .gold-btn { background: linear-gradient(90deg, #b59410, #d9b11e); border: 1px solid #eab308; color: #000; }
         .games-btn { background: linear-gradient(to r, #064e3b, #065f46); border: 1px solid #10b981; color: white; }
         
-        .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-
-        /* زر التثبيت في أسفل اليمين */
         #installBtn { position: fixed; bottom: 30px; right: 20px; z-index: 1000; display: none; }
+        .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen bg-image flex flex-col items-center">
@@ -47,6 +66,10 @@
     <button id="installBtn" class="glass p-4 rounded-full shadow-2xl animate__animated animate__bounceIn">
         <i class="fas fa-download text-yellow-400 text-xl"></i>
     </button>
+
+    <a href="posts.html" class="post-btn-fixed animate__animated animate__bounceIn">
+        <i class="fas fa-share-alt text-xl"></i>
+    </a>
 
     <div class="fixed inset-0 bg-black/30 z-0"></div>
 
@@ -111,7 +134,7 @@
 
     <footer class="relative z-10 w-full text-center pb-8">
         <div class="glass inline-block px-6 py-2">
-            <p class="text-[10px] text-gray-300 font-bold tracking-widest">
+            <p class="text-[10px] text-gray-300 font-bold tracking-widest leading-relaxed">
                 جميع الحقوق محفوظة © ٢٠٢٦ | صُمم بواسطة <span class="text-blue-400">عبد العزيز حسين عبد العزيز علي</span>
             </p>
         </div>
@@ -139,5 +162,4 @@
     
     <script src="install.js"></script>
 </body>
-                </html>
-    
+</html>

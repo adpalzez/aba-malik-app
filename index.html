@@ -33,12 +33,19 @@
         .games-btn { background: linear-gradient(to r, #064e3b, #065f46); border: 1px solid #10b981; color: white; }
         
         .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+
+        /* زر التثبيت في أسفل اليمين */
+        #installBtn { position: fixed; bottom: 30px; right: 20px; z-index: 1000; display: none; }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen bg-image flex flex-col items-center">
 
     <button id="themeToggle" class="theme-toggle glass">
         <i id="themeIcon" class="fas fa-sun text-yellow-400 text-xl"></i>
+    </button>
+
+    <button id="installBtn" class="glass p-4 rounded-full shadow-2xl animate__animated animate__bounceIn">
+        <i class="fas fa-download text-yellow-400 text-xl"></i>
     </button>
 
     <div class="fixed inset-0 bg-black/30 z-0"></div>
@@ -111,7 +118,6 @@
     </footer>
 
     <script>
-        // الأكواد البرمجية للوظائف
         const subWisdoms = ["من استشار، شارك الناس في عقولهم.", "العدل أساس الملك.", "القائد الناجح هو من يصنع قادة، لا أتباعاً."];
         const mainWisdom = "كُنْ مَاهِراً لِيَحْتَاجَكَ النَّاس، وَكُنْ هَيِّناً لِيُحِبَّكَ النَّاس.";
 
@@ -129,13 +135,9 @@
             const icon = document.getElementById('themeIcon');
             icon.classList.toggle('fa-sun'); icon.classList.toggle('fa-moon');
         });
-
-        // تشغيل ميزة العمل بدون إنترنت
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js')
-            .then(() => console.log("تطبيق أبا مالك جاهز أوفلاين"));
-        }
     </script>
+    
+    <script src="install.js"></script>
 </body>
                 </html>
-                                                                         
+    

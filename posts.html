@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مشاركات أبا مالك العقيلي</title>
+    <title>مشاركات أبا مالك العقيلي | المنصة التفاعلية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
@@ -12,47 +12,53 @@
     <style>
         body { font-family: 'Cairo', sans-serif; background-color: #0f172a; color: white; scroll-behavior: smooth; }
         .post-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; overflow: hidden; margin-bottom: 24px; }
-        .profile-img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #ef4444; }
-        .action-btn { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; shadow-lg transition: all 0.3s; }
+        .profile-img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #ef4444; object-cover }
+        
+        /* تنسيق أزرار التفاعل والردود */
+        .interaction-btn { color: #94a3b8; transition: all 0.2s; font-size: 0.85rem; padding: 6px 12px; border-radius: 99px; }
+        .interaction-btn:hover { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .interaction-btn.active { color: #ef4444; font-weight: bold; background: rgba(239, 68, 68, 0.15); }
+        .comment-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; transition: border-color 0.3s; }
+        .comment-input:focus { border-color: #ef4444; outline: none; }
+        .comment-card { background: rgba(255,255,255,0.03); border-radius: 12px; p: 8px 12px; margin-top: 6px; }
     </style>
 </head>
 <body class="pb-32">
 
     <header class="sticky top-0 z-50 bg-[#0f172a]/80 backdrop-blur-md p-4 border-b border-white/10 flex justify-between items-center">
-        <a href="index.html" class="text-gray-400"><i class="fas fa-arrow-right text-xl"></i></a>
+        <a href="index.html" class="text-gray-400 hover:text-red-500 transition"><i class="fas fa-arrow-right text-xl"></i></a>
         <h1 class="text-xl font-black tracking-widest text-red-500">مشاركات أبا مالك</h1>
         <div class="w-6"></div> 
     </header>
 
     <div class="container mx-auto px-4 py-6 max-w-md" id="postsContainer">
-        <div id="previewArea" class="hidden post-card border-2 border-dashed border-red-500 p-2 animate__animated animate__fadeIn">
-            <p class="text-center text-xs text-red-500 mb-2 font-bold uppercase">معاينة قبل الرفع السحابي</p>
-            <img id="imagePreview" src="#" class="hidden w-full h-64 object-cover rounded-xl shadow-lg">
-            <video id="videoPreview" controls class="hidden w-full h-64 rounded-xl shadow-lg bg-black"></video>
-            <button id="uploadBtn" onclick="publishPost()" class="w-full bg-red-600 mt-3 py-4 rounded-xl font-bold shadow-lg">نشر المشاركة للجميع</button>
+        
+        <div class="post-card p-4 animate__animated animate__fadeIn mb-8 border-2 border-red-500/20">
+            <textarea id="postText" rows="3" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm focus:outline-none focus:border-red-500 transition" placeholder="ماذا يدور في ذهنك يا أبا مالك؟"></textarea>
+            
+            <div id="previewArea" class="hidden mt-3 rounded-xl overflow-hidden border border-red-500/30">
+                <img id="imagePreview" src="#" class="hidden w-full h-48 object-cover">
+                <video id="videoPreview" controls class="hidden w-full h-48 bg-black"></video>
+            </div>
+
+            <div class="flex justify-between items-center mt-4">
+                <div class="flex gap-3">
+                    <button onclick="document.getElementById('fileInput').click()" class="text-gray-400 hover:text-red-500 hover:scale-110 transition"><i class="fas fa-image text-xl"></i></button>
+                    <button onclick="document.getElementById('videoInput').click()" class="text-gray-400 hover:text-blue-500 hover:scale-110 transition"><i class="fas fa-video text-xl"></i></button>
+                </div>
+                <button id="uploadBtn" onclick="publishPost()" class="bg-red-600 px-8 py-2.5 rounded-full font-bold text-sm shadow-lg active:scale-95 transition">نشر المشاركة</button>
+            </div>
         </div>
+
+        <input type="file" id="fileInput" class="hidden" accept="image/*">
+        <input type="file" id="videoInput" class="hidden" accept="video/*">
 
         <div id="dynamicPosts"></div>
-
-        <div class="post-card">
-            <div class="p-4 flex items-center gap-3">
-                <img src="https://i.ibb.co/pBhzxHdM/1000027317.jpg" class="profile-img">
-                <div><h4 class="font-bold text-sm">أبا مالك العقيلي</h4><span class="text-[10px] text-gray-400">نظام المشاركات الذكي</span></div>
-            </div>
-            <div class="px-4 pb-3 text-sm text-gray-300">أهلاً بك يا أبا مالك في منصتك السحابية الجديدة.</div>
-        </div>
-    </div>
-
-    <div class="fixed bottom-24 left-6 flex flex-col gap-4 z-[1000]">
-        <input type="file" id="videoInput" class="hidden" accept="video/*">
-        <button onclick="document.getElementById('videoInput').click()" class="action-btn bg-blue-600 animate__animated animate__pulse animate__infinite"><i class="fas fa-video text-white"></i></button>
-        <input type="file" id="fileInput" class="hidden" accept="image/*">
-        <button onclick="document.getElementById('fileInput').click()" class="action-btn bg-red-600"><i class="fas fa-camera text-white"></i></button>
     </div>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-[#0f172a] border-t border-white/10 p-4 flex justify-around items-center z-[1000]">
-        <a href="index.html" class="text-gray-400"><i class="fas fa-home text-xl"></i></a>
-        <a href="azkar.html" class="text-gray-400"><i class="fas fa-book-open text-xl"></i></a>
+        <a href="index.html" class="text-gray-400 hover:text-red-500 transition"><i class="fas fa-home text-xl"></i></a>
+        <a href="azkar.html" class="text-gray-400 hover:text-red-500 transition"><i class="fas fa-book-open text-xl"></i></a>
     </nav>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -60,9 +66,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
     <script>
-        // إعدادات Firebase (يجب استبدالها ببيانات حسابك)
+        // إعدادات Firebase الخاصة بك
         const firebaseConfig = {
-            apiKey: "AIzaSy...", 
+            apiKey: "AIzaSy...", // استبدلها بمفتاحك
             authDomain: "your-app.firebaseapp.com",
             projectId: "your-app",
             storageBucket: "your-app.appspot.com",
@@ -73,7 +79,7 @@
         const storage = firebase.storage();
         const db = firebase.firestore();
 
-        // معاينة الملفات
+        // معاينة الملفات قبل الرفع
         const previewFile = (input, isVideo) => {
             const file = input.files[0];
             if (file) {
@@ -83,54 +89,116 @@
                 const vid = document.getElementById('videoPreview');
                 if (isVideo) { vid.src = url; vid.classList.remove('hidden'); img.classList.add('hidden'); }
                 else { img.src = url; img.classList.remove('hidden'); vid.classList.add('hidden'); }
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         };
         document.getElementById('fileInput').onchange = () => previewFile(document.getElementById('fileInput'), false);
         document.getElementById('videoInput').onchange = () => previewFile(document.getElementById('videoInput'), true);
 
-        // وظيفة النشر الحقيقية
+        // وظيفة النشر الحقيقية للملف والنص
         async function publishPost() {
+            const text = document.getElementById('postText').value;
             const file = document.getElementById('fileInput').files[0] || document.getElementById('videoInput').files[0];
-            if (!file) return alert("اختر ملفاً أولاً");
+            if (!text && !file) return alert("اكتب رسالة أو اختر ملفاً أولاً يا أبا مالك");
 
             const btn = document.getElementById('uploadBtn');
-            btn.innerHTML = "جاري الرفع..."; btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري النشر...'; btn.disabled = true;
 
             try {
-                const ref = storage.ref(`posts/${Date.now()}_${file.name}`);
-                await ref.put(file);
-                const url = await ref.getDownloadURL();
-
+                let fileUrl = null; let fileType = 'text';
+                if (file) {
+                    const ref = storage.ref(`posts/${Date.now()}_${file.name}`);
+                    await ref.put(file);
+                    fileUrl = await ref.getDownloadURL();
+                    fileType = file.type.includes('video') ? 'video' : 'image';
+                }
                 await db.collection("all_posts").add({
-                    url: url,
-                    type: file.type.includes('video') ? 'video' : 'image',
+                    content: text, url: fileUrl, type: fileType,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    user: "أبا مالك العقيلي"
+                    user: "أبا مالك العقيلي", likesCount: 0, commentsCount: 0
                 });
-
-                alert("تم النشر بنجاح!");
-                location.reload();
-            } catch (err) { alert("فشل الرفع: " + err.message); btn.innerHTML = "نشر الآن"; btn.disabled = false; }
+                document.getElementById('postText').value = "";
+                document.getElementById('previewArea').classList.add('hidden');
+            } catch (err) { alert("فشل النشر: " + err.message); }
+            finally { btn.innerHTML = "نشر المشاركة"; btn.disabled = false; }
         }
 
-        // جلب المنشورات وعرضها
+        // جلب المنشورات تفاعلياً وعرضها مع التفاعلات والردود
         db.collection("all_posts").orderBy("timestamp", "desc").onSnapshot(snap => {
             let html = '';
             snap.forEach(doc => {
                 const post = doc.data();
+                const postId = doc.id;
                 html += `
-                    <div class="post-card animate__animated animate__fadeInUp">
+                    <div class="post-card animate__animated animate__fadeInUp mb-6">
                         <div class="p-4 flex items-center gap-3">
-                            <img src="https://i.ibb.co/pBhzxHdM/1000027317.jpg" class="profile-img">
-                            <div><h4 class="font-bold text-sm">${post.user}</h4><span class="text-[10px] text-gray-400">منذ قليل</span></div>
+                            <img src="https://i.ibb.co/pBhzxHdM/1000027317.jpg" class="profile-img object-cover">
+                            <div><h4 class="font-bold text-sm">${post.user}</h4><span class="text-[10px] text-gray-400">إشراف هندسي • موقع العمل</span></div>
                         </div>
-                        ${post.type === 'video' ? `<video src="${post.url}" controls class="w-full h-64 bg-black"></video>` : `<img src="${post.url}" class="w-full h-64 object-cover">`}
+                        <div class="px-4 pb-3"><p class="text-sm text-gray-100 leading-relaxed">${post.content || ''}</p></div>
+                        ${post.url ? (post.type === 'video' ? `<video src="${post.url}" controls class="w-full h-64 bg-black"></video>` : `<img src="${post.url}" class="w-full h-64 object-cover">`) : ''}
+                        
+                        <div class="p-2 border-t border-white/5 flex items-center gap-2 justify-around">
+                            <button onclick="toggleLike('${postId}')" class="interaction-btn flex items-center gap-2">
+                                <i class="far fa-heart"></i> <span>${post.likesCount || 0}</span> الإعجابات
+                            </button>
+                            <button onclick="toggleComments('${postId}')" class="interaction-btn flex items-center gap-2">
+                                <i class="far fa-comment"></i> <span>${post.commentsCount || 0}</span> الردود
+                            </button>
+                            <button onclick="sharePost('${post.content || 'مشاركة من أبا مالك'}')" class="interaction-btn flex items-center gap-2"><i class="fas fa-share text-xs"></i> مشاركة</button>
+                        </div>
+
+                        <div id="comments-section-${postId}" class="hidden px-4 pb-4 pt-2 border-t border-white/5 bg-white/5 animate__animated animate__fadeIn">
+                            <div id="comments-list-${postId}" class="space-y-3 mb-3 max-h-40 overflow-y-auto pr-2 text-xs text-gray-300">
+                                </div>
+                            <div class="flex gap-2">
+                                <input id="comment-input-${postId}" type="text" class="comment-input flex-grow p-2.5 text-xs text-white outline-none placeholder:text-gray-500" placeholder="اكتب رداً احترافياً...">
+                                <button onclick="addComment('${postId}')" class="text-red-500 text-sm px-3 hover:scale-110 transition"><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </div>
                     </div>`;
             });
             document.getElementById('dynamicPosts').innerHTML = html;
         });
+
+        // وظائف التفاعل (JavaScript)
+        async function toggleLike(postId) {
+            const postRef = db.collection("all_posts").doc(postId);
+            await postRef.update({ likesCount: firebase.firestore.FieldValue.increment(1) });
+        }
+
+        function toggleComments(postId) {
+            const section = document.getElementById(`comments-section-${postId}`);
+            const isHidden = section.classList.toggle('hidden');
+            if (!isHidden) loadComments(postId); // تحميل الردود عند فتح القسم
+        }
+
+        async function loadComments(postId) {
+            db.collection("all_posts").doc(postId).collection("comments").orderBy("timestamp", "asc").onSnapshot(snap => {
+                let html = '';
+                snap.forEach(doc => {
+                    const comment = doc.data();
+                    html += `<div class="comment-card"><span class="font-bold text-red-400">${comment.user}:</span> ${comment.text}</div>`;
+                });
+                document.getElementById(`comments-list-${postId}`).innerHTML = html || '<p class="text-gray-500 text-center py-2">لا توجد ردود بعد.</p>';
+            });
+        }
+
+        async function addComment(postId) {
+            const input = document.getElementById(`comment-input-${postId}`);
+            const text = input.value; if (!text) return;
+            await db.collection("all_posts").doc(postId).collection("comments").add({
+                text: text, user: "زائر احترافي", timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            await db.collection("all_posts").doc(postId).update({ commentsCount: firebase.firestore.FieldValue.increment(1) });
+            input.value = "";
+        }
+
+        function sharePost(text) {
+            if (navigator.share) {
+                navigator.share({ title: 'مشاركة من تطبيق أبا مالك', text: text, url: window.location.href });
+            } else { alert("انسخ الرابط لمشاركة المنشور يا قائد."); }
+        }
     </script>
 </body>
-        </html>
-        
+    </html>
+    

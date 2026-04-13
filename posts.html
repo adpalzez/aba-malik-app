@@ -54,7 +54,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
     <script>
-        // إعداداتك الحقيقية التي استخرجتها يا أبا مالك
         const firebaseConfig = {
           apiKey: "AIzaSyDOk3e9s7suX4eR7kviyo31ZkEU_25AuJQ",
           authDomain: "planning-with-ai-8d3e9.firebaseapp.com",
@@ -68,7 +67,6 @@
         const storage = firebase.storage();
         const db = firebase.firestore();
 
-        // معاينة الملفات
         const previewFile = (input, isVideo) => {
             const file = input.files[0];
             if (file) {
@@ -83,15 +81,12 @@
         document.getElementById('fileInput').onchange = () => previewFile(document.getElementById('fileInput'), false);
         document.getElementById('videoInput').onchange = () => previewFile(document.getElementById('videoInput'), true);
 
-        // نشر المنشور
         async function publishPost() {
             const text = document.getElementById('postText').value;
             const file = document.getElementById('fileInput').files[0] || document.getElementById('videoInput').files[0];
             if (!text && !file) return alert("اكتب شيئاً أولاً");
-
             const btn = document.getElementById('uploadBtn');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
-
             try {
                 let fileUrl = null; let fileType = 'text';
                 if (file) {
@@ -107,11 +102,10 @@
                 });
                 document.getElementById('postText').value = "";
                 document.getElementById('previewArea').classList.add('hidden');
-            } catch (err) { alert("تأكد من تفعيل Firestore و Storage في Firebase: " + err.message); }
+            } catch (err) { alert("تأكد من تفعيل قواعد الحماية (Rules) في Firebase: " + err.message); }
             finally { btn.innerHTML = "نشر"; btn.disabled = false; }
         }
 
-        // عرض المنشورات
         db.collection("all_posts").orderBy("timestamp", "desc").onSnapshot(snap => {
             let html = '';
             snap.forEach(doc => {

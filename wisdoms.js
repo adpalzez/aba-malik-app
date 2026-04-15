@@ -1,14 +1,10 @@
-// --- 1. قاعدة بيانات الحكم (Wisdom Encyclopedia) ---
-const wisdomData = {
+// مصفوفة الحكم (المصدر الوحيد للحكم)
+const abaMalikWisdoms = {
     main: "كُنْ مَاهِراً لِيَحْتَاجَكَ النَّاس, وَكُنْ هَيِّناً لِيُحِبَّكَ النَّاس.",
     others: [
         "من استشار، شارك الناس في عقولهم.",
         "العدل أساس الملك.",
         "القائد الناجح هو من يصنع قادة، وليس من يصنع أتباعاً.",
-        "الصبر مفتاح الفرج.",
-        "العلم في الصغر كالنقش على الحجر.",
-        "العمل المتقن يفرض نفسه.",
-        "احرص على ما ينفعك، واستعن بالله.",
         "الدقة في التنفيذ هي الفارق بين الهواة والمحترفين.",
         "الأمانة في العمل تفتح لك أبواب الرزق من حيث لا تحتسب.",
         "قوة الرجل في هدوئه، وهيبته في صدق كلمته.",
@@ -17,57 +13,42 @@ const wisdomData = {
     ]
 };
 
-// --- 2. وظائف المنطق (Logic Functions) ---
-
-// دالة تجلب حكمة عشوائية بناءً على الاحتمالات
+// وظيفة اختيار الحكمة
 function getRandomWisdom() {
-    const probability = Math.random();
-    // احتمال 60% لظهور الحكمة الرئيسية و 40% للحكم الأخرى
-    if (probability > 0.4) {
-        return wisdomData.main;
-    } else {
-        const randomIndex = Math.floor(Math.random() * wisdomData.others.length);
-        return wisdomData.others[randomIndex];
-    }
+    // نسبة 60% للحكمة الرئيسية
+    return Math.random() > 0.4 
+        ? abaMalikWisdoms.main 
+        : abaMalikWisdoms.others[Math.floor(Math.random() * abaMalikWisdoms.others.length)];
 }
 
-// وظيفة إظهار النافذة المنبثقة (Modal)
+// وظيفة إظهار النافذة
 function showWisdom() {
     const modal = document.getElementById('wisdomModal');
     const textZone = document.getElementById('wisdomText');
     
     if (modal && textZone) {
-        // تعيين النص عشوائياً
-        textZone.innerHTML = getRandomWisdom();
+        textZone.innerText = getRandomWisdom(); // وضع النص
+        modal.classList.remove('hidden'); // إظهار النافذة
         
-        // إظهار النافذة بحركة انسيابية (باستخدام Animate.css إذا كانت متوفرة)
-        modal.classList.remove('hidden'); 
-        modal.classList.add('flex', 'animate__animated', 'animate__fadeIn');
+        // إضافة حركة دخول جميلة (Animate.css)
+        const modalContent = modal.querySelector('.glass');
+        modalContent.classList.add('animate__animated', 'animate__zoomIn');
     }
 }
 
 // وظيفة إغلاق النافذة
-function closeWisdom() { 
+function closeWisdom() {
     const modal = document.getElementById('wisdomModal');
     if (modal) {
-        modal.classList.add('hidden'); 
-        modal.classList.remove('flex');
+        modal.classList.add('hidden');
     }
 }
 
-// --- 3. تحسين تجربة المستخدم (UX) ---
-
-// إغلاق النافذة عند الضغط في أي مكان خارج محتوى النافذة
+// إغلاق عند الضغط خارج نافذة الحكمة
 window.addEventListener('click', function(event) {
     const modal = document.getElementById('wisdomModal');
     if (event.target === modal) {
         closeWisdom();
     }
 });
-
-// إغلاق النافذة عند الضغط على زر Escape من لوحة المفاتيح
-window.addEventListener('keydown', function(event) {
-    if (event.key === "Escape") {
-        closeWisdom();
-    }
-});
+        

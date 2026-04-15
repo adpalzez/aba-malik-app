@@ -94,6 +94,22 @@
         </div>
     </div>
 
+    <div class="relative z-10 container mx-auto px-6 py-4 flex flex-col items-center">
+        <div class="glass p-6 w-full max-w-md text-center shadow-2xl mb-8 border-t-2 border-blue-500/30 animate__animated animate__fadeInUp">
+            <h4 class="text-sm font-bold text-blue-400 mb-4 tracking-widest uppercase">نبض التطبيق</h4>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-black/20 p-3 rounded-2xl border border-white/5">
+                    <p class="text-[10px] text-gray-400 mb-1">إجمالي التصفح</p>
+                    <p id="viewCount" class="text-xl font-black text-white">0</p>
+                </div>
+                <div class="bg-black/20 p-3 rounded-2xl border border-white/5">
+                    <p class="text-[10px] text-gray-400 mb-1">إجمالي التحميل</p>
+                    <p id="installCount" class="text-xl font-black text-green-400">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="wisdomModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
         <div class="glass p-8 max-w-sm w-full text-center border-2 border-yellow-500/50 relative animate__animated animate__zoomIn">
             <div class="absolute top-4 w-full left-0 px-6 flex justify-between">
@@ -143,7 +159,7 @@
             alert("أنت الآن تعمل بدون إنترنت - تطبيق أبا مالك جاهز دائماً!");
         });
 
-        // --- وظيفة المشاركة (تستخدم النص الموجود في المودال) ---
+        // --- وظيفة المشاركة ---
         function shareWisdom() {
             const wisdomText = document.getElementById('wisdomText').innerText;
             const text = encodeURIComponent(`من تطبيق أبا مالك العقيلي:\n\n"${wisdomText}"`);
@@ -151,4 +167,5 @@
         }
     </script>
 </body>
-</html>
+        </html>
+    

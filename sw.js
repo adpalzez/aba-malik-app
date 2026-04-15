@@ -1,4 +1,4 @@
-const cacheName = 'aba-malik-v2'; // قمنا بتغيير الإصدار هنا لتنشيط التحديث
+const cacheName = 'aba-malik-v3'; // رفعنا الإصدار للتحديث
 const assets = [
   './',
   './index.html',
@@ -11,31 +11,45 @@ const assets = [
   'https://i.ibb.co/pBhzxHdM/1000027317.jpg'
 ];
 
-// تثبيت وحفظ الملفات
+// تثبيت مرن
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(cacheName).then(cache => {
-      // استخدام addAll بحذر، وإضافة ملفاتك الأساسية
-      return cache.addAll(assets);
+      console.log('جاري حفظ الملفات في الذاكرة...');
+      // استخدام حلقة لتجنب تعطل التثبيت في حال فشل ملف واحد
+      return Promise.all(
+        assets.map(url => {
+          return cache.add(url).catch(err => console.error('فشل تحميل الملف:', url, err));
+        })
+      );
     })
   );
+  self.skipWaiting(); // تفعيل فوري للنسخة الجديدة
 });
 
-// تفعيل النسخة الجديدة وحذف القديمة
+// تفعيل وتنظيف الذاكرة القديمة
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys => {
-      return Promise.all(keys.filter(key => key !== cacheName).map(key => caches.delete(key)));
+      return Promise.all(
+        keys.filter(key => key !== cacheName).map(key => caches.delete(key))
+      );
     })
   );
+  return self.clients.claim(); // السيطرة الفورية على الصفحات المفتوحة
 });
 
-// العرض من الذاكرة عند انقطاع النت
+// العرض من الذاكرة
 self.addEventListener('fetch', e => {
   e.respondWith(
     caches.match(e.request).then(res => {
-      return res || fetch(e.request);
+      return res || fetch(e.request).catch(() => {
+        // إذا فشل النت وكان الطلب لصفحة HTML، يمكننا عرض صفحة "أوفلاين" هنا
+        if (e.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+      });
     })
   );
 });
-    
+            

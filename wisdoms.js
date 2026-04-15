@@ -51,4 +51,4 @@ window.addEventListener('click', function(event) {
         closeWisdom();
     }
 });
-        
+            

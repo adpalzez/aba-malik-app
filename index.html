@@ -29,12 +29,17 @@
         .gallery-btn { background: linear-gradient(90deg, #b45309, #d97706); color: white; }
         .wisdom-btn { background: linear-gradient(90deg, #581c87, #6d28d9); color: white; }
         .games-btn { background: linear-gradient(to r, #064e3b, #065f46); color: white; }
+        .rating-btn { background: linear-gradient(90deg, #f59e0b, #d97706); color: white; }
 
         .post-btn-fixed { position: fixed; bottom: 30px; left: 20px; z-index: 1000; background: linear-gradient(90deg, #dc2626, #991b1b); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(220, 38, 38, 0.5); }
         .badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #0f172a; animation: pulse-badge 2s infinite; }
         
         #installBtn { position: fixed; bottom: 30px; right: 20px; z-index: 1000; display: none; }
         .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        
+        /* نجوم التقييم */
+        .star-btn { transition: transform 0.2s; }
+        .star-btn:active { transform: scale(1.4); }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen bg-image flex flex-col items-center">
@@ -74,6 +79,10 @@
                 
                 <button onclick="showWisdom()" class="wisdom-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95">
                     <span>حكمة اليوم</span><i class="fas fa-lightbulb text-yellow-400 text-xl"></i>
+                </button>
+
+                <button onclick="openRating()" class="rating-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95">
+                    <span>تقييم التطبيق</span><i class="fas fa-star text-yellow-300 text-xl"></i>
                 </button>
             </div>
 
@@ -116,12 +125,28 @@
                 <button onclick="closeWisdom()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
                 <button onclick="shareWisdom()" class="text-green-500 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></button>
             </div>
-
             <i class="fas fa-quote-right text-yellow-500 text-3xl mb-4 mt-4"></i>
             <div id="wisdomText" class="text-2xl font-black leading-relaxed mb-6"></div>
+            <button onclick="closeWisdom()" class="bg-yellow-600 text-black px-8 py-3 rounded-full font-bold text-sm shadow-lg w-full transition active:scale-95">اعتززت بهذه الحكمة</button>
+        </div>
+    </div>
+
+    <div id="ratingModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="glass p-8 max-w-sm w-full text-center border-2 border-orange-500/50 relative animate__animated animate__zoomIn">
+            <button onclick="closeRating()" class="absolute top-4 left-4 text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+            <h3 class="text-xl font-black mb-2">تقييمك يهمنا</h3>
+            <p class="text-[10px] text-gray-400 mb-6">كم نجمة يستحق تطبيق أبا مالك؟</p>
             
-            <button onclick="closeWisdom()" class="bg-yellow-600 text-black px-8 py-3 rounded-full font-bold text-sm shadow-lg w-full transition active:scale-95">
-                اعتززت بهذه الحكمة
+            <div class="flex justify-center gap-3 mb-8 text-4xl">
+                <i class="far fa-star cursor-pointer text-gray-400 star-btn" onclick="setRating(1)"></i>
+                <i class="far fa-star cursor-pointer text-gray-400 star-btn" onclick="setRating(2)"></i>
+                <i class="far fa-star cursor-pointer text-gray-400 star-btn" onclick="setRating(3)"></i>
+                <i class="far fa-star cursor-pointer text-gray-400 star-btn" onclick="setRating(4)"></i>
+                <i class="far fa-star cursor-pointer text-gray-400 star-btn" onclick="setRating(5)"></i>
+            </div>
+
+            <button id="submitRatingBtn" onclick="submitRating()" class="bg-orange-600 text-white px-8 py-3 rounded-full font-bold text-sm shadow-lg w-full opacity-50 cursor-not-allowed transition" disabled>
+                إرسال التقييم
             </button>
         </div>
     </div>
@@ -154,10 +179,42 @@
             }
         });
 
-        // --- ميزة إشعار الأوفلاين الذكية ---
-        window.addEventListener('offline', () => {
-            alert("أنت الآن تعمل بدون إنترنت - تطبيق أبا مالك جاهز دائماً!");
-        });
+        // --- وظائف التقييم ---
+        let userRating = 0;
+        function openRating() { document.getElementById('ratingModal').classList.replace('hidden', 'flex'); }
+        function closeRating() { document.getElementById('ratingModal').classList.replace('flex', 'hidden'); }
+
+        function setRating(n) {
+            userRating = n;
+            const stars = document.querySelectorAll('.star-btn');
+            stars.forEach((star, i) => {
+                if (i < n) {
+                    star.classList.replace('far', 'fas');
+                    star.classList.add('text-yellow-400');
+                } else {
+                    star.classList.replace('fas', 'far');
+                    star.classList.remove('text-yellow-400');
+                }
+            });
+            const btn = document.getElementById('submitRatingBtn');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        function submitRating() {
+            if (typeof db !== 'undefined' && userRating > 0) {
+                db.collection('ratings').add({
+                    stars: userRating,
+                    time: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    alert("شكراً لتقييمك يا بطل!");
+                    closeRating();
+                });
+            }
+        }
+
+        // --- ميزة إشعار الأوفلاين ---
+        window.addEventListener('offline', () => alert("أنت الآن تعمل بدون إنترنت - تطبيق أبا مالك جاهز دائماً!"));
 
         // --- وظيفة المشاركة ---
         function shareWisdom() {
@@ -167,5 +224,5 @@
         }
     </script>
 </body>
-        </html>
-    
+                    </html>
+                        

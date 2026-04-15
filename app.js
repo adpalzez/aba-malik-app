@@ -1,6 +1,6 @@
 // 1. إعدادات Firebase الخاصة بمشروعك
 const firebaseConfig = {
-  apiKey: "AIzaSy...", // تأكد من وضع بياناتك الحقيقية هنا
+  apiKey: "AIzaSy...", // ضع بياناتك الحقيقية هنا
   authDomain: "your-project.firebaseapp.com",
   projectId: "your-project-id",
   storageBucket: "your-project.appspot.com",
@@ -29,18 +29,16 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// --- 5. نظام الإحصائيات (الجديد) ---
+// --- 5. نظام الإحصائيات ونبض التطبيق ---
 
-// أ. تسجيل زيارة جديدة عند فتح التطبيق
 function logVisit() {
   db.collection('analytics').add({
     type: 'تصفح',
-    device: navigator.userAgent.substring(0, 50), // نوع المتصفح/الهاتف
+    device: navigator.userAgent.substring(0, 50),
     time: firebase.firestore.FieldValue.serverTimestamp()
   });
 }
 
-// ب. تسجيل عملية تحميل (تثبيت) التطبيق
 window.addEventListener('appinstalled', () => {
   db.collection('analytics').add({
     type: 'تحميل وتثبيت',
@@ -48,7 +46,6 @@ window.addEventListener('appinstalled', () => {
   });
 });
 
-// ج. عرض الإحصائيات في لوحة التحكم (إذا وجدت العناصر في HTML)
 function getAnalytics() {
   const viewElem = document.getElementById('viewCount');
   const installElem = document.getElementById('installCount');
@@ -57,14 +54,68 @@ function getAnalytics() {
     db.collection('analytics').where('type', '==', 'تصفح')
       .onSnapshot(snap => { viewElem.innerText = snap.size; });
   }
-
   if (installElem) {
     db.collection('analytics').where('type', '==', 'تحميل وتثبيت')
       .onSnapshot(snap => { installElem.innerText = snap.size; });
   }
 }
 
-// --- 6. وظيفة جلب المنشورات ---
+// --- 6. نظام التقييم بالنجوم (الجديد) ---
+
+let userRating = 0;
+
+function openRating() {
+    const modal = document.getElementById('ratingModal');
+    if(modal) modal.classList.replace('hidden', 'flex');
+}
+
+function closeRating() {
+    const modal = document.getElementById('ratingModal');
+    if(modal) modal.classList.replace('flex', 'hidden');
+}
+
+function setRating(n) {
+    userRating = n;
+    const stars = document.querySelectorAll('.star-btn');
+    stars.forEach((star, i) => {
+        if (i < n) {
+            star.classList.replace('far', 'fas');
+            star.classList.add('text-yellow-400');
+        } else {
+            star.classList.replace('fas', 'far');
+            star.classList.remove('text-yellow-400');
+        }
+    });
+    
+    const btn = document.getElementById('submitRatingBtn');
+    if(btn) {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+}
+
+function submitRating() {
+    if (userRating === 0) return;
+
+    db.collection('ratings').add({
+        stars: userRating,
+        time: firebase.firestore.FieldValue.serverTimestamp(),
+        device: navigator.userAgent.substring(0, 30)
+    }).then(() => {
+        alert("شكراً لتقييمك يا أبا مالك! تم استلام النجوم بنجاح.");
+        closeRating();
+        
+        // تسجيل التقييم كنشاط في الإحصائيات
+        db.collection('analytics').add({
+            type: 'تقييم نجوم',
+            value: userRating,
+            time: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    }).catch(err => console.error("خطأ في التقييم:", err));
+}
+
+// --- 7. وظيفة جلب المنشورات ---
+
 const postsContainer = document.querySelector('.posts-container');
 
 function getPosts() {
@@ -77,9 +128,7 @@ function getPosts() {
           renderPost(post, doc.id);
         });
       }
-    }, (err) => {
-      console.log('خطأ في جلب البيانات:', err.message);
-    });
+    }, (err) => console.log('خطأ في جلب البيانات:', err.message));
 }
 
 function renderPost(post, id) {
@@ -99,10 +148,11 @@ function renderPost(post, id) {
   if (postsContainer) postsContainer.innerHTML += html;
 }
 
-// تشغيل كافة الوظائف عند تحميل الصفحة
+// --- 8. تشغيل كل شيء عند التحميل ---
+
 document.addEventListener('DOMContentLoaded', () => {
-  logVisit();      // تسجيل الزيارة فوراً
-  getAnalytics();  // تحديث أرقام لوحة التحكم
-  if (postsContainer) getPosts(); // جلب المنشورات
+  logVisit();      
+  getAnalytics();  
+  if (postsContainer) getPosts();
 });
       

@@ -16,66 +16,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        body { 
-            font-family: 'Cairo', sans-serif; 
-            scroll-behavior: smooth; 
-            transition: background-color 0.5s ease, color 0.5s ease; 
-        }
-        .glass { 
-            background: rgba(0, 0, 0, 0.4); 
-            backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 255, 255, 0.15); 
-            border-radius: 40px; 
-            transition: all 0.5s ease; 
-        }
-        .bg-image { 
-            background-image: url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); 
-            background-size: cover; 
-            background-position: center; 
-            background-attachment: fixed; 
-        }
+        body { font-family: 'Cairo', sans-serif; scroll-behavior: smooth; transition: all 0.5s ease; }
+        .glass { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 40px; }
+        .bg-image { background-image: url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); background-size: cover; background-position: center; background-attachment: fixed; }
         
-        /* تحسينات الوضع الفاتح */
+        /* الوضع الفاتح */
         body.light-mode { background-color: #f0f2f5; color: #1a1a1a; }
         body.light-mode .bg-image { background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); }
         body.light-mode .glass { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.1); color: #1a1a1a; }
-        body.light-mode #wisdomText { color: #1a1a1a; }
-        body.light-mode .fixed.inset-0.bg-black\/30 { background-color: rgba(255,255,255,0.2); }
 
-        /* الأزرار الملونة */
-        .mosque-btn { background: linear-gradient(90deg, #166534, #15803d); border: 1px solid #16a34a; color: white; }
-        .azkar-btn { background: linear-gradient(90deg, #1e3a8a, #1d4ed8); border: 1px solid #2563eb; color: white; }
-        .gallery-btn { background: linear-gradient(90deg, #b45309, #d97706); border: 1px solid #f97316; color: white; }
-        .wisdom-btn { background: linear-gradient(90deg, #581c87, #6d28d9); border: 1px solid #8b5cf6; color: white; }
-        .games-btn { background: linear-gradient(to r, #064e3b, #065f46); border: 1px solid #10b981; color: white; }
+        /* الأزرار */
+        .mosque-btn { background: linear-gradient(90deg, #166534, #15803d); color: white; }
+        .azkar-btn { background: linear-gradient(90deg, #1e3a8a, #1d4ed8); color: white; }
+        .gallery-btn { background: linear-gradient(90deg, #b45309, #d97706); color: white; }
+        .wisdom-btn { background: linear-gradient(90deg, #581c87, #6d28d9); color: white; }
+        .games-btn { background: linear-gradient(to r, #064e3b, #065f46); color: white; }
 
-        .post-btn-fixed { 
-            position: fixed; bottom: 30px; left: 20px; z-index: 1000;
-            background: linear-gradient(90deg, #dc2626, #991b1b); 
-            border: 2px solid #ef4444; color: white; 
-            width: 60px; height: 60px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.5);
-            transition: transform 0.2s;
-        }
-        .post-btn-fixed:active { transform: scale(0.9); }
-
-        .badge {
-            position: absolute; top: -5px; right: -5px;
-            background-color: #ef4444; color: white;
-            font-size: 10px; font-weight: bold;
-            width: 22px; height: 22px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            border: 2px solid #0f172a;
-            animation: pulse-badge 2s infinite;
-        }
-
-        @keyframes pulse-badge {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
-
+        .post-btn-fixed { position: fixed; bottom: 30px; left: 20px; z-index: 1000; background: linear-gradient(90deg, #dc2626, #991b1b); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(220, 38, 38, 0.5); }
+        .badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #0f172a; animation: pulse-badge 2s infinite; }
+        @keyframes pulse-badge { 0% { transform: scale(1); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        
         #installBtn { position: fixed; bottom: 30px; right: 20px; z-index: 1000; display: none; }
         .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     </style>
@@ -86,7 +46,7 @@
         <i id="themeIcon" class="fas fa-sun text-yellow-400 text-xl"></i>
     </button>
 
-    <button id="installBtn" class="glass p-4 rounded-full shadow-2xl animate__animated animate__bounceIn">
+    <button id="installBtn" class="glass p-4 rounded-full shadow-2xl">
         <i class="fas fa-download text-yellow-400 text-xl"></i>
     </button>
 
@@ -94,8 +54,6 @@
         <i class="fas fa-share-alt text-xl"></i>
         <span class="badge">1</span>
     </a>
-
-    <div class="fixed inset-0 bg-black/30 z-0 pointer-events-none"></div>
 
     <nav class="p-6 relative z-50 text-center">
         <h1 class="text-2xl font-black tracking-widest uppercase animate__animated animate__fadeInDown">ABA MALIK AL-AQILI</h1>
@@ -116,6 +74,7 @@
                 <a href="gallery.html" class="gallery-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95">
                     <span>معرض الأعمال الإبداعية</span><i class="fas fa-microchip text-yellow-500 text-xl"></i>
                 </a>
+                
                 <button onclick="showWisdom()" class="wisdom-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg transition active:scale-95">
                     <span>حكمة اليوم</span><i class="fas fa-lightbulb text-yellow-400 text-xl"></i>
                 </button>
@@ -148,64 +107,32 @@
     </div>
 
     <footer class="relative z-10 w-full text-center pb-8">
-        <div class="glass inline-block px-6 py-2">
-            <p class="text-[10px] text-gray-300 font-bold tracking-widest leading-relaxed">
-                جميع الحقوق محفوظة © ٢٠٢٦ | صُمم بواسطة <span class="text-blue-400">عبد العزيز حسين عبد العزيز علي</span>
-            </p>
+        <div class="glass inline-block px-6 py-2 text-[10px] text-gray-300 font-bold tracking-widest">
+            جميع الحقوق محفوظة © ٢٠٢٦ | صُمم بواسطة <span class="text-blue-400">عبد العزيز حسين عبد العزيز علي</span>
         </div>
     </footer>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script src="./app.js"></script>
+    <script src="./wisdom.js"></script> 
+    <script src="./install.js"></script>
+
     <script>
-        // --- إدارة الحكم ---
-        const subWisdoms = [
-            "من استشار، شارك الناس في عقولهم.", 
-            "العدل أساس الملك.", 
-            "القائد الناجح هو من يصنع قادة.",
-            "الصبر مفتاح الفرج.",
-            "العلم في الصغر كالنقش على الحجر."
-        ];
-        const mainWisdom = "كُنْ مَاهِراً لِيَحْتَاجَكَ النَّاس, وَكُنْ هَيِّناً لِيُحِبَّكَ النَّاس.";
-
-        function showWisdom() {
-            const modal = document.getElementById('wisdomModal');
-            const textZone = document.getElementById('wisdomText');
-            // اختيار حكمة عشوائية
-            textZone.innerHTML = Math.random() > 0.3 ? mainWisdom : subWisdoms[Math.floor(Math.random() * subWisdoms.length)];
-            modal.classList.remove('hidden'); 
-            modal.classList.add('flex');
-        }
-        function closeWisdom() { 
-            document.getElementById('wisdomModal').classList.add('hidden'); 
-            document.getElementById('wisdomModal').classList.remove('flex');
-        }
-
-        // --- تبديل الأوضاع (Dark/Light) ---
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
-
         themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('light-mode');
-            
             if (document.body.classList.contains('light-mode')) {
                 themeIcon.classList.replace('fa-sun', 'fa-moon');
                 themeIcon.classList.remove('text-yellow-400');
-                themeIcon.classList.add('text-gray-600');
             } else {
                 themeIcon.classList.replace('fa-moon', 'fa-sun');
-                themeIcon.classList.remove('text-gray-600');
                 themeIcon.classList.add('text-yellow-400');
             }
         });
-
-        // إغلاق النافذة عند الضغط خارجها
-        window.onclick = function(event) {
-            const modal = document.getElementById('wisdomModal');
-            if (event.target == modal) {
-                closeWisdom();
-            }
-        }
     </script>
-    
-    <script src="install.js"></script>
 </body>
-</html>
+    </html>
+    

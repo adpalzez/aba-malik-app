@@ -16,16 +16,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Cairo', sans-serif; scroll-behavior: smooth; transition: all 0.5s ease; }
+        body { font-family: 'Cairo', sans-serif; scroll-behavior: smooth; transition: all 0.5s ease; padding-bottom: 90px; }
         .glass { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 40px; }
         .bg-image { background-image: url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); background-size: cover; background-position: center; background-attachment: fixed; }
         
-        /* الوضع الفاتح */
         body.light-mode { background-color: #f0f2f5; color: #1a1a1a; }
         body.light-mode .bg-image { background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); }
         body.light-mode .glass { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.1); color: #1a1a1a; }
 
-        /* الأزرار */
+        /* الأزرار الرئيسية */
         .mosque-btn { background: linear-gradient(90deg, #166534, #15803d); color: white; }
         .azkar-btn { background: linear-gradient(90deg, #1e3a8a, #1d4ed8); color: white; }
         .gallery-btn { background: linear-gradient(90deg, #b45309, #d97706); color: white; }
@@ -33,13 +32,16 @@
         .rating-btn { background: linear-gradient(90deg, #f59e0b, #d97706); color: white; }
         .games-btn { background: linear-gradient(to r, #064e3b, #065f46); color: white; }
 
-        .post-btn-fixed { position: fixed; bottom: 30px; left: 20px; z-index: 1000; background: linear-gradient(90deg, #dc2626, #991b1b); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(220, 38, 38, 0.5); }
-        .badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #0f172a; animation: pulse-badge 2s infinite; }
-        
-        /* تعديل مواقع الأزرار لتناسب الشريط العلوي */
+        /* أزرار التحكم العلوية */
         #installBtn { position: fixed; top: 60px; right: 20px; z-index: 100; display: none; }
         .theme-toggle { position: fixed; top: 60px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         
+        /* تنسيق شريط التنقل السفلي */
+        .nav-bottom { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.1); padding: 12px 10px 25px 10px; display: flex; justify-content: around; align-items: center; }
+        .nav-item { color: rgba(255, 255, 255, 0.4); flex: 1; display: flex; flex-col; align-items: center; gap: 4px; transition: 0.3s; }
+        .nav-item.active { color: #fbbf24; }
+        .nav-item.active i { transform: translateY(-5px); }
+
         .star-btn { transition: transform 0.2s; }
         .star-btn:active { transform: scale(1.4); }
     </style>
@@ -73,11 +75,6 @@
     <button id="installBtn" class="glass p-4 rounded-full shadow-2xl">
         <i class="fas fa-download text-emerald-400 text-xl"></i>
     </button>
-
-    <a href="posts.html" class="post-btn-fixed animate__animated animate__bounceIn">
-        <i class="fas fa-share-alt text-xl text-white"></i>
-        <span class="badge">1</span>
-    </a>
 
     <nav class="p-10 relative z-50 text-center">
         <h1 class="text-2xl font-black tracking-widest uppercase animate__animated animate__fadeInDown">ABA MALIK AL-AQILI</h1>
@@ -123,6 +120,26 @@
         </div>
     </div>
 
+    <nav class="nav-bottom animate__animated animate__fadeInUp">
+        <a href="index.html" class="nav-item active flex flex-col items-center">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-[9px] font-bold">الرئيسية</span>
+        </a>
+        <a href="prayer.html" class="nav-item flex flex-col items-center">
+            <i class="fas fa-mosque text-xl"></i>
+            <span class="text-[9px] font-bold">المسجد</span>
+        </a>
+        <a href="posts.html" class="nav-item flex flex-col items-center relative">
+            <i class="fas fa-share-alt text-xl"></i>
+            <span class="absolute top-0 right-1/4 w-2 h-2 bg-red-500 rounded-full"></span>
+            <span class="text-[9px] font-bold">المنشورات</span>
+        </a>
+        <a href="azkar.html" class="nav-item flex flex-col items-center">
+            <i class="fas fa-book-open text-xl"></i>
+            <span class="text-[9px] font-bold">الأذكار</span>
+        </a>
+    </nav>
+
     <div id="wisdomModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
         <div class="glass p-8 max-w-sm w-full text-center border-2 border-yellow-500/50 relative animate__animated animate__zoomIn">
             <div class="absolute top-4 w-full left-0 px-6 flex justify-between">
@@ -151,7 +168,7 @@
         </div>
     </div>
 
-    <footer class="relative z-10 w-full text-center pb-8">
+    <footer class="relative z-10 w-full text-center pb-20">
         <div class="glass inline-block px-6 py-2 text-[10px] text-gray-300 font-bold tracking-widest leading-relaxed">
             جميع الحقوق محفوظة © ٢٠٢٦ | صُمم بواسطة <span class="text-blue-400">عبد العزيز حسين عبد العزيز علي</span>
         </div>
@@ -159,13 +176,12 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    
     <script src="./app.js"></script>
     <script src="./wisdoms.js"></script> 
     <script src="./install.js"></script>
 
     <script>
-        // 1. تبديل الوضع
+        // تبديل الوضع
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
         themeToggle.addEventListener('click', () => {
@@ -176,11 +192,10 @@
             themeIcon.classList.toggle('text-gray-600');
         });
 
-        // 2. إدارة التقييم
+        // إدارة التقييم
         let userRating = 0;
         function openRating() { document.getElementById('ratingModal').classList.replace('hidden', 'flex'); }
         function closeRating() { document.getElementById('ratingModal').classList.replace('flex', 'hidden'); }
-
         function setRating(n) {
             userRating = n;
             const stars = document.querySelectorAll('.star-btn');
@@ -197,7 +212,6 @@
             btn.disabled = false;
             btn.classList.remove('opacity-50', 'cursor-not-allowed');
         }
-
         function submitRating() {
             if (typeof db !== 'undefined' && userRating > 0) {
                 db.collection('ratings').add({
@@ -209,17 +223,12 @@
                 });
             }
         }
-
-        // 3. مشاركة الحكمة
         function shareWisdom() {
             const wisdomText = document.getElementById('wisdomText').innerText;
             const text = encodeURIComponent(`من تطبيق أبا مالك العقيلي:\n\n"${wisdomText}"`);
             window.open(`https://wa.me/?text=${text}`, '_blank');
         }
-
-        // 4. حالة الأوفلاين
         window.addEventListener('offline', () => alert("أنت الآن تعمل بدون إنترنت - تطبيق أبا مالك جاهز دائماً!"));
     </script>
 </body>
-    </html>
-    
+</html>

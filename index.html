@@ -20,12 +20,10 @@
         .glass { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 40px; }
         .bg-image { background-image: url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); background-size: cover; background-position: center; background-attachment: fixed; }
         
-        /* الوضع الفاتح */
         body.light-mode { background-color: #f0f2f5; color: #1a1a1a; }
         body.light-mode .bg-image { background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); }
         body.light-mode .glass { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.1); color: #1a1a1a; }
 
-        /* الأزرار */
         .mosque-btn { background: linear-gradient(90deg, #166534, #15803d); color: white; }
         .azkar-btn { background: linear-gradient(90deg, #1e3a8a, #1d4ed8); color: white; }
         .gallery-btn { background: linear-gradient(90deg, #b45309, #d97706); color: white; }
@@ -34,7 +32,6 @@
 
         .post-btn-fixed { position: fixed; bottom: 30px; left: 20px; z-index: 1000; background: linear-gradient(90deg, #dc2626, #991b1b); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(220, 38, 38, 0.5); }
         .badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #0f172a; animation: pulse-badge 2s infinite; }
-        @keyframes pulse-badge { 0% { transform: scale(1); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
         
         #installBtn { position: fixed; bottom: 30px; right: 20px; z-index: 1000; display: none; }
         .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
@@ -116,8 +113,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     
     <script src="./app.js"></script>
-    <script src="./wisdom.js"></script> 
-    <script src="./install.js"></script>
+    <script src="./wisdoms.js"></script> <script src="./install.js"></script>
 
     <script>
         const themeToggle = document.getElementById('themeToggle');
@@ -134,5 +130,5 @@
         });
     </script>
 </body>
-    </html>
-    
+        </html>
+            

@@ -1,7 +1,6 @@
 // 1. إعدادات Firebase الخاصة بمشروعك
-// (استبدل القيم أدناه ببياناتك من لوحة تحكم Firebase)
 const firebaseConfig = {
-  apiKey: "AIzaSy...",
+  apiKey: "AIzaSy...", // تأكد من وضع بياناتك الحقيقية هنا
   authDomain: "your-project.firebaseapp.com",
   projectId: "your-project-id",
   storageBucket: "your-project.appspot.com",
@@ -15,19 +14,10 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 
 // 3. تفعيل خاصية الثبات (Offline Persistence) 
-// هذا الجزء هو المسؤول عن جعل المنشورات تظهر بدون إنترنت
 firebase.firestore().enablePersistence()
-  .then(() => {
-    console.log("تم تفعيل وضع الأوفلاين للبيانات بنجاح!");
-  })
   .catch((err) => {
-    if (err.code == 'failed-precondition') {
-      // تعدد التبويبات المفتوحة قد يمنع التفعيل
-      console.warn("التخزين المحلي يعمل في تبويب واحد فقط.");
-    } else if (err.code == 'unimplemented') {
-      // المتصفح لا يدعم الخاصية
-      console.warn("المتصفح لا يدعم التخزين المحلي.");
-    }
+    if (err.code == 'failed-precondition') console.warn("التخزين المحلي يعمل في تبويب واحد فقط.");
+    else if (err.code == 'unimplemented') console.warn("المتصفح لا يدعم التخزين المحلي.");
   });
 
 // 4. تسجيل الـ Service Worker (sw.js)
@@ -39,15 +29,49 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// 5. وظيفة جلب المنشورات وعرضها (مثال)
+// --- 5. نظام الإحصائيات (الجديد) ---
+
+// أ. تسجيل زيارة جديدة عند فتح التطبيق
+function logVisit() {
+  db.collection('analytics').add({
+    type: 'تصفح',
+    device: navigator.userAgent.substring(0, 50), // نوع المتصفح/الهاتف
+    time: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+// ب. تسجيل عملية تحميل (تثبيت) التطبيق
+window.addEventListener('appinstalled', () => {
+  db.collection('analytics').add({
+    type: 'تحميل وتثبيت',
+    time: firebase.firestore.FieldValue.serverTimestamp()
+  });
+});
+
+// ج. عرض الإحصائيات في لوحة التحكم (إذا وجدت العناصر في HTML)
+function getAnalytics() {
+  const viewElem = document.getElementById('viewCount');
+  const installElem = document.getElementById('installCount');
+
+  if (viewElem) {
+    db.collection('analytics').where('type', '==', 'تصفح')
+      .onSnapshot(snap => { viewElem.innerText = snap.size; });
+  }
+
+  if (installElem) {
+    db.collection('analytics').where('type', '==', 'تحميل وتثبيت')
+      .onSnapshot(snap => { installElem.innerText = snap.size; });
+  }
+}
+
+// --- 6. وظيفة جلب المنشورات ---
 const postsContainer = document.querySelector('.posts-container');
 
 function getPosts() {
-  // استخدام onSnapshot يضمن تحديث البيانات فوراً عند عودة النت
   db.collection('posts').orderBy('createdAt', 'desc')
     .onSnapshot((snapshot) => {
       if (postsContainer) {
-        postsContainer.innerHTML = ''; // مسح المحتوى القديم
+        postsContainer.innerHTML = ''; 
         snapshot.forEach((doc) => {
           const post = doc.data();
           renderPost(post, doc.id);
@@ -58,7 +82,6 @@ function getPosts() {
     });
 }
 
-// 6. وظيفة بناء شكل المنشور (Tailwind CSS)
 function renderPost(post, id) {
   const html = `
     <div class="bg-white p-4 rounded-lg shadow-md mb-4 animate__animated animate__fadeIn" data-id="${id}">
@@ -66,18 +89,20 @@ function renderPost(post, id) {
         <img src="${post.userImage || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-full border">
         <div class="mr-3">
           <h3 class="font-bold text-gray-800">${post.userName || 'مستخدم'}</h3>
-          <p class="text-xs text-gray-500">${new Date(post.createdAt?.toDate()).toLocaleString('ar-EG')}</p>
+          <p class="text-xs text-gray-500">${post.createdAt ? new Date(post.createdAt.toDate()).toLocaleString('ar-EG') : ''}</p>
         </div>
       </div>
       <p class="text-gray-700 leading-relaxed">${post.content}</p>
       ${post.imageUrl ? `<img src="${post.imageUrl}" class="mt-3 rounded-lg w-full h-auto">` : ''}
     </div>
   `;
-  postsContainer.innerHTML += html;
+  if (postsContainer) postsContainer.innerHTML += html;
 }
 
-// تشغيل جلب البيانات عند تحميل الصفحة
+// تشغيل كافة الوظائف عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
-  if (postsContainer) getPosts();
+  logVisit();      // تسجيل الزيارة فوراً
+  getAnalytics();  // تحديث أرقام لوحة التحكم
+  if (postsContainer) getPosts(); // جلب المنشورات
 });
-        
+      

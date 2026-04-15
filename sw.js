@@ -1,9 +1,13 @@
-const cacheName = 'aba-malik-v3'; // رفعنا الإصدار للتحديث
+// اسم الإصدار - يفضل رفعه عند كل تحديث جوهري للملفات
+const cacheName = 'aba-malik-v3'; 
+
+// قائمة الملفات المراد تخزينها للعمل بدون إنترنت (Offline)
 const assets = [
   './',
   './index.html',
   './posts.html',
   './install.js',
+  './wisdom.js', // تم الدمج هنا لضمان عمل برمجة الحكم أوفلاين
   './manifest.json',
   'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css',
@@ -11,23 +15,25 @@ const assets = [
   'https://i.ibb.co/pBhzxHdM/1000027317.jpg'
 ];
 
-// تثبيت مرن
+// 1. حدث التثبيت (Install Event)
+// يتم فيه فتح الكاش وحفظ الملفات
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(cacheName).then(cache => {
-      console.log('جاري حفظ الملفات في الذاكرة...');
-      // استخدام حلقة لتجنب تعطل التثبيت في حال فشل ملف واحد
+      console.log('SW: جاري حفظ الملفات في الذاكرة المؤقتة...');
+      // استخدام Promise.all لضمان استمرار التثبيت حتى لو فشل تحميل ملف واحد
       return Promise.all(
         assets.map(url => {
-          return cache.add(url).catch(err => console.error('فشل تحميل الملف:', url, err));
+          return cache.add(url).catch(err => console.error('SW: فشل تحميل الملف:', url, err));
         })
       );
     })
   );
-  self.skipWaiting(); // تفعيل فوري للنسخة الجديدة
+  self.skipWaiting(); // تفعيل النسخة الجديدة فوراً بمجرد انتهاء التثبيت
 });
 
-// تفعيل وتنظيف الذاكرة القديمة
+// 2. حدث التفعيل (Activate Event)
+// يتم فيه تنظيف أي كاش قديم بأسماء مختلفة (V1, V2...)
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys => {
@@ -36,15 +42,17 @@ self.addEventListener('activate', e => {
       );
     })
   );
-  return self.clients.claim(); // السيطرة الفورية على الصفحات المفتوحة
+  return self.clients.claim(); // السيطرة الفورية على جميع الصفحات المفتوحة
 });
 
-// العرض من الذاكرة
+// 3. حدث جلب البيانات (Fetch Event)
+// استراتيجية "الكاش أولاً" لضمان السرعة وتوفير البيانات
 self.addEventListener('fetch', e => {
   e.respondWith(
     caches.match(e.request).then(res => {
+      // إذا وجد الملف في الكاش نعرضه، وإلا نقوم بطلبه من الإنترنت
       return res || fetch(e.request).catch(() => {
-        // إذا فشل النت وكان الطلب لصفحة HTML، يمكننا عرض صفحة "أوفلاين" هنا
+        // في حال فشل الإنترنت وكان المستخدم يتصفح صفحات الموقع
         if (e.request.mode === 'navigate') {
           return caches.match('./index.html');
         }
@@ -52,4 +60,3 @@ self.addEventListener('fetch', e => {
     })
   );
 });
-            

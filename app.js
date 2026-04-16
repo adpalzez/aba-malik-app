@@ -1,6 +1,6 @@
 /**
  * مملكة أبا مالك العقيلي - الإصدار 2026
- * المحرك البرمجي الموحد (Unified App Engine)
+ * المحرك البرمجي الموحد (Kingdom Core Engine) مع نظام الحماية
  */
 
 // ==========================================
@@ -19,17 +19,46 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 const db = firebase.firestore();
+const auth = firebase.auth();
+
 db.enablePersistence().catch((err) => console.warn("الوضع الأوفلاين غير متاح:", err.code));
 
 // ==========================================
-// 2. الحالة العامة (Global State)
+// 2. نظام الحماية (Auth Guard)
+// ==========================================
+auth.onAuthStateChanged((user) => {
+    const isLoginPage = window.location.pathname.includes('login.html');
+    
+    if (!user) {
+        // إذا لم يكن مسجلاً وليس في صفحة الدخول، يتم توجيهه فوراً
+        if (!isLoginPage) {
+            window.location.href = 'login.html';
+        }
+    } else {
+        // إذا كان مسجلاً وحاول دخول صفحة login، يتم توجيهه للرئيسية
+        if (isLoginPage) {
+            window.location.href = 'index.html';
+        }
+        console.log("أهلاً بك يا ملك: " + user.email);
+    }
+});
+
+// دالة الخروج
+window.logout = function() {
+    auth.signOut().then(() => {
+        window.location.href = 'login.html';
+    });
+};
+
+// ==========================================
+// 3. الحالة العامة (Global State)
 // ==========================================
 let points = parseInt(localStorage.getItem('userPoints')) || 0;
 let userRating = 0; 
 let deferredPrompt; 
 
 // ==========================================
-// 3. نظام التثبيت الذكي (PWA Logic)
+// 4. نظام التثبيت الذكي (PWA Logic)
 // ==========================================
 function isAppInstalled() {
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -62,7 +91,7 @@ function initInstallHandler() {
 }
 
 // ==========================================
-// 4. الهوية الملكية ونقاط الأثر
+// 5. الهوية الملكية ونقاط الأثر
 // ==========================================
 window.addPoints = function(amount) {
     points += amount;
@@ -89,7 +118,7 @@ window.saveIdentity = function() {
 };
 
 // ==========================================
-// 5. نظام الحكمة (Wisdom System)
+// 6. نظام الحكمة (Wisdom System)
 // ==========================================
 window.showRandomWisdom = function() {
     const hks = [
@@ -111,7 +140,7 @@ window.closeWisdom = function() {
 };
 
 // ==========================================
-// 6. نظام التقييم (Rating System)
+// 7. نظام التقييم (Rating System)
 // ==========================================
 window.openRating = () => {
     if (localStorage.getItem('hasRated')) return alert("شكراً لتقييمك المسبق!");
@@ -161,7 +190,7 @@ function initRatingSystem() {
 }
 
 // ==========================================
-// 7. تسجيل الـ Service Worker (v4)
+// 8. تسجيل الـ Service Worker (v4)
 // ==========================================
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -173,16 +202,17 @@ if ('serviceWorker' in navigator) {
 }
 
 // ==========================================
-// 8. التشغيل النهائي
+// 9. التشغيل النهائي (Main Init)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     const pDisplay = document.getElementById('userPoints');
     if (pDisplay) pDisplay.innerText = points;
+    
     updateRoyalIdentity();
     initInstallHandler();
     initRatingSystem();
     
-    // المظهر
+    // تفعيل أزرار المظهر
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.onclick = () => {
@@ -195,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // تحديث مواقيت الصلاة
+    // تحديث مواقيت الصلاة (إذا كانت الدالة موجودة)
     setInterval(() => { 
         if (typeof updatePrayerWidget === 'function') updatePrayerWidget(); 
     }, 1000);

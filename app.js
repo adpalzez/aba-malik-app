@@ -10,15 +10,16 @@ const firebaseConfig = {
     appId: "1:123456789:web:abcdef"
 };
 
+// تهيئة التطبيق
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// تفعيل خاصية العمل بدون إنترنت (Offline Persistence)
+// تفعيل خاصية العمل بدون إنترنت
 db.enablePersistence().catch((err) => {
     console.warn("Persistence Error:", err.code);
 });
 
-// تسجيل الـ Service Worker لتثبيت التطبيق (PWA)
+// تسجيل الـ Service Worker (PWA)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Error:', err));
@@ -77,7 +78,7 @@ function getAnalytics() {
 // ==========================================
 let userRating = 0;
 const ratingModal = document.getElementById('ratingModal');
-const submitBtn = document.getElementById('submitRatingBtn');
+const submitRatingBtn = document.getElementById('submitRatingBtn');
 const starBtns = document.querySelectorAll('.star-btn');
 const ratingComment = document.getElementById('ratingComment');
 
@@ -94,14 +95,14 @@ function closeRating() {
     resetRating();
 }
 
-// ربط أزرار النجوم
+// تفاعل النجوم
 starBtns.forEach((star) => {
     star.onclick = (e) => {
         userRating = parseInt(e.currentTarget.getAttribute('data-value'));
         updateStars(userRating);
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        if (submitRatingBtn) {
+            submitRatingBtn.disabled = false;
+            submitRatingBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         }
     };
 
@@ -134,20 +135,20 @@ function resetRating() {
     userRating = 0;
     if (ratingComment) ratingComment.value = "";
     updateStars(0);
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    if (submitRatingBtn) {
+        submitRatingBtn.disabled = true;
+        submitRatingBtn.classList.add('opacity-50', 'cursor-not-allowed');
     }
 }
 
-if (submitBtn) {
-    submitBtn.onclick = async () => {
+if (submitRatingBtn) {
+    submitRatingBtn.onclick = async () => {
         if (userRating === 0) return;
-        const originalText = submitBtn.innerText;
+        const originalText = submitRatingBtn.innerText;
         const comment = ratingComment ? ratingComment.value.trim() : "";
 
-        submitBtn.innerText = "جاري الحفظ...";
-        submitBtn.disabled = true;
+        submitRatingBtn.innerText = "جاري الحفظ...";
+        submitRatingBtn.disabled = true;
 
         try {
             await db.collection('ratings').add({
@@ -163,30 +164,32 @@ if (submitBtn) {
                 <div class="py-10 animate__animated animate__fadeIn">
                     <i class="fas fa-check-circle text-green-500 text-6xl mb-4"></i>
                     <h3 class="text-2xl font-black mb-2">تم الاستلام!</h3>
-                    <p class="text-gray-400 text-sm">شكراً لك على دعمك يا أبا مالك.</p>
+                    <p class="text-gray-400 text-sm px-6">شكراً لك على دعمك يا أبا مالك.</p>
                     <button onclick="location.reload()" class="mt-8 bg-white text-black px-8 py-2 rounded-full font-bold shadow-lg">إغلاق</button>
                 </div>`;
             
             db.collection('analytics').add({ type: 'تقييم مكتمل', value: userRating, time: firebase.firestore.FieldValue.serverTimestamp() });
         } catch (error) {
-            submitBtn.innerText = originalText;
-            submitBtn.disabled = false;
+            submitRatingBtn.innerText = originalText;
+            submitRatingBtn.disabled = false;
             alert("خطأ في الاتصال بالقاعدة.");
         }
     };
 }
 
-// ربط أزرار الفتح والإغلاق يدوياً
-const openBtn = document.getElementById('ratingBtn');
-const closeBtn = document.getElementById('closeRating');
-if (openBtn) openBtn.onclick = openRating;
-if (closeBtn) closeBtn.onclick = closeRating;
+// ربط أزرار الفتح والإغلاق
+const ratingBtn = document.getElementById('ratingBtn');
+const closeRatingBtn = document.getElementById('closeRating');
+if (ratingBtn) ratingBtn.onclick = openRating;
+if (closeRatingBtn) closeRatingBtn.onclick = closeRating;
+
 
 // ==========================================
-// 5. نظام المنشورات الحية
+// 5. نظام المنشورات (عرض + إضافة)
 // ==========================================
 const postsContainer = document.querySelector('.posts-container');
 
+// جلب المنشورات وعرضها
 function getPosts() {
     db.collection('posts').orderBy('createdAt', 'desc')
         .onSnapshot((snapshot) => {
@@ -201,7 +204,7 @@ function getPosts() {
 
 function renderPost(post, id) {
     const html = `
-    <div class="bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/10 mb-6 animate__animated animate__fadeInUp" data-id="${id}">
+    <div class="bg-white/10 backdrop-blur-md p-5 rounded-3xl border border-white/10 mb-6 animate__animated animate__fadeInUp" data-id="${id}">
       <div class="flex items-center mb-3">
         <img src="${post.userImage || 'https://i.ibb.co/pBhzxHdM/1000027317.jpg'}" class="w-10 h-10 rounded-full border border-white/20">
         <div class="mr-3">
@@ -215,12 +218,76 @@ function renderPost(post, id) {
     if (postsContainer) postsContainer.insertAdjacentHTML('beforeend', html);
 }
 
+// دالة إضافة منشور جديد (خاصة بأبا مالك)
+async function addNewPost() {
+    const postInput = document.getElementById('postInput');
+    const content = postInput.value.trim();
+    
+    if (!content) {
+        alert("من فضلك اكتب محتوى المنشور أولاً.");
+        return;
+    }
+
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري النشر...';
+    btn.disabled = true;
+
+    try {
+        await db.collection('posts').add({
+            userName: "أبا مالك العقيلي",
+            userImage: "https://i.ibb.co/pBhzxHdM/1000027317.jpg",
+            content: content,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            likes: 0
+        });
+
+        postInput.value = ""; 
+        alert("تم النشر بنجاح على مملكة العقيلي!");
+        
+    } catch (error) {
+        console.error("خطأ في النشر: ", error);
+        alert("عذراً، حدث خطأ أثناء النشر.");
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
 // ==========================================
-// 6. التشغيل عند تحميل الصفحة
+// 6. نظام الحكم (Wisdoms)
+// ==========================================
+const wisdoms = [
+    "من اعتمد على الله كفاه.",
+    "الوقت هو المادة الخام للحياة.",
+    "العلم صيد والكتابة قيده.",
+    "خالف نفسك تسترح."
+];
+
+const wisdomBtn = document.getElementById('wisdomBtn');
+const wisdomModal = document.getElementById('wisdomModal');
+const closeWisdom = document.getElementById('closeWisdom');
+
+if (wisdomBtn) {
+    wisdomBtn.onclick = () => {
+        const text = wisdoms[Math.floor(Math.random() * wisdoms.length)];
+        document.getElementById('wisdomText').innerText = text;
+        if (wisdomModal) wisdomModal.classList.replace('hidden', 'flex');
+    };
+}
+
+if (closeWisdom) {
+    closeWisdom.onclick = () => {
+        if (wisdomModal) wisdomModal.classList.replace('flex', 'hidden');
+    };
+}
+
+// ==========================================
+// 7. التشغيل عند تحميل الصفحة
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     logVisit();
     getAnalytics();
     if (postsContainer) getPosts();
 });
-  
+                    

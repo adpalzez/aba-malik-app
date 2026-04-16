@@ -1,8 +1,8 @@
 // ==========================================
-// 1. إعدادات وتدشين Firebase
+// 1. إعدادات وتدشين Firebase (v8)
 // ==========================================
 const firebaseConfig = {
-    apiKey: "AIzaSy...", // ضع بياناتك الحقيقية هنا
+    apiKey: "AIzaSy...", // استبدلها ببياناتك الحقيقية من Firebase Console
     authDomain: "your-project.firebaseapp.com",
     projectId: "your-project-id",
     storageBucket: "your-project.appspot.com",
@@ -10,284 +10,219 @@ const firebaseConfig = {
     appId: "1:123456789:web:abcdef"
 };
 
-// تهيئة التطبيق
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// تفعيل خاصية العمل بدون إنترنت
-db.enablePersistence().catch((err) => {
-    console.warn("Persistence Error:", err.code);
-});
-
-// تسجيل الـ Service Worker (PWA)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Error:', err));
-    });
-}
+// تفعيل العمل بدون إنترنت
+db.enablePersistence().catch((err) => console.warn("Persistence Error:", err.code));
 
 // ==========================================
-// 2. إدارة المظهر (Dark/Light Mode)
+// 2. إدارة الحالة العامة (نقاط، مظهر، صفحات)
 // ==========================================
-const themeToggle = document.getElementById('themeToggle');
-if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('light-mode');
-        const icon = document.getElementById('themeIcon');
-        if (icon) {
-            icon.classList.toggle('fa-sun');
-            icon.classList.toggle('fa-moon');
-        }
-    });
-}
-
-// ==========================================
-// 3. نظام الإحصائيات (شريط النبض الحي)
-// ==========================================
-function logVisit() {
-    db.collection('analytics').add({
-        type: 'تصفح',
-        device: navigator.userAgent.substring(0, 50),
-        time: firebase.firestore.FieldValue.serverTimestamp()
-    });
-}
-
-window.addEventListener('appinstalled', () => {
-    db.collection('analytics').add({
-        type: 'تحميل وتثبيت',
-        time: firebase.firestore.FieldValue.serverTimestamp()
-    });
-});
-
-function getAnalytics() {
-    const viewElem = document.getElementById('viewCount');
-    const installElem = document.getElementById('installCount');
-
-    if (viewElem) {
-        db.collection('analytics').where('type', '==', 'تصفح')
-            .onSnapshot(snap => { viewElem.innerText = snap.size; });
-    }
-    if (installElem) {
-        db.collection('analytics').where('type', '==', 'تحميل وتثبيت')
-            .onSnapshot(snap => { installElem.innerText = snap.size; });
-    }
-}
-
-// ==========================================
-// 4. نظام التقييم المطور (نجوم + تعليق)
-// ==========================================
+let points = parseInt(localStorage.getItem('userPoints')) || 0;
 let userRating = 0;
-const ratingModal = document.getElementById('ratingModal');
-const submitRatingBtn = document.getElementById('submitRatingBtn');
-const starBtns = document.querySelectorAll('.star-btn');
-const ratingComment = document.getElementById('ratingComment');
 
-function openRating() {
-    if (localStorage.getItem('hasRated')) {
-        alert("لقد قمت بالتقييم مسبقاً، شكراً لك!");
-        return;
+// وظيفة التنقل بين الصفحات (SPA Logic)
+window.showPage = function(pageId) {
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) targetPage.classList.add('active');
+
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-page') === pageId) item.classList.add('active');
+    });
+    window.scrollTo(0, 0);
+};
+
+// وظيفة إضافة النقاط (Gamification)
+function addPoints(amount) {
+    points += amount;
+    localStorage.setItem('userPoints', points);
+    const elem = document.getElementById('userPoints');
+    if (elem) {
+        elem.innerText = points;
+        elem.parentElement.classList.add('animate__animated', 'animate__bounce');
+        setTimeout(() => elem.parentElement.classList.remove('animate__bounce'), 1000);
     }
-    if (ratingModal) ratingModal.classList.replace('hidden', 'flex');
 }
 
-function closeRating() {
-    if (ratingModal) ratingModal.classList.replace('flex', 'hidden');
-    resetRating();
+// ==========================================
+// 3. محراب الصلاة الذكي (Mehrab Logic)
+// ==========================================
+const prayerTimes = [
+    { name: "الفجر", time: "04:30" },
+    { name: "الظهر", time: "12:00" },
+    { name: "العصر", time: "15:30" },
+    { name: "المغرب", time: "18:45" },
+    { name: "العشاء", time: "20:15" }
+];
+
+function updatePrayerWidget() {
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    
+    let next = prayerTimes.find(p => {
+        const [h, m] = p.time.split(':');
+        return (parseInt(h) * 60 + parseInt(m)) > currentTime;
+    }) || prayerTimes[0];
+
+    const nextElem = document.getElementById('nextPrayerName');
+    const timerElem = document.getElementById('prayerTimer');
+    const widget = document.getElementById('prayerWidget');
+
+    if (nextElem) nextElem.innerText = next.name;
+    
+    const [nh, nm] = next.time.split(':');
+    let target = new Date();
+    target.setHours(nh, nm, 0);
+    if (target < now) target.setDate(target.getDate() + 1);
+    
+    const diff = target - now;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    
+    if (timerElem) timerElem.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+
+    if (widget) {
+        if (diff < 1800000) widget.style.background = "linear-gradient(90deg, #b45309, #d97706)"; // برتقالي عند القرب
+        else widget.style.background = "linear-gradient(90deg, #166534, #15803d)"; // أخضر
+    }
 }
 
-// تفاعل النجوم
-starBtns.forEach((star) => {
+// ==========================================
+// 4. بوصلة الشعور والحكمة
+// ==========================================
+const moodWisdoms = {
+    happy: "الحمد لله! 'لئن شكرتم لأزيدنكم'. استثمر فرحك في نشر الخير.",
+    tired: "يا حي يا قيوم برحمتك أستغيث.. القلوب تتعب لترتاح بذكر الله.",
+    anxious: "ألا بذكر الله تطمئن القلوب.. ردد: لا حول ولا قوة إلا بالله.",
+    grateful: "أنت في نعمة عظيمة، ذكر غيرك بفضل الله الآن عبر منشور."
+};
+
+window.setMood = function(mood) {
+    const text = moodWisdoms[mood];
+    document.getElementById('wisdomText').innerText = text;
+    document.getElementById('wisdomModal').classList.remove('hidden');
+    addPoints(10);
+};
+
+// ==========================================
+// 5. نظام التقييم المطور
+// ==========================================
+window.openRating = function() {
+    if (localStorage.getItem('hasRated')) return alert("شكراً لك، لقد قمت بالتقييم مسبقاً!");
+    document.getElementById('ratingModal').classList.remove('hidden');
+};
+
+const starBtns = document.querySelectorAll('.star-btn');
+starBtns.forEach(star => {
     star.onclick = (e) => {
         userRating = parseInt(e.currentTarget.getAttribute('data-value'));
         updateStars(userRating);
-        if (submitRatingBtn) {
-            submitRatingBtn.disabled = false;
-            submitRatingBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        }
-    };
-
-    star.onmouseenter = (e) => {
-        const hoverValue = parseInt(e.currentTarget.getAttribute('data-value'));
-        updateStars(hoverValue, true);
-    };
-
-    star.onmouseleave = () => {
-        updateStars(userRating);
+        const btn = document.getElementById('submitRatingBtn');
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
     };
 });
 
-function updateStars(rating, isHover = false) {
+function updateStars(rating) {
     starBtns.forEach((s, i) => {
-        const starValue = i + 1;
-        if (starValue <= rating) {
+        if (i < rating) {
             s.classList.replace('far', 'fas');
-            s.classList.add(isHover ? 'text-yellow-200' : 'text-yellow-400');
-            s.classList.remove('text-gray-500');
+            s.classList.add('text-yellow-400');
         } else {
             s.classList.replace('fas', 'far');
-            s.classList.add('text-gray-500');
-            s.classList.remove('text-yellow-400', 'text-yellow-200');
+            s.classList.remove('text-yellow-400');
         }
     });
 }
 
-function resetRating() {
-    userRating = 0;
-    if (ratingComment) ratingComment.value = "";
-    updateStars(0);
-    if (submitRatingBtn) {
-        submitRatingBtn.disabled = true;
-        submitRatingBtn.classList.add('opacity-50', 'cursor-not-allowed');
-    }
-}
-
-if (submitRatingBtn) {
-    submitRatingBtn.onclick = async () => {
-        if (userRating === 0) return;
-        const originalText = submitRatingBtn.innerText;
-        const comment = ratingComment ? ratingComment.value.trim() : "";
-
-        submitRatingBtn.innerText = "جاري الحفظ...";
-        submitRatingBtn.disabled = true;
-
-        try {
-            await db.collection('ratings').add({
-                stars: userRating,
-                comment: comment || "بدون تعليق",
-                time: firebase.firestore.FieldValue.serverTimestamp(),
-                device: navigator.userAgent.substring(0, 30)
-            });
-
-            localStorage.setItem('hasRated', 'true');
-
-            ratingModal.querySelector('.glass').innerHTML = `
-                <div class="py-10 animate__animated animate__fadeIn">
-                    <i class="fas fa-check-circle text-green-500 text-6xl mb-4"></i>
-                    <h3 class="text-2xl font-black mb-2">تم الاستلام!</h3>
-                    <p class="text-gray-400 text-sm px-6">شكراً لك على دعمك يا أبا مالك.</p>
-                    <button onclick="location.reload()" class="mt-8 bg-white text-black px-8 py-2 rounded-full font-bold shadow-lg">إغلاق</button>
-                </div>`;
-            
-            db.collection('analytics').add({ type: 'تقييم مكتمل', value: userRating, time: firebase.firestore.FieldValue.serverTimestamp() });
-        } catch (error) {
-            submitRatingBtn.innerText = originalText;
-            submitRatingBtn.disabled = false;
-            alert("خطأ في الاتصال بالقاعدة.");
-        }
-    };
-}
-
-// ربط أزرار الفتح والإغلاق
-const ratingBtn = document.getElementById('ratingBtn');
-const closeRatingBtn = document.getElementById('closeRating');
-if (ratingBtn) ratingBtn.onclick = openRating;
-if (closeRatingBtn) closeRatingBtn.onclick = closeRating;
-
+document.getElementById('submitRatingBtn').onclick = async () => {
+    const comment = document.getElementById('ratingComment').value.trim();
+    try {
+        await db.collection('ratings').add({
+            stars: userRating,
+            comment: comment || "بدون تعليق",
+            time: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        localStorage.setItem('hasRated', 'true');
+        alert("شكراً لتقييمك يا أبا مالك!");
+        document.getElementById('ratingModal').classList.add('hidden');
+        addPoints(30);
+    } catch(e) { alert("خطأ في الاتصال."); }
+};
 
 // ==========================================
-// 5. نظام المنشورات (عرض + إضافة)
+// 6. نظام المنشورات (Live Feed)
 // ==========================================
-const postsContainer = document.querySelector('.posts-container');
-
-// جلب المنشورات وعرضها
-function getPosts() {
-    db.collection('posts').orderBy('createdAt', 'desc')
-        .onSnapshot((snapshot) => {
-            if (postsContainer) {
-                postsContainer.innerHTML = '';
-                snapshot.forEach((doc) => {
-                    renderPost(doc.data(), doc.id);
-                });
-            }
-        }, (err) => console.log('Firestore Error:', err.message));
-}
-
-function renderPost(post, id) {
-    const html = `
-    <div class="bg-white/10 backdrop-blur-md p-5 rounded-3xl border border-white/10 mb-6 animate__animated animate__fadeInUp" data-id="${id}">
-      <div class="flex items-center mb-3">
-        <img src="${post.userImage || 'https://i.ibb.co/pBhzxHdM/1000027317.jpg'}" class="w-10 h-10 rounded-full border border-white/20">
-        <div class="mr-3">
-          <h3 class="font-bold text-white text-sm">${post.userName || 'أبا مالك العقيلي'}</h3>
-          <p class="text-[10px] text-gray-400">${post.createdAt ? new Date(post.createdAt.toDate()).toLocaleString('ar-EG') : 'الآن'}</p>
-        </div>
-      </div>
-      <p class="text-gray-200 text-sm leading-relaxed">${post.content}</p>
-      ${post.imageUrl ? `<img src="${post.imageUrl}" class="mt-3 rounded-2xl w-full h-48 object-cover border border-white/10">` : ''}
-    </div>`;
-    if (postsContainer) postsContainer.insertAdjacentHTML('beforeend', html);
-}
-
-// دالة إضافة منشور جديد (خاصة بأبا مالك)
 async function addNewPost() {
-    const postInput = document.getElementById('postInput');
-    const content = postInput.value.trim();
-    
-    if (!content) {
-        alert("من فضلك اكتب محتوى المنشور أولاً.");
-        return;
-    }
-
-    const btn = event.currentTarget;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري النشر...';
-    btn.disabled = true;
+    const input = document.getElementById('postInput');
+    if (!input.value.trim()) return;
 
     try {
         await db.collection('posts').add({
             userName: "أبا مالك العقيلي",
-            userImage: "https://i.ibb.co/pBhzxHdM/1000027317.jpg",
-            content: content,
+            content: input.value,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            likes: 0
+            userImage: "https://i.ibb.co/pBhzxHdM/1000027317.jpg"
         });
+        input.value = "";
+        addPoints(50);
+    } catch(e) { alert("فشل النشر."); }
+}
+window.addNewPost = addNewPost;
 
-        postInput.value = ""; 
-        alert("تم النشر بنجاح على مملكة العقيلي!");
-        
-    } catch (error) {
-        console.error("خطأ في النشر: ", error);
-        alert("عذراً، حدث خطأ أثناء النشر.");
-    } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
+function getPosts() {
+    const container = document.querySelector('.posts-container');
+    db.collection('posts').orderBy('createdAt', 'desc').onSnapshot(snap => {
+        if (!container) return;
+        container.innerHTML = '';
+        snap.forEach(doc => {
+            const post = doc.data();
+            const html = `
+            <div class="bg-white/10 backdrop-blur-md p-5 rounded-[30px] border border-white/10 mb-6 animate__animated animate__fadeInUp">
+                <div class="flex items-center mb-3">
+                    <img src="${post.userImage}" class="w-10 h-10 rounded-full border border-white/20">
+                    <div class="mr-3">
+                        <h3 class="font-bold text-white text-xs">${post.userName}</h3>
+                        <p class="text-[8px] text-gray-400">${post.createdAt ? new Date(post.createdAt.toDate()).toLocaleTimeString('ar-EG') : 'الآن'}</p>
+                    </div>
+                </div>
+                <p class="text-gray-200 text-sm leading-relaxed">${post.content}</p>
+            </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        });
+    });
 }
 
 // ==========================================
-// 6. نظام الحكم (Wisdoms)
+// 7. الإحصائيات والتشغيل النهائي
 // ==========================================
-const wisdoms = [
-    "من اعتمد على الله كفاه.",
-    "الوقت هو المادة الخام للحياة.",
-    "العلم صيد والكتابة قيده.",
-    "خالف نفسك تسترح."
-];
-
-const wisdomBtn = document.getElementById('wisdomBtn');
-const wisdomModal = document.getElementById('wisdomModal');
-const closeWisdom = document.getElementById('closeWisdom');
-
-if (wisdomBtn) {
-    wisdomBtn.onclick = () => {
-        const text = wisdoms[Math.floor(Math.random() * wisdoms.length)];
-        document.getElementById('wisdomText').innerText = text;
-        if (wisdomModal) wisdomModal.classList.replace('hidden', 'flex');
-    };
+function getAnalytics() {
+    db.collection('analytics').where('type', '==', 'تصفح').onSnapshot(snap => {
+        const el = document.getElementById('viewCount');
+        if (el) el.innerText = snap.size;
+    });
 }
 
-if (closeWisdom) {
-    closeWisdom.onclick = () => {
-        if (wisdomModal) wisdomModal.classList.replace('flex', 'hidden');
-    };
-}
-
-// ==========================================
-// 7. التشغيل عند تحميل الصفحة
-// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    logVisit();
+    // 1. تفعيل الإحصائيات ونقاط المستخدم
+    db.collection('analytics').add({ type: 'تصفح', time: firebase.firestore.FieldValue.serverTimestamp() });
     getAnalytics();
-    if (postsContainer) getPosts();
+    document.getElementById('userPoints').innerText = points;
+
+    // 2. تشغيل الأنظمة الحية
+    getPosts();
+    setInterval(updatePrayerWidget, 1000);
+
+    // 3. ربط أزرار الحكمة
+    const wBtn = document.getElementById('wisdomBtn');
+    if (wBtn) wBtn.onclick = () => {
+        const wisdoms = ["كن مع الله ولا تبالي", "الوقت كالسيف", "من اعتمد على الله كفاه"];
+        document.getElementById('wisdomText').innerText = wisdoms[Math.floor(Math.random()*wisdoms.length)];
+        document.getElementById('wisdomModal').classList.remove('hidden');
+    };
 });
-                    
+                              

@@ -10,157 +10,56 @@ const firebaseConfig = {
     appId: "1:123456789:web:abcdef"
 };
 
-// تهيئة التطبيق
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 const db = firebase.firestore();
-
-// تفعيل العمل بدون إنترنت لضمان السرعة الفائقة
 db.enablePersistence().catch((err) => console.warn("الوضع الأوفلاين غير متاح:", err.code));
 
 // ==========================================
-// 2. إدارة الحالة العامة (Global State)
+// 2. الحالة العامة (Global State)
 // ==========================================
 let points = parseInt(localStorage.getItem('userPoints')) || 0;
 let userRating = 0; 
 let deferredPrompt; 
 
 // ==========================================
-// 3. المحرك الرئيسي للتنقل (SPA Engine)
-// ==========================================
-window.showPage = function(pageId) {
-    const pages = document.querySelectorAll('.page');
-    const navItems = document.querySelectorAll('.nav-item');
-    
-    pages.forEach(p => p.classList.remove('active'));
-    navItems.forEach(n => n.classList.remove('active'));
-
-    const targetPage = document.getElementById(pageId);
-    if (targetPage) targetPage.classList.add('active');
-
-    const activeNav = document.querySelector(`.nav-item[data-page="${pageId}"]`);
-    if (activeNav) activeNav.classList.add('active');
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-// ==========================================
-// 4. نظام "نقاط الأثر" (Gamification)
+// 3. نظام "نقاط الأثر" و "الحكمة" (إصلاح زر الحكمة)
 // ==========================================
 window.addPoints = function(amount) {
     points += amount;
     localStorage.setItem('userPoints', points);
     const elem = document.getElementById('userPoints');
-    if (elem) {
-        elem.innerText = points;
-        elem.parentElement.classList.add('animate__animated', 'animate__bounce');
-        setTimeout(() => elem.parentElement.classList.remove('animate__bounce'), 1000);
+    if (elem) elem.innerText = points;
+};
+
+// جعل الدالة عالمية لكي يعمل الزر في HTML
+window.showRandomWisdom = function() {
+    const hks = [
+        "من اعتمد على الله كفاه، ومن توكل عليه هداه.",
+        "الوقت هو المادة الخام للحياة، فلا تضيعه في التوافه.",
+        "العلم صيد والكتابة قيده، فقيّد صيدك بكثرة القراءة.",
+        "إذا أردت أن تعرف قدرك عند الله، فانظر أين أقامك.",
+        "القلوب أوعية، وخيرها أوعاها للخير."
+    ];
+    const txt = document.getElementById('wisdomText');
+    if (txt) {
+        txt.innerText = hks[Math.floor(Math.random() * hks.length)];
+        document.getElementById('wisdomModal')?.classList.remove('hidden');
+        window.addPoints(5);
     }
 };
 
-// ==========================================
-// 5. محراب الصلاة الذكي (الشريط العلوي)
-// ==========================================
-const prayerTimes = [
-    { name: "الفجر", time: "04:30" },
-    { name: "الظهر", time: "12:00" },
-    { name: "العصر", time: "15:30" },
-    { name: "المغرب", time: "18:45" },
-    { name: "العشاء", time: "20:15" }
-];
-
-function updatePrayerWidget() {
-    const now = new Date();
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-    
-    let next = prayerTimes.find(p => {
-        const [h, m] = p.time.split(':');
-        return (parseInt(h) * 60 + parseInt(m)) > currentTime;
-    }) || prayerTimes[0];
-
-    const nextElem = document.getElementById('nextPrayerName');
-    if (nextElem) nextElem.innerText = next.name;
-    
-    const [nh, nm] = next.time.split(':');
-    let target = new Date();
-    target.setHours(nh, nm, 0);
-    if (target < now) target.setDate(target.getDate() + 1);
-    
-    const diff = target - now;
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    
-    const timerElem = document.getElementById('prayerTimer');
-    if (timerElem) {
-        timerElem.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-        if (diff < 1800000) timerElem.className = "text-xs font-mono font-black text-orange-500 animate-pulse";
-        else timerElem.className = "text-xs font-mono font-black text-white";
-    }
-}
-
-// ==========================================
-// 6. بوصلة المشاعر والمنشورات
-// ==========================================
-const moodWisdoms = {
-    happy: "الحمد لله! 'لئن شكرتم لأزيدنكم'. فرحك طاعة.",
-    grateful: "دوام النعمة بالشكر.. الحمد لله دائماً.",
-    anxious: "ردد: لا حول ولا قوة إلا بالله، ففيها الفرج.",
-    tired: "استرح بذكر الله.. 'ألا بذكر الله تطمئن القلوب'."
+window.closeWisdom = function() {
+    document.getElementById('wisdomModal')?.classList.add('hidden');
 };
 
-window.setMood = function(mood) {
-    const wisdomText = document.getElementById('wisdomText');
-    if (wisdomText) wisdomText.innerText = moodWisdoms[mood];
-    document.getElementById('wisdomModal')?.classList.remove('hidden');
-    addPoints(10);
+// ==========================================
+// 4. نظام التقييم (إصلاح النجوم)
+// ==========================================
+window.openRating = () => {
+    if (localStorage.getItem('hasRated')) return alert("شكراً لتقييمك المسبق!");
+    document.getElementById('ratingModal')?.classList.remove('hidden');
 };
 
-window.addNewPost = async function() {
-    const input = document.getElementById('postInput');
-    const content = input?.value.trim();
-    if (!content) return;
-
-    try {
-        await db.collection('posts').add({
-            userName: "أبا مالك العقيلي",
-            content: content,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            userImage: "https://i.ibb.co/pBhzxHdM/1000027317.jpg"
-        });
-        input.value = "";
-        addPoints(50);
-        alert("تم النشر في المملكة!");
-    } catch(e) { alert("حدث خطأ في النشر."); }
-};
-
-function getPosts() {
-    const container = document.querySelector('.posts-container');
-    if (!container) return;
-    db.collection('posts').orderBy('createdAt', 'desc').limit(15).onSnapshot(snap => {
-        container.innerHTML = '';
-        snap.forEach(doc => {
-            const post = doc.data();
-            const html = `
-            <div class="bg-white/10 backdrop-blur-md p-5 rounded-[30px] border border-white/10 mb-4 animate__animated animate__fadeInUp">
-                <div class="flex items-center mb-2">
-                    <img src="${post.userImage}" class="w-8 h-8 rounded-full border border-white/20">
-                    <div class="mr-3">
-                        <h3 class="font-bold text-white text-[10px]">${post.userName}</h3>
-                        <p class="text-[7px] text-gray-500">${post.createdAt ? new Date(post.createdAt.toDate()).toLocaleTimeString('ar-EG') : 'الآن'}</p>
-                    </div>
-                </div>
-                <p class="text-gray-200 text-xs leading-relaxed text-right">${post.content}</p>
-            </div>`;
-            container.insertAdjacentHTML('beforeend', html);
-        });
-    });
-}
-
-// ==========================================
-// 7. نظام التقييم وتفاعل المستخدم
-// ==========================================
 function initRatingSystem() {
     const starBtns = document.querySelectorAll('.star-btn');
     starBtns.forEach(star => {
@@ -187,6 +86,7 @@ function initRatingSystem() {
     if (submitBtn) {
         submitBtn.onclick = async () => {
             const comment = document.getElementById('ratingComment')?.value.trim();
+            if (userRating === 0) return alert("يرجى اختيار عدد النجوم أولاً");
             try {
                 await db.collection('ratings').add({
                     stars: userRating,
@@ -196,16 +96,86 @@ function initRatingSystem() {
                 localStorage.setItem('hasRated', 'true');
                 alert("تم إرسال تقييمك بنجاح!");
                 document.getElementById('ratingModal')?.classList.add('hidden');
-                addPoints(30);
-            } catch(e) { alert("خطأ في الإرسال."); }
+                window.addPoints(30);
+            } catch(e) { alert("خطأ في الإرسال: تأكد من اتصالك"); }
         };
     }
 }
 
 // ==========================================
-// 8. المظهر و PWA والتشغيل النهائي
+// 5. زر التثبيت (PWA Fix)
 // ==========================================
-function initUIHandlers() {
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // إظهار الزر فوراً عند جاهزية المتصفح
+    const installBtn = document.getElementById('installApp');
+    if (installBtn) installBtn.classList.remove('hidden');
+});
+
+function initInstallHandler() {
+    const installBtn = document.getElementById('installApp');
+    if (installBtn) {
+        installBtn.onclick = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') installBtn.classList.add('hidden');
+                deferredPrompt = null;
+            } else {
+                alert("التطبيق مثبت بالفعل أو المتصفح لا يدعم التثبيت حالياً.");
+            }
+        };
+    }
+}
+
+// ==========================================
+// 6. المحرك الرئيسي (SPA & Navigation)
+// ==========================================
+window.showPage = function(pageId) {
+    const pages = document.querySelectorAll('.page');
+    const navItems = document.querySelectorAll('.nav-item');
+    pages.forEach(p => p.classList.remove('active'));
+    navItems.forEach(n => n.classList.remove('active'));
+    document.getElementById(pageId)?.classList.add('active');
+    document.querySelector(`.nav-item[data-page="${pageId}"]`)?.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// ==========================================
+// 7. تسجيل الـ Service Worker (v4)
+// ==========================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js?v=4')
+        .then(reg => {
+            console.log('مملكة أبا مالك: تم التحديث لـ v4');
+            reg.onupdatefound = () => {
+                const installingWorker = reg.installing;
+                installingWorker.onstatechange = () => {
+                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        alert("تحديث جديد متوفر! سيتم تحميل الواجهة الجديدة الآن.");
+                        location.reload();
+                    }
+                };
+            };
+        });
+    });
+}
+
+// ==========================================
+// 8. التشغيل عند التحميل
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    // تحديث النقاط
+    const pDisplay = document.getElementById('userPoints');
+    if (pDisplay) pDisplay.innerText = points;
+
+    // تشغيل الأنظمة
+    initRatingSystem();
+    initInstallHandler();
+    
+    // تشغيل الوضع الليلي
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.onclick = () => {
@@ -218,74 +188,8 @@ function initUIHandlers() {
         };
     }
 
-    const wisdomBtn = document.getElementById('wisdomBtn');
-    if (wisdomBtn) {
-        wisdomBtn.onclick = () => {
-            const hks = ["كن مع الله ولا تبالي", "الوقت كالسيف", "من اعتمد على الله كفاه", "خالف نفسك تسترح"];
-            const txt = document.getElementById('wisdomText');
-            if (txt) txt.innerText = hks[Math.floor(Math.random() * hks.length)];
-            document.getElementById('wisdomModal')?.classList.remove('hidden');
-            addPoints(5);
-        };
-    }
-
-    // PWA التثبيت
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        document.getElementById('installApp')?.classList.remove('hidden');
-    });
-
-    const installBtn = document.getElementById('installApp');
-    if (installBtn) {
-        installBtn.onclick = async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') installBtn.classList.add('hidden');
-                deferredPrompt = null;
-            }
-        };
-    }
-}
-
-// تسجيل الـ Service Worker مع نظام التحديث v4
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=4')
-            .then(reg => {
-                console.log('مملكة أبا مالك: تم تحديث النظام لـ v4');
-                reg.onupdatefound = () => {
-                    const installingWorker = reg.installing;
-                    installingWorker.onstatechange = () => {
-                        if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            alert("تحديث جديد متوفر! سيتم الآن إعادة تحميل المملكة.");
-                            location.reload();
-                        }
-                    };
-                };
-            })
-            .catch(err => console.log('خطأ في التسجيل:', err));
-    });
-}
-
-// الإطلاق العظيم
-document.addEventListener('DOMContentLoaded', () => {
-    const pDisplay = document.getElementById('userPoints');
-    if (pDisplay) pDisplay.innerText = points;
-
-    updatePrayerWidget();
-    setInterval(updatePrayerWidget, 1000);
-    
-    getPosts();
-    initUIHandlers();
-    initRatingSystem();
-
-    // إحصائيات سريعة
-    db.collection('analytics').add({ type: 'تصفح', time: firebase.firestore.FieldValue.serverTimestamp() });
-    db.collection('analytics').where('type', '==', 'تصفح').onSnapshot(s => {
-        const vCount = document.getElementById('viewCount');
-        if (vCount) vCount.innerText = s.size;
-    });
+    // إحصائيات سريعة ومنشورات
+    if (typeof getPosts === 'function') getPosts();
+    setInterval(() => { if (typeof updatePrayerWidget === 'function') updatePrayerWidget(); }, 1000);
 });
-                            
+                    

@@ -2,239 +2,266 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مملكة صلاح الدين - القائد أبا مالك</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مملكة أبا مالك | الإصدار النهائي المصلح</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
-        body { 
-            font-family: 'Cairo', sans-serif; 
-            background: url('https://i.ibb.co/pBhzxHdM/1000027317.jpg') no-repeat center center fixed;
-            background-size: cover;
-            overflow-x: hidden;
+        :root { --gold: #b49632; --danger: #ff4d4d; }
+        body { font-family: 'Cairo', sans-serif; background: #000; overflow: hidden; color: white; height: 100vh; display: flex; flex-direction: column; }
+
+        /* أنيميشن الشخصيات الحية */
+        @keyframes march { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(12px); } }
+        @keyframes work { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-20deg); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes wander { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(8px, 8px); } 75% { transform: translate(-8px, 4px); } }
+
+        .anim-march { animation: march 2.2s infinite ease-in-out; }
+        .anim-work { animation: work 1.5s infinite ease-in-out; }
+        .anim-float { animation: float 3s infinite ease-in-out; }
+        .anim-wander { animation: wander 4.5s infinite ease-in-out; }
+
+        /* الرضية العملاقة (تم تكبيرها لتملأ الشاشة) */
+        .open-field { 
+            width: 96%; flex-grow: 1; background: radial-gradient(circle, rgba(50, 40, 30, 0.4) 0%, #000 100%), url('https://www.transparenttextures.com/patterns/dark-matter.png');
+            border: 2px solid var(--gold); border-radius: 40px; position: relative; overflow: hidden; box-shadow: inset 0 0 120px #000; margin: 5px auto;
         }
-        .overlay { background: rgba(0, 0, 0, 0.85); min-height: 100vh; }
-        .resource-card { background: rgba(31, 41, 55, 0.8); backdrop-filter: blur(10px); border: 1px solid #4b5563; transition: 0.3s; }
-        .resource-card:hover { transform: translateY(-5px); border-color: #eab308; }
-        .glass { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .attack-anim { animation: shake 0.5s; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); background: rgba(220, 38, 38, 0.2); } 75% { transform: translateX(10px); } }
+
+        /* شريط الموارد العلوي */
+        .res-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 10px; background: #0a0907; border-bottom: 2px solid rgba(180, 150, 50, 0.3); }
+        .h-tag { background: #0d0b09; border: 1px solid #b4963255; border-radius: 10px; padding: 4px; text-align: center; }
+        .h-val { font-weight: 900; font-size: 13px; display: block; }
+        .h-lbl { font-size: 6px; color: var(--gold); font-weight: 900; text-transform: uppercase; }
+
+        /* لوحة التحكم السفلية */
+        .control-zone { height: 260px; background: #0a0907; border-top: 2px solid rgba(180, 150, 50, 0.3); display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding-bottom: 15px; }
+        .ps-btn { width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; background: linear-gradient(145deg, #222, #050505); border: 1px solid #444; box-shadow: 5px 5px 15px #000; cursor: pointer; }
+        .ps-btn:active { transform: scale(0.85); filter: brightness(1.6); }
+
+        /* الدواوين الجانبية */
+        .side-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 75%; background: rgba(10, 8, 5, 0.99); border-left: 4px solid var(--gold); z-index: 5000; transform: translateX(110%); transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); padding: 25px; box-shadow: -20px 0 80px #000; }
+        .side-drawer.active { transform: translateX(0); }
+
+        /* شاشة البداية */
+        #startScreen { background: #000; z-index: 9999; position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+        .choice-card { border: 2px solid var(--gold); padding: 20px; border-radius: 20px; width: 85%; margin-bottom: 15px; cursor: pointer; background: rgba(20,15,10,0.8); }
     </style>
 </head>
-<body class="text-white">
+<body onclick="wakeUI()">
 
-<div class="overlay p-4">
-    <header class="text-center mb-6 animate__animated animate__fadeInDown">
-        <h1 class="text-4xl font-black text-yellow-500 mb-2 drop-shadow-2xl">مملكة صلاح الدين الأيوبي</h1>
-        <p id="rankDisplay" class="text-blue-400 font-bold tracking-widest text-lg transition-all duration-500">القائد العسكري: أبا مالك</p>
+    <div id="startScreen">
+        <h1 class="text-5xl font-black text-yellow-500 mb-4 italic">مملكة أبا مالك</h1>
+        <p class="text-gray-500 mb-10 text-xs tracking-widest uppercase">النسخة الحية - games.html</p>
+        <div onclick="startGame('warrior')" class="choice-card text-red-500"><i class="fas fa-shield-halved text-4xl mb-2"></i><p class="font-bold text-lg">نهج الفتوحات</p></div>
+        <div onclick="startGame('merchant')" class="choice-card text-yellow-500"><i class="fas fa-coins text-4xl mb-2"></i><p class="font-bold text-lg">نهج التجارة</p></div>
+        <div onclick="startGame('farmer')" class="choice-card text-green-500"><i class="fas fa-wheat-awn text-4xl mb-2"></i><p class="font-bold text-lg">نهج الخيرات</p></div>
+    </div>
+
+    <header class="res-bar">
+        <div class="h-tag"><span class="h-val text-yellow-500" id="goldVal">0</span><span class="h-lbl">الخزينة</span></div>
+        <div class="h-tag"><span class="h-val text-orange-400" id="foodVal">0</span><span class="h-lbl">الزاد</span></div>
+        <div class="h-tag"><span class="h-val text-green-500" id="woodVal">0</span><span class="h-lbl">الخشب</span></div>
+        <div class="h-tag"><span class="h-val text-blue-300" id="ironVal">0</span><span class="h-lbl">الحديد</span></div>
     </header>
 
-    <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="resource-card p-4 rounded-2xl text-center">
-            <img src="https://img.icons8.com/color/48/gold-bars.png" class="mx-auto mb-2">
-            <div id="goldCount" class="text-2xl font-bold">100</div>
-            <span class="text-xs text-yellow-500 font-bold">خزينة الذهب</span>
-        </div>
-        <div class="resource-card p-4 rounded-2xl text-center">
-            <img src="https://img.icons8.com/color/48/wood-log.png" class="mx-auto mb-2">
-            <div id="woodCount" class="text-2xl font-bold">100</div>
-            <span class="text-xs text-amber-500 font-bold">مخزن الخشب</span>
-        </div>
-        <div class="resource-card p-4 rounded-2xl text-center">
-            <img src="https://img.icons8.com/color/48/crusader.png" class="mx-auto mb-2">
-            <div id="armyCount" class="text-2xl font-bold">0</div>
-            <span class="text-xs text-red-500 font-bold">الجيش النظامي</span>
-        </div>
-        <div class="resource-card p-4 rounded-2xl text-center">
-            <img src="https://img.icons8.com/color/48/castle.png" class="mx-auto mb-2">
-            <div id="castleCount" class="text-2xl font-bold">0</div>
-            <span class="text-xs text-blue-500 font-bold">القلاع المشيدة</span>
-        </div>
-    </section>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="space-y-6">
-            <div class="bg-gray-800/60 p-6 rounded-3xl border-2 border-yellow-700 shadow-xl">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-hammer text-yellow-500"></i> الإنتاج اليومي</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="produce('gold')" class="bg-yellow-600 hover:bg-yellow-500 p-6 rounded-2xl font-bold text-black shadow-lg transition active:scale-90">سك الذهب</button>
-                    <button onclick="produce('wood')" class="bg-amber-800 hover:bg-amber-700 p-6 rounded-2xl font-bold text-white shadow-lg transition active:scale-90">جمع الخشب</button>
-                </div>
-            </div>
-            
-            <div class="glass p-6 rounded-3xl border-t-4 border-red-600 animate__animated animate__fadeIn">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-black text-white">غرفة عمليات القائد</h3>
-                    <div class="flex gap-2">
-                        <button onclick="resetGame()" class="text-[10px] bg-white/10 hover:bg-red-900 px-2 py-1 rounded text-white transition">ضبط المملكة</button>
-                        <span class="bg-red-600 text-[10px] px-3 py-1 rounded-full animate-pulse uppercase">حالة الحرب: نشطة</span>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-black/40 p-4 rounded-2xl border border-white/5 text-center">
-                        <p class="text-[10px] text-gray-400 uppercase">قوة الجيش</p>
-                        <p id="armyPower" class="text-2xl font-black text-red-500">150</p>
-                    </div>
-                    <div class="bg-black/40 p-4 rounded-2xl border border-white/5 text-center">
-                        <p class="text-[10px] text-gray-400 uppercase">مستوى الهيبة</p>
-                        <p id="prestige" class="text-2xl font-black text-purple-500">1</p>
-                    </div>
-                </div>
-                <div class="space-y-3">
-                    <button onclick="trainElite()" class="w-full bg-gradient-to-r from-blue-900 to-blue-700 p-4 rounded-xl font-bold flex justify-between items-center hover:brightness-125 transition">
-                        <span>تدريب فرقة نُخبة (💰100)</span>
-                        <i class="fas fa-shield-alt"></i>
-                    </button>
-                    <button id="attackBtn" onclick="executeAttack()" class="w-full bg-gradient-to-r from-red-900 to-red-600 p-4 rounded-xl font-black text-lg shadow-lg flex justify-center items-center gap-3 active:scale-95 transition">
-                        <i class="fas fa-fire"></i> شن هجوم كاسح
-                    </button>
+    <main class="open-field" id="mainField">
+        <div class="absolute top-6 left-0 right-0 flex justify-center z-[200]">
+            <div class="bg-black/95 px-8 py-2 rounded-full border-2 border-yellow-600/40 shadow-2xl flex items-center gap-6">
+                <span id="moodIcon" class="text-4xl animate-pulse">😊</span>
+                <div class="text-right">
+                    <span class="text-[10px] text-yellow-500 font-black italic">المشرف الحكيم</span>
+                    <span id="popCount" class="block text-[8px] text-gray-400 font-bold">الرعية: 0</span>
                 </div>
             </div>
         </div>
 
-        <div class="bg-gray-800/60 p-6 rounded-3xl border-2 border-red-900 shadow-xl">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-fist-raised text-red-500"></i> التجهيزات العسكرية</h2>
-            <div class="space-y-4">
-                <button onclick="buyUnit('army')" class="w-full bg-red-700 hover:bg-red-600 p-4 rounded-2xl font-bold flex justify-between items-center px-8 border-b-4 border-red-950 transition active:scale-95">
-                    <div class="flex items-center gap-3"><span>تدريب محارب</span></div>
-                    <span class="bg-black/30 px-3 py-1 rounded-lg">💰 50</span>
-                </button>
-                <button onclick="buyUnit('castle')" class="w-full bg-blue-700 hover:bg-blue-600 p-4 rounded-2xl font-bold flex justify-between items-center px-8 border-b-4 border-blue-950 transition active:scale-95">
-                    <div class="flex items-center gap-3"><span>بناء قلعة</span></div>
-                    <span class="bg-black/30 px-3 py-1 rounded-lg text-[10px]">💰 200 | 🌲 200</span>
-                </button>
+        <div id="royalsLayer" class="absolute top-28 left-0 right-0 flex justify-around p-4"></div>
+        <div id="housesLayer" class="flex flex-wrap justify-center gap-2 mt-48"></div>
+        <div id="civiliansLayer" class="mt-6 flex flex-wrap justify-center gap-4"></div>
+        <div id="armyVisuals" class="absolute bottom-20 left-0 right-0 flex justify-center gap-2"></div>
+        
+        <p class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-white/5 font-black tracking-[1.5em] uppercase">الميدان الإمبراطوري</p>
+    </main>
+
+    <footer class="control-zone">
+        <div class="relative w-44 h-44">
+            <button onclick="task('land')" class="ps-btn absolute top-0 left-1/2 -translate-x-1/2 text-green-500"><i class="fas fa-expand-arrows-alt"></i></button>
+            <button onclick="task('supply')" class="ps-btn absolute right-0 top-1/2 -translate-y-1/2 text-orange-500"><i class="fas fa-basket-shopping"></i></button>
+            <button onclick="task('craft')" class="ps-btn absolute left-0 top-1/2 -translate-y-1/2 text-blue-400"><i class="fas fa-hammer-war"></i></button>
+            <button onclick="openSideMenu('recruitMenu')" class="ps-btn absolute bottom-0 left-1/2 -translate-x-1/2 text-red-500"><i class="fas fa-fist-raised"></i></button>
+        </div>
+
+        <div class="w-full px-8">
+            <div class="w-full bg-gray-900 h-1.5 rounded-full overflow-hidden mb-4"><div id="healthBar" class="bg-green-500 h-full w-full transition-all duration-1000"></div></div>
+            <div class="flex gap-2 justify-center">
+                <button onclick="openSideMenu('deptMenu')" class="bg-white/5 px-4 py-2 rounded-xl text-[9px] font-black text-yellow-500 border border-white/5">الأقسام</button>
+                <button onclick="openSideMenu('nutritionMenu')" class="bg-white/5 px-4 py-2 rounded-xl text-[9px] font-black text-green-500 border border-white/5">التغذية</button>
+                <button onclick="openSideMenu('membersMenu')" class="bg-white/5 px-4 py-2 rounded-xl text-[9px] font-black text-blue-400 border border-white/5">الأعضاء</button>
             </div>
-            <div class="mt-8 bg-black/40 p-4 rounded-2xl border border-white/5 min-h-[150px]">
-                <h3 class="text-center font-bold text-yellow-500 mb-4 text-xs italic">تشكيلات الجيش في الميدان</h3>
-                <div id="armyVisuals" class="flex flex-wrap justify-center gap-2"></div>
-            </div>
+        </div>
+    </footer>
+
+    <div id="menuOverlay" class="fixed inset-0 bg-black/80 z-[4000] hidden" onclick="closeAllMenus()"></div>
+    
+    <div id="deptMenu" class="side-drawer">
+        <h3 class="text-2xl font-black text-yellow-500 mb-8 border-b border-white/10 pb-2">ديوان الأقسام</h3>
+        <div class="grid grid-cols-2 gap-4">
+            <button onclick="build('farm')" class="bg-white/5 p-6 rounded-3xl border border-white/10 text-center active:scale-95 transition">
+                <i class="fas fa-house-wheat text-3xl text-yellow-500 mb-2"></i>
+                <p class="font-bold text-xs">مزرعة</p>
+                <span id="fC" class="text-xs text-yellow-600 font-black">0</span>
+            </button>
+            <button onclick="build('mine')" class="bg-white/5 p-6 rounded-3xl border border-white/10 text-center active:scale-95 transition">
+                <i class="fas fa-hill-rockslide text-3xl text-orange-500 mb-2"></i>
+                <p class="font-bold text-xs">منجم</p>
+                <span id="mC" class="text-xs text-orange-600 font-black">0</span>
+            </button>
         </div>
     </div>
 
-    <footer class="text-center mt-10 pb-10">
-        <a href="index.html" class="inline-block bg-white text-black px-12 py-3 rounded-2xl font-black shadow-2xl hover:bg-yellow-500 transition">العودة للديوان العام</a>
-    </footer>
-</div>
+    <div id="recruitMenu" class="side-drawer">
+        <h3 class="text-2xl font-black text-red-500 mb-8 border-b border-white/10 pb-2">ديوان الحرب</h3>
+        <button onclick="recruit()" class="w-full bg-blue-900/20 p-5 rounded-2xl flex justify-between mb-4"><span>فرسان النخبة</span><span>💰150</span></button>
+        <button onclick="executeAttack()" class="w-full bg-red-600 p-5 rounded-2xl text-black font-black">شن الزحف المقدس ⚔️</button>
+    </div>
 
-<script>
-    let gold, wood, army, castles, power, prestige;
+    <div id="nutritionMenu" class="side-drawer">
+        <h3 class="text-2xl font-black text-green-500 mb-8 border-b border-white/10 pb-2">التغذية الصحية</h3>
+        <button onclick="activateDiet('honey')" class="w-full bg-yellow-600/20 p-5 rounded-2xl flex justify-between mb-4"><span>عسل وزيت زيتون</span><span>💰300</span></button>
+        <button onclick="activateDiet('dates')" class="w-full bg-orange-600/20 p-5 rounded-2xl flex justify-between"><span>تمر وفاكهة</span><span>💰150</span></button>
+    </div>
 
-    // تشغيل عند تحميل الصفحة لاسترجاع البيانات
-    window.onload = function() {
-        const savedData = JSON.parse(localStorage.getItem('aba_malik_kingdom'));
-        if (savedData) {
-            gold = savedData.gold; wood = savedData.wood;
-            army = savedData.army; castles = savedData.castles;
-            power = savedData.power || (army * 10 + castles * 100 + 150);
-            prestige = savedData.prestige;
-            refreshArmyIcons(); 
-        } else {
-            resetToDefault();
+    <div id="membersMenu" class="side-drawer">
+        <h3 class="text-2xl font-black text-blue-400 mb-10 border-b border-white/10 pb-2">ديوان الأعضاء</h3>
+        <div class="flex items-center gap-5 bg-white/5 p-5 rounded-3xl mb-4 border border-white/5">
+            <i class="fas fa-user-tie text-4xl text-blue-400"></i>
+            <div><p class="text-lg font-bold">المشرف الحكيم</p><p class="text-[10px] text-yellow-500 font-bold">مستشار الإمبراطورية</p></div>
+        </div>
+    </div>
+
+    <script>
+        // المحرك البرمجي المصلح
+        let gold=0, wood=0, food=0, iron=0, land=0, farms=0, mines=0, cavalry=0, health=0;
+        let dietMode = 'normal';
+
+        function speak(t, p=1) { 
+            if(!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const m = new SpeechSynthesisUtterance(t); m.lang = 'ar-SA'; m.pitch = p; window.speechSynthesis.speak(m); 
         }
-        update();
-    };
 
-    function resetToDefault() {
-        gold = 100; wood = 100; army = 0; castles = 0; power = 150; prestige = 1;
-        document.getElementById('armyVisuals').innerHTML = '';
-    }
-
-    function resetGame() {
-        if(confirm("سيدي القائد، هل أنت متأكد من مسح تقدم المملكة والبدء من الصفر؟")) {
-            resetToDefault();
-            saveData();
-            update();
+        function startGame(mode) {
+            document.getElementById('startScreen').style.display='none';
+            gold=500; wood=300; food=600; iron=200; land=300; farms=0; mines=0; cavalry=0; health=90;
+            if(mode==='warrior') { cavalry=15; speak("بدأ عهد الفتوحات يا سلطان أبا مالك", 0.7); }
+            else if(mode==='merchant') { gold=2500; mines=1; speak("بدأ عهد التجارة والرخاء يا جلالة الملك", 1); }
+            else { food=1500; farms=2; health=100; speak("البيوت ستعمر بالخير بفضلك", 1.2); }
+            setInterval(engine, 1000);
+            updateUI();
         }
-    }
 
-    function produce(type) {
-        if (type === 'gold') gold += 10;
-        else wood += 15;
-        update();
-    }
+        function engine() {
+            let hFactor = health / 100;
+            let hGain = (dietMode==='honey'?0.7 : (dietMode==='dates'?0.4 : -0.25));
+            health = Math.min(100, Math.max(0, health + hGain));
 
-    function buyUnit(type) {
-        if (type === 'army' && gold >= 50) {
-            gold -= 50; army++; power += 10;
-            addSoldierIcon(true);
-        } else if (type === 'castle' && gold >= 200 && wood >= 200) {
-            gold -= 200; wood -= 200; castles++; power += 100;
-        } else {
-            alert("الموارد غير كافية!"); return;
+            // الشرط الجزائي عند تدني الصحة
+            if(health < 25) { gold = Math.max(0, gold-5); food = Math.max(0, food-10); }
+
+            // الإنتاج (المزارع تعطي طعاماً غزيراً الآن)
+            gold += Math.floor((land/100 + mines*20) * hFactor) - Math.floor(cavalry*2);
+            food += Math.floor((farms*50 + 10) * hFactor) - Math.floor(cavalry*3);
+            wood += Math.floor(mines*5);
+            iron += Math.floor(mines*25 * hFactor);
+            
+            if(food <= 0) { food=0; health -= 1; }
+            updateUI();
         }
-        update();
-    }
 
-    function trainElite() {
-        if (gold >= 100) {
-            gold -= 100; power += 50;
-            alert("تم تدريب فرقة نُخبة يا أبا مالك!");
-            update();
-        } else { alert("الذهب لا يكفي لتدريب النخبة!"); }
-    }
+        function task(t) {
+            if(t==='land' && gold >= land/2){ gold -= Math.floor(land/2); land += 100; speak("اتسعت الأرض", 0.8); }
+            else if(t==='supply'){ food += 40; wood += 35; speak("جمعنا التموين", 1.2); }
+            else if(t==='craft'){ gold += 20; iron += 15; speak("سك الذهب", 0.7); }
+            updateUI();
+        }
 
-    function executeAttack() {
-        if (power < 100) { alert("جيشك ضعيف جداً للهجوم!"); return; }
-        const btn = document.getElementById('attackBtn');
-        btn.disabled = true; btn.innerHTML = "جاري القتال...";
-        document.body.classList.add('attack-anim');
-        
-        setTimeout(() => {
-            document.body.classList.remove('attack-anim');
-            let win = Math.random() > 0.4;
-            if(win) {
-                prestige++; gold += 150;
-                alert("نصر ساحق! غنمنا 150 ذهبة وارتفعت هيبتك.");
+        // دالة البناء المصلحة
+        function build(type) {
+            if(gold >= 250) {
+                gold -= 250;
+                if(type === 'farm') { farms++; } else { mines++; }
+                speak("تم التشييد والإعمار يا سلطان", 1);
             } else {
-                power = Math.max(0, power - 30);
-                alert("تراجعنا تكتيكياً.. خسرنا بعض القوة.");
+                speak("الخزينة لا تكفي للبناء", 0.8);
             }
-            btn.disabled = false; btn.innerHTML = '<i class="fas fa-fire"></i> شن هجوم كاسح';
-            update();
-        }, 1500);
-    }
-
-    function addSoldierIcon(isNew) {
-        const div = document.getElementById('armyVisuals');
-        const img = document.createElement('img');
-        img.src = "https://img.icons8.com/color/96/knight.png";
-        img.className = "w-8 h-8 " + (isNew ? "animate__animated animate__zoomIn" : "");
-        div.appendChild(img);
-    }
-
-    function refreshArmyIcons() {
-        const div = document.getElementById('armyVisuals');
-        div.innerHTML = '';
-        for(let i=0; i<army; i++) addSoldierIcon(false);
-    }
-
-    function saveData() {
-        const gameData = { gold, wood, army, castles, power, prestige };
-        localStorage.setItem('aba_malik_kingdom', JSON.stringify(gameData));
-    }
-
-    function update() {
-        document.getElementById('goldCount').innerText = gold;
-        document.getElementById('woodCount').innerText = wood;
-        document.getElementById('armyCount').innerText = army;
-        document.getElementById('castleCount').innerText = castles;
-        document.getElementById('armyPower').innerText = power;
-        document.getElementById('prestige').innerText = prestige;
-        
-        const rank = document.getElementById('rankDisplay');
-        if (castles >= 10) {
-            rank.innerText = "رتبة العرش: السلطان أبا مالك الفاتح";
-            rank.className = "text-yellow-400 font-black tracking-widest text-xl animate__animated animate__tada animate__infinite";
-        } else if (castles >= 5) {
-            rank.innerText = "رتبة العرش: الأمير أبا مالك";
-            rank.className = "text-blue-400 font-bold tracking-widest text-lg";
-        } else if (prestige >= 5) {
-            rank.innerText = "رتبة العرش: القائد المهاب أبا مالك";
+            updateUI();
         }
-        saveData(); // الحفظ التلقائي عند كل تغيير
-    }
-</script>
+
+        function recruit() { if(gold>=150){ gold-=150; cavalry+=5; speak("الفرسان جاهزون", 0.7); } updateUI(); }
+        function activateDiet(m) { if(gold>=200){ gold-=200; dietMode=m; speak("تم تفعيل الغذاء الصحي", 1.1); } updateUI(); }
+
+        function executeAttack() {
+            if(cavalry<10) { speak("الجيش ضعيف للزحف", 0.7); return; }
+            document.getElementById('battleField').classList.add('animate__shakeX');
+            setTimeout(() => {
+                document.getElementById('battleField').classList.remove('animate__shakeX');
+                if(Math.random()>0.5){ gold+=1200; speak("نصر مبين!", 0.8); } else { cavalry=Math.floor(cavalry/2); speak("تراجعنا تكتيكياً", 0.7); }
+                updateUI();
+            }, 1000);
+        }
+
+        function openSideMenu(id) {
+            closeAllMenus();
+            const overlay = document.getElementById('menuOverlay');
+            const target = document.getElementById(id);
+            overlay.classList.remove('hidden');
+            setTimeout(() => target.classList.add('active'), 10);
+        }
+
+        function closeAllMenus() {
+            document.querySelectorAll('.side-drawer').forEach(d => d.classList.remove('active'));
+            document.getElementById('menuOverlay').classList.add('hidden');
+        }
+
+        function updateUI() {
+            document.getElementById('goldVal').innerText = Math.floor(gold);
+            document.getElementById('foodVal').innerText = Math.floor(food);
+            document.getElementById('woodVal').innerText = Math.floor(wood);
+            document.getElementById('ironVal').innerText = Math.floor(iron);
+            document.getElementById('fC').innerText = farms; 
+            document.getElementById('mC').innerText = mines;
+            document.getElementById('popCount').innerText = "الرعية: " + Math.floor(land/6 + farms*15);
+            document.getElementById('healthBar').style.width = health + "%";
+
+            // تحديث الوجوه
+            const mood = document.getElementById('moodIcon');
+            if(health < 25) mood.innerText = '🤒';
+            else if(health > 90) mood.innerText = '🤩';
+            else mood.innerText = '😊';
+
+            // 1. الملوك والأميرات
+            document.getElementById('royalsLayer').innerHTML = 
+                '<div class="flex flex-col items-center anim-float"><i class="fas fa-crown text-5xl text-yellow-500"></i><span class="text-[8px] font-black">الملك أبا مالك</span></div>' +
+                '<div class="flex flex-col items-center anim-float" style="animation-delay:1s"><i class="fas fa-chess-queen text-4xl text-pink-400"></i><span class="text-[8px] font-black uppercase">الأميرة</span></div>';
+
+            // 2. المباني والقلاع
+            document.getElementById('housesLayer').innerHTML = '<i class="fas fa-castle text-4xl text-yellow-800 opacity-80 mx-1"></i>'.repeat(Math.min(land/100, 6));
+
+            // 3. الرعية والنساء والعبيد
+            let civs = "";
+            for(let i=0; i<Math.min(land/80, 4); i++) civs += '<i class="fas fa-user-dress text-2xl text-purple-400 anim-wander mx-2"></i>';
+            for(let i=0; i<Math.min(farms+mines, 5); i++) civs += '<i class="fas fa-person-digging text-2xl text-orange-900 anim-work mx-2"></i>';
+            document.getElementById('civiliansLayer').innerHTML = civs;
+
+            // 4. الجيش
+            document.getElementById('armyVisuals').innerHTML = '<i class="fas fa-helmet-battle text-4xl text-red-600 anim-march mx-2"></i>'.repeat(Math.min(cavalry/5, 6));
+        }
+
+        function wakeUI() {}
+    </script>
 </body>
-</html>
+                               </html>
+            

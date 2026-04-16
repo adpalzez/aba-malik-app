@@ -1,8 +1,13 @@
+/**
+ * مملكة أبا مالك العقيلي - الإصدار 2026
+ * المحرك البرمجي الموحد (Unified App Engine)
+ */
+
 // ==========================================
 // 1. تدشين Firebase (v8)
 // ==========================================
 const firebaseConfig = {
-    apiKey: "AIzaSy...", // ⚠️ ضع مفتاحك الحقيقي هنا
+    apiKey: "AIzaSy...", // ⚠️ استبدله بمفتاحك الحقيقي
     authDomain: "your-project.firebaseapp.com",
     projectId: "your-project-id",
     storageBucket: "your-project.appspot.com",
@@ -10,7 +15,9 @@ const firebaseConfig = {
     appId: "1:123456789:web:abcdef"
 };
 
-if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 const db = firebase.firestore();
 db.enablePersistence().catch((err) => console.warn("الوضع الأوفلاين غير متاح:", err.code));
 
@@ -22,7 +29,40 @@ let userRating = 0;
 let deferredPrompt; 
 
 // ==========================================
-// 3. نظام "نقاط الأثر" و "الهوية الملكية" (ربط الإعدادات)
+// 3. نظام التثبيت الذكي (PWA Logic)
+// ==========================================
+function isAppInstalled() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const installBtn = document.getElementById('installApp');
+    if (installBtn && !isAppInstalled()) {
+        installBtn.classList.remove('hidden');
+        installBtn.style.display = 'flex';
+    }
+});
+
+function initInstallHandler() {
+    const installBtn = document.getElementById('installApp');
+    if (installBtn) {
+        installBtn.onclick = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        };
+    }
+}
+
+// ==========================================
+// 4. الهوية الملكية ونقاط الأثر
 // ==========================================
 window.addPoints = function(amount) {
     points += amount;
@@ -31,7 +71,6 @@ window.addPoints = function(amount) {
     if (elem) elem.innerText = points;
 };
 
-// وظيفة تحديث الاسم من الإعدادات
 function updateRoyalIdentity() {
     const savedName = localStorage.getItem('royalName');
     const nameDisplay = document.querySelector('.mood-bar span.text-\\[9px\\]');
@@ -40,24 +79,22 @@ function updateRoyalIdentity() {
     }
 }
 
-// دالة حفظ الاسم الجديد (تُستدعى من settings.html)
 window.saveIdentity = function() {
     const newName = document.getElementById('royalNameInput').value;
     if(newName) {
         localStorage.setItem('royalName', newName);
-        alert('تم تحديث هوية الملك بنجاح! سيظهر الاسم الجديد في شريط النبض.');
+        alert('تم تحديث هوية الملك بنجاح!');
         window.location.href = 'index.html';
     }
 };
 
 // ==========================================
-// 4. نظام "الحكمة" (Wisdom System)
+// 5. نظام الحكمة (Wisdom System)
 // ==========================================
 window.showRandomWisdom = function() {
     const hks = [
         "من اعتمد على الله كفاه، ومن توكل عليه هداه.",
         "الوقت هو المادة الخام للحياة، فلا تضيعه في التوافه.",
-        "العلم صيد والكتابة قيده، فقيّد صيدك بكثرة القراءة.",
         "إذا أردت أن تعرف قدرك عند الله، فانظر أين أقامك.",
         "القلوب أوعية، وخيرها أوعاها للخير."
     ];
@@ -74,7 +111,7 @@ window.closeWisdom = function() {
 };
 
 // ==========================================
-// 5. نظام التقييم (Rating System)
+// 6. نظام التقييم (Rating System)
 // ==========================================
 window.openRating = () => {
     if (localStorage.getItem('hasRated')) return alert("شكراً لتقييمك المسبق!");
@@ -107,7 +144,7 @@ function initRatingSystem() {
     if (submitBtn) {
         submitBtn.onclick = async () => {
             const comment = document.getElementById('ratingComment')?.value.trim();
-            if (userRating === 0) return alert("يرجى اختيار عدد النجوم أولاً");
+            if (userRating === 0) return alert("يرجى اختيار عدد النجوم");
             try {
                 await db.collection('ratings').add({
                     stars: userRating,
@@ -115,34 +152,10 @@ function initRatingSystem() {
                     time: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 localStorage.setItem('hasRated', 'true');
-                alert("تم إرسال تقييمك بنجاح!");
+                alert("تم التقييم بنجاح!");
                 document.getElementById('ratingModal')?.classList.add('hidden');
                 window.addPoints(30);
-            } catch(e) { alert("خطأ في الإرسال: تأكد من اتصالك"); }
-        };
-    }
-}
-
-// ==========================================
-// 6. زر التثبيت (PWA Fix)
-// ==========================================
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    const installBtn = document.getElementById('installApp');
-    if (installBtn) installBtn.classList.remove('hidden');
-});
-
-function initInstallHandler() {
-    const installBtn = document.getElementById('installApp');
-    if (installBtn) {
-        installBtn.onclick = async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') installBtn.classList.add('hidden');
-                deferredPrompt = null;
-            }
+            } catch(e) { alert("خطأ في الاتصال."); }
         };
     }
 }
@@ -154,34 +167,22 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js?v=4')
         .then(reg => {
-            console.log('مملكة أبا مالك: تم التحديث لـ v4');
-            reg.onupdatefound = () => {
-                const installingWorker = reg.installing;
-                installingWorker.onstatechange = () => {
-                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        alert("تحديث جديد متوفر! سيتم تحميل الواجهة الجديدة الآن.");
-                        location.reload();
-                    }
-                };
-            };
+            console.log('مملكة أبا مالك: نظام v4 نشط');
         });
     });
 }
 
 // ==========================================
-// 8. التشغيل عند التحميل (DOMContentLoaded)
+// 8. التشغيل النهائي
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // تحديث النقاط والاسم الملكي
     const pDisplay = document.getElementById('userPoints');
     if (pDisplay) pDisplay.innerText = points;
     updateRoyalIdentity();
-
-    // تشغيل الأنظمة
-    initRatingSystem();
     initInstallHandler();
+    initRatingSystem();
     
-    // تشغيل الوضع الليلي
+    // المظهر
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.onclick = () => {
@@ -194,9 +195,9 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // إحصائيات ومنشورات ومواقيت صلاة
+    // تحديث مواقيت الصلاة
     setInterval(() => { 
         if (typeof updatePrayerWidget === 'function') updatePrayerWidget(); 
     }, 1000);
 });
-        
+    

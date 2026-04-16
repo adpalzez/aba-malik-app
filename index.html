@@ -7,23 +7,37 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" href="https://i.ibb.co/pBhzxHdM/1000027317.jpg">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
         body { font-family: 'Cairo', sans-serif; transition: 0.5s; padding-bottom: 90px; }
         .glass { background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.15); border-radius: 40px; }
         .bg-image { background-image: url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); background-size: cover; background-position: center; background-attachment: fixed; }
+        
+        /* الوضع الفاتح */
         body.light-mode { background-color: #f0f2f5; color: #1a1a1a; }
         body.light-mode .bg-image { background-image: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); }
         body.light-mode .glass { background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.1); color: #1a1a1a; }
+
+        /* إصلاح حركة النبض */
+        @keyframes pulse-custom {
+            0% { transform: scale(0.9); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.6; }
+            100% { transform: scale(0.9); opacity: 1; }
+        }
+        .pulse-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; animation: pulse-custom 1.5s infinite; }
+
         .mosque-btn { background: linear-gradient(90deg, #166534, #15803d); color: white; }
         .azkar-btn { background: linear-gradient(90deg, #1e3a8a, #1d4ed8); color: white; }
         .gallery-btn { background: linear-gradient(90deg, #b45309, #d97706); color: white; }
         .wisdom-btn { background: linear-gradient(90deg, #581c87, #6d28d9); color: white; }
         .rating-btn { background: linear-gradient(90deg, #f59e0b, #d97706); color: white; }
         .games-btn { background: linear-gradient(to r, #064e3b, #065f46); color: white; }
+
         .theme-toggle { position: fixed; top: 60px; left: 20px; z-index: 100; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .nav-bottom { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.1); padding: 12px 10px 25px 10px; display: flex; justify-content: space-around; }
         .nav-item { color: rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.3s; }
@@ -31,9 +45,13 @@
     </style>
 </head>
 <body class="bg-black text-white min-h-screen bg-image flex flex-col items-center">
+
     <div class="fixed top-0 left-0 right-0 z-[1000] flex justify-center p-2 pointer-events-none">
         <div class="bg-black/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 flex items-center gap-4 animate__animated animate__fadeInDown pointer-events-auto">
-            <div class="flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span><span class="text-[9px] font-bold text-gray-400 uppercase">نشط</span></div>
+            <div class="flex items-center gap-1">
+                <span class="pulse-dot"></span>
+                <span class="text-[9px] font-bold text-gray-400 uppercase">متصل</span>
+            </div>
             <div class="flex gap-4 text-[11px] font-black">
                 <div class="flex items-center gap-1.5"><i class="fas fa-eye text-blue-400 text-[10px]"></i><span id="viewCount">0</span></div>
                 <div class="h-3 w-[1px] bg-white/20"></div>
@@ -44,24 +62,33 @@
 
     <button id="themeToggle" class="theme-toggle glass"><i id="themeIcon" class="fas fa-sun text-yellow-400 text-xl"></i></button>
 
-    <nav class="p-10 relative z-50 text-center"><h1 class="text-2xl font-black tracking-widest uppercase animate__animated animate__fadeInDown">ABA MALIK AL-AQILI</h1></nav>
+    <nav class="p-10 relative z-50 text-center">
+        <h1 class="text-2xl font-black tracking-widest uppercase animate__animated animate__fadeInDown">ABA MALIK AL-AQILI</h1>
+    </nav>
 
     <div class="relative z-10 container mx-auto px-6 py-4 flex flex-col items-center flex-grow">
         <div class="glass p-8 w-full max-w-md text-center shadow-2xl animate__animated animate__zoomIn">
-            <h2 class="text-5xl font-black mb-1">أبا مالك</h2><h3 class="text-2xl font-bold text-blue-400 mb-8">العقيلي</h3>
+            <h2 class="text-5xl font-black mb-1">أبا مالك</h2>
+            <h3 class="text-2xl font-bold text-blue-400 mb-8">العقيلي</h3>
+            
             <div class="flex flex-col gap-5 mb-8">
-                <a href="prayer.html" class="mosque-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg"><span>ركن المسجد والمواقيت</span><i class="fas fa-mosque text-yellow-400 text-xl"></i></a>
-                <a href="azkar.html" class="azkar-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg"><span>موسوعة أذكار أبا مالك</span><i class="fas fa-book-reader text-yellow-400 text-xl"></i></a>
-                <a href="gallery.html" class="gallery-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg"><span>معرض الأعمال الإبداعية</span><i class="fas fa-microchip text-yellow-500 text-xl"></i></a>
-                <button onclick="showWisdom()" class="wisdom-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg"><span>حكمة اليوم</span><i class="fas fa-lightbulb text-yellow-400 text-xl"></i></button>
-                <button onclick="openRating()" class="rating-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm shadow-lg"><span>تقييم التطبيق</span><i class="fas fa-star text-yellow-300 text-xl"></i></button>
+                <a href="prayer.html" class="mosque-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm"><span>ركن المسجد والمواقيت</span><i class="fas fa-mosque text-yellow-400 text-xl"></i></a>
+                <a href="azkar.html" class="azkar-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm"><span>موسوعة أذكار أبا مالك</span><i class="fas fa-book-reader text-yellow-400 text-xl"></i></a>
+                <a href="gallery.html" class="gallery-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm"><span>معرض الأعمال الإبداعية</span><i class="fas fa-microchip text-yellow-500 text-xl"></i></a>
+                <button onclick="showWisdom()" class="wisdom-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm"><span>حكمة اليوم</span><i class="fas fa-lightbulb text-yellow-400 text-xl"></i></button>
+                <button onclick="openRating()" class="rating-btn w-full flex items-center justify-between px-6 py-4 rounded-full font-bold text-sm"><span>تقييم التطبيق</span><i class="fas fa-star text-yellow-300 text-xl"></i></button>
             </div>
-            <a href="games.html" class="games-btn w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-bold shadow-xl mb-8"><i class="fas fa-chess-rook text-xl"></i> دخول مملكة صلاح الدين</a>
+
+            <a href="games.html" class="games-btn w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-bold mb-8 shadow-xl"><i class="fas fa-chess-rook text-xl"></i> دخول مملكة صلاح الدين</a>
+            
             <div class="grid grid-cols-2 gap-4">
                 <a href="https://wa.me/201113412908" target="_blank" class="bg-[#2ecc71] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-white"><i class="fab fa-whatsapp"></i> واتساب</a>
                 <a href="tel:+201113412908" class="bg-white text-black flex items-center justify-center gap-2 py-4 rounded-2xl font-bold"><i class="fas fa-phone-alt"></i> اتصال</a>
             </div>
         </div>
+
+        <div class="posts-container w-full max-w-md mt-10">
+            </div>
     </div>
 
     <nav class="nav-bottom">
@@ -72,17 +99,22 @@
     </nav>
 
     <div id="wisdomModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-        <div class="glass p-8 max-w-sm w-full text-center border-2 border-yellow-500/50 relative animate__animated animate__zoomIn">
-            <div class="absolute top-4 w-full left-0 px-6 flex justify-between"><button onclick="closeWisdom()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button><button onclick="shareWisdom()" class="text-green-500 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></button></div>
-            <i class="fas fa-quote-right text-yellow-500 text-3xl mb-4 mt-4"></i><div id="wisdomText" class="text-2xl font-black mb-6"></div>
+        <div class="glass p-8 max-w-sm w-full text-center border-2 border-yellow-500/50 relative">
+            <div class="absolute top-4 w-full left-0 px-6 flex justify-between">
+                <button onclick="closeWisdom()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+                <button onclick="shareWisdom()" class="text-green-500 hover:text-green-400"><i class="fab fa-whatsapp text-2xl"></i></button>
+            </div>
+            <i class="fas fa-quote-right text-yellow-500 text-3xl mb-4 mt-4"></i>
+            <div id="wisdomText" class="text-2xl font-black mb-6"></div>
             <button onclick="closeWisdom()" class="bg-yellow-600 text-black px-8 py-3 rounded-full font-bold w-full">اعتززت بهذه الحكمة</button>
         </div>
     </div>
 
     <div id="ratingModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-        <div class="glass p-8 max-w-sm w-full text-center border-2 border-orange-500/50 relative animate__animated animate__zoomIn">
+        <div class="glass p-8 max-w-sm w-full text-center border-2 border-orange-500/50 relative">
             <button onclick="closeRating()" class="absolute top-4 left-4 text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
-            <h3 class="text-xl font-black mb-2">تقييمك يهمنا</h3><p class="text-[10px] text-gray-400 mb-6">كم نجمة يستحق تطبيق أبا مالك؟</p>
+            <h3 class="text-xl font-black mb-2">تقييمك يهمنا</h3>
+            <p class="text-[10px] text-gray-400 mb-6">كم نجمة يستحق تطبيق أبا مالك؟</p>
             <div class="flex justify-center gap-3 mb-8 text-4xl">
                 <i class="far fa-star cursor-pointer text-gray-400 star-btn" onclick="setRating(1)"></i>
                 <i class="far fa-star cursor-pointer text-gray-400 star-btn" onclick="setRating(2)"></i>
@@ -90,28 +122,33 @@
                 <i class="far fa-star cursor-pointer text-gray-400 star-btn" onclick="setRating(4)"></i>
                 <i class="far fa-star cursor-pointer text-gray-400 star-btn" onclick="setRating(5)"></i>
             </div>
-            <button id="submitRatingBtn" onclick="submitRating()" class="bg-orange-600 text-white px-8 py-3 rounded-full font-bold w-full opacity-50 cursor-not-allowed transition" disabled>إرسال التقييم</button>
+            <button id="submitRatingBtn" onclick="submitRating()" class="bg-orange-600 text-white px-8 py-3 rounded-full font-bold w-full opacity-50 cursor-not-allowed" disabled>إرسال التقييم</button>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="./app.js"></script>
-    <script src="./rating.js"></script>
-    <script src="./wisdoms.js"></script> 
-    <script src="./install.js"></script>
-    <script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <script src="app.js"></script>
+    <script src="wisdoms.js"></script> <script>
+        // كود تبديل المظهر (Theme)
         const themeToggle = document.getElementById('themeToggle');
         themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('light-mode');
-            document.getElementById('themeIcon').classList.toggle('fa-sun');
-            document.getElementById('themeIcon').classList.toggle('fa-moon');
+            const icon = document.getElementById('themeIcon');
+            icon.classList.toggle('fa-sun');
+            icon.classList.toggle('fa-moon');
         });
-        function shareWisdom() {
-            const wisdomText = document.getElementById('wisdomText').innerText;
-            const text = encodeURIComponent(`من تطبيق أبا مالك العقيلي:\n\n"${wisdomText}"`);
-            window.open(`https://wa.me/?text=${text}`, '_blank');
+
+        // كود بسيط لعرض الحكمة (إذا لم تكن موجودة في ملف خارجي)
+        function showWisdom() {
+            const wisdoms = ["كن مع الله ولا تبالي", "الوقت كالسيف إن لم تقطعه قطعك", "ابتسم فالله ربك"];
+            const text = wisdoms[Math.floor(Math.random() * wisdoms.length)];
+            document.getElementById('wisdomText').innerText = text;
+            document.getElementById('wisdomModal').classList.remove('hidden');
         }
+        function closeWisdom() { document.getElementById('wisdomModal').classList.add('hidden'); }
     </script>
 </body>
 </html>

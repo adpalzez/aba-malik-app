@@ -1,8 +1,8 @@
 // ==========================================
-// 1. إعدادات وتدشين Firebase (v8)
+// 1. تدشين Firebase (v8)
 // ==========================================
 const firebaseConfig = {
-    apiKey: "AIzaSy...", // استبدلها ببياناتك الحقيقية من Firebase Console
+    apiKey: "AIzaSy...", // ⚠️ ضع مفتاحك الحقيقي هنا
     authDomain: "your-project.firebaseapp.com",
     projectId: "your-project-id",
     storageBucket: "your-project.appspot.com",
@@ -13,29 +13,33 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// تفعيل العمل بدون إنترنت
-db.enablePersistence().catch((err) => console.warn("Persistence Error:", err.code));
+// تفعيل العمل بدون إنترنت لضمان السرعة
+db.enablePersistence().catch((err) => console.warn("الوضع الأوفلاين غير متاح:", err.code));
 
 // ==========================================
-// 2. إدارة الحالة العامة (نقاط، مظهر، صفحات)
+// 2. المحرك الرئيسي للتنقل (SPA Engine)
 // ==========================================
-let points = parseInt(localStorage.getItem('userPoints')) || 0;
-let userRating = 0;
-
-// وظيفة التنقل بين الصفحات (SPA Logic)
 window.showPage = function(pageId) {
-    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    const pages = document.querySelectorAll('.page');
+    const navItems = document.querySelectorAll('.nav-item');
+    
+    pages.forEach(p => p.classList.remove('active'));
+    navItems.forEach(n => n.classList.remove('active'));
+
     const targetPage = document.getElementById(pageId);
     if (targetPage) targetPage.classList.add('active');
 
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.getAttribute('data-page') === pageId) item.classList.add('active');
-    });
-    window.scrollTo(0, 0);
+    const activeNav = document.querySelector(`.nav-item[data-page="${pageId}"]`);
+    if (activeNav) activeNav.classList.add('active');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// وظيفة إضافة النقاط (Gamification)
+// ==========================================
+// 3. نظام "نقاط الأثر" (Gamification)
+// ==========================================
+let points = parseInt(localStorage.getItem('userPoints')) || 0;
+
 function addPoints(amount) {
     points += amount;
     localStorage.setItem('userPoints', points);
@@ -48,7 +52,7 @@ function addPoints(amount) {
 }
 
 // ==========================================
-// 3. محراب الصلاة الذكي (Mehrab Logic)
+// 4. المحراب العلوي (Prayer System)
 // ==========================================
 const prayerTimes = [
     { name: "الفجر", time: "04:30" },
@@ -67,11 +71,7 @@ function updatePrayerWidget() {
         return (parseInt(h) * 60 + parseInt(m)) > currentTime;
     }) || prayerTimes[0];
 
-    const nextElem = document.getElementById('nextPrayerName');
-    const timerElem = document.getElementById('prayerTimer');
-    const widget = document.getElementById('prayerWidget');
-
-    if (nextElem) nextElem.innerText = next.name;
+    document.getElementById('nextPrayerName').innerText = next.name;
     
     const [nh, nm] = next.time.split(':');
     let target = new Date();
@@ -83,98 +83,49 @@ function updatePrayerWidget() {
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
     
-    if (timerElem) timerElem.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-
-    if (widget) {
-        if (diff < 1800000) widget.style.background = "linear-gradient(90deg, #b45309, #d97706)"; // برتقالي عند القرب
-        else widget.style.background = "linear-gradient(90deg, #166534, #15803d)"; // أخضر
+    const timerElem = document.getElementById('prayerTimer');
+    if (timerElem) {
+        timerElem.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        if (diff < 1800000) timerElem.className = "text-xs font-mono font-black text-orange-500 animate-pulse";
+        else timerElem.className = "text-xs font-mono font-black text-white";
     }
 }
 
 // ==========================================
-// 4. بوصلة الشعور والحكمة
+// 5. بوصلة المشاعر ونظام المنشورات
 // ==========================================
 const moodWisdoms = {
-    happy: "الحمد لله! 'لئن شكرتم لأزيدنكم'. استثمر فرحك في نشر الخير.",
-    tired: "يا حي يا قيوم برحمتك أستغيث.. القلوب تتعب لترتاح بذكر الله.",
-    anxious: "ألا بذكر الله تطمئن القلوب.. ردد: لا حول ولا قوة إلا بالله.",
-    grateful: "أنت في نعمة عظيمة، ذكر غيرك بفضل الله الآن عبر منشور."
+    happy: "الحمد لله! 'لئن شكرتم لأزيدنكم'. فرحك طاعة.",
+    tired: "استرح بذكر الله.. 'ألا بذكر الله تطمئن القلوب'.",
+    anxious: "ردد: لا حول ولا قوة إلا بالله، ففيها الفرج.",
+    grateful: "دوام النعمة بالشكر.. شاركنا الحمد في منشور."
 };
 
 window.setMood = function(mood) {
-    const text = moodWisdoms[mood];
-    document.getElementById('wisdomText').innerText = text;
+    document.getElementById('wisdomText').innerText = moodWisdoms[mood];
     document.getElementById('wisdomModal').classList.remove('hidden');
     addPoints(10);
 };
 
-// ==========================================
-// 5. نظام التقييم المطور
-// ==========================================
-window.openRating = function() {
-    if (localStorage.getItem('hasRated')) return alert("شكراً لك، لقد قمت بالتقييم مسبقاً!");
-    document.getElementById('ratingModal').classList.remove('hidden');
-};
-
-const starBtns = document.querySelectorAll('.star-btn');
-starBtns.forEach(star => {
-    star.onclick = (e) => {
-        userRating = parseInt(e.currentTarget.getAttribute('data-value'));
-        updateStars(userRating);
-        const btn = document.getElementById('submitRatingBtn');
-        btn.disabled = false;
-        btn.classList.remove('opacity-50', 'cursor-not-allowed');
-    };
-});
-
-function updateStars(rating) {
-    starBtns.forEach((s, i) => {
-        if (i < rating) {
-            s.classList.replace('far', 'fas');
-            s.classList.add('text-yellow-400');
-        } else {
-            s.classList.replace('fas', 'far');
-            s.classList.remove('text-yellow-400');
-        }
-    });
-}
-
-document.getElementById('submitRatingBtn').onclick = async () => {
-    const comment = document.getElementById('ratingComment').value.trim();
-    try {
-        await db.collection('ratings').add({
-            stars: userRating,
-            comment: comment || "بدون تعليق",
-            time: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        localStorage.setItem('hasRated', 'true');
-        alert("شكراً لتقييمك يا أبا مالك!");
-        document.getElementById('ratingModal').classList.add('hidden');
-        addPoints(30);
-    } catch(e) { alert("خطأ في الاتصال."); }
-};
-
-// ==========================================
-// 6. نظام المنشورات (Live Feed)
-// ==========================================
-async function addNewPost() {
+window.addNewPost = async function() {
     const input = document.getElementById('postInput');
-    if (!input.value.trim()) return;
+    const content = input.value.trim();
+    if (!content) return;
 
     try {
         await db.collection('posts').add({
             userName: "أبا مالك العقيلي",
-            content: input.value,
+            content: content,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             userImage: "https://i.ibb.co/pBhzxHdM/1000027317.jpg"
         });
         input.value = "";
         addPoints(50);
-    } catch(e) { alert("فشل النشر."); }
-}
-window.addNewPost = addNewPost;
+        alert("تم النشر في المملكة!");
+    } catch(e) { alert("حدث خطأ في النشر."); }
+};
 
-function getPosts() {
+function loadPosts() {
     const container = document.querySelector('.posts-container');
     db.collection('posts').orderBy('createdAt', 'desc').onSnapshot(snap => {
         if (!container) return;
@@ -182,15 +133,15 @@ function getPosts() {
         snap.forEach(doc => {
             const post = doc.data();
             const html = `
-            <div class="bg-white/10 backdrop-blur-md p-5 rounded-[30px] border border-white/10 mb-6 animate__animated animate__fadeInUp">
-                <div class="flex items-center mb-3">
-                    <img src="${post.userImage}" class="w-10 h-10 rounded-full border border-white/20">
+            <div class="bg-white/10 backdrop-blur-md p-5 rounded-[30px] border border-white/10 mb-4 animate__animated animate__fadeInUp">
+                <div class="flex items-center mb-2">
+                    <img src="${post.userImage}" class="w-8 h-8 rounded-full border border-white/20">
                     <div class="mr-3">
-                        <h3 class="font-bold text-white text-xs">${post.userName}</h3>
-                        <p class="text-[8px] text-gray-400">${post.createdAt ? new Date(post.createdAt.toDate()).toLocaleTimeString('ar-EG') : 'الآن'}</p>
+                        <h3 class="font-bold text-white text-[10px]">${post.userName}</h3>
+                        <p class="text-[7px] text-gray-500">${post.createdAt ? new Date(post.createdAt.toDate()).toLocaleTimeString('ar-EG') : 'الآن'}</p>
                     </div>
                 </div>
-                <p class="text-gray-200 text-sm leading-relaxed">${post.content}</p>
+                <p class="text-gray-200 text-xs leading-relaxed">${post.content}</p>
             </div>`;
             container.insertAdjacentHTML('beforeend', html);
         });
@@ -198,31 +149,59 @@ function getPosts() {
 }
 
 // ==========================================
-// 7. الإحصائيات والتشغيل النهائي
+// 6. المظهر والتثبيت (Theme & PWA)
 // ==========================================
-function getAnalytics() {
-    db.collection('analytics').where('type', '==', 'تصفح').onSnapshot(snap => {
-        const el = document.getElementById('viewCount');
-        if (el) el.innerText = snap.size;
-    });
-}
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installApp')?.classList.remove('hidden');
+});
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. تفعيل الإحصائيات ونقاط المستخدم
-    db.collection('analytics').add({ type: 'تصفح', time: firebase.firestore.FieldValue.serverTimestamp() });
-    getAnalytics();
-    document.getElementById('userPoints').innerText = points;
+function initUIHandlers() {
+    // زر الوضع الليلي
+    document.getElementById('themeToggle').onclick = () => {
+        document.body.classList.toggle('light-mode');
+        const icon = document.getElementById('themeIcon');
+        icon.classList.toggle('fa-moon');
+        icon.classList.toggle('fa-sun');
+    };
 
-    // 2. تشغيل الأنظمة الحية
-    getPosts();
-    setInterval(updatePrayerWidget, 1000);
+    // زر التثبيت
+    document.getElementById('installApp').onclick = async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') document.getElementById('installApp').classList.add('hidden');
+            deferredPrompt = null;
+        }
+    };
 
-    // 3. ربط أزرار الحكمة
-    const wBtn = document.getElementById('wisdomBtn');
-    if (wBtn) wBtn.onclick = () => {
-        const wisdoms = ["كن مع الله ولا تبالي", "الوقت كالسيف", "من اعتمد على الله كفاه"];
-        document.getElementById('wisdomText').innerText = wisdoms[Math.floor(Math.random()*wisdoms.length)];
+    // زر الحكمة
+    document.getElementById('wisdomBtn').onclick = () => {
+        const hks = ["كن مع الله ولا تبالي", "الوقت كالسيف", "من اعتمد على الله كفاه"];
+        document.getElementById('wisdomText').innerText = hks[Math.floor(Math.random()*hks.length)];
         document.getElementById('wisdomModal').classList.remove('hidden');
     };
+}
+
+// ==========================================
+// 7. التشغيل النهائي (The BIG CLICK)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    // تحديث البيانات الأولية
+    document.getElementById('userPoints').innerText = points;
+    updatePrayerWidget();
+    setInterval(updatePrayerWidget, 1000);
+    
+    // تشغيل الأنظمة
+    loadPosts();
+    initUIHandlers();
+    
+    // تسجيل الإحصائيات
+    db.collection('analytics').add({ type: 'تصفح', time: firebase.firestore.FieldValue.serverTimestamp() });
+    db.collection('analytics').where('type', '==', 'تصفح').onSnapshot(s => {
+        document.getElementById('viewCount').innerText = s.size;
+    });
 });
-                              
+                                               

@@ -2,7 +2,7 @@
 // 1. تدشين Firebase (v8)
 // ==========================================
 const firebaseConfig = {
-    apiKey: "AIzaSy...", // ⚠️ لا تنسَ وضع مفتاحك الحقيقي هنا
+    apiKey: "AIzaSy...", // ⚠️ ضع مفتاحك الحقيقي هنا
     authDomain: "your-project.firebaseapp.com",
     projectId: "your-project-id",
     storageBucket: "your-project.appspot.com",
@@ -159,13 +159,8 @@ function getPosts() {
 }
 
 // ==========================================
-// 7. نظام التقييم (النجوم)
+// 7. نظام التقييم وتفاعل المستخدم
 // ==========================================
-window.openRating = () => {
-    if (localStorage.getItem('hasRated')) return alert("شكراً لتقييمك المسبق!");
-    document.getElementById('ratingModal')?.classList.remove('hidden');
-};
-
 function initRatingSystem() {
     const starBtns = document.querySelectorAll('.star-btn');
     starBtns.forEach(star => {
@@ -188,27 +183,29 @@ function initRatingSystem() {
         };
     });
 
-    document.getElementById('submitRatingBtn').onclick = async () => {
-        const comment = document.getElementById('ratingComment')?.value.trim();
-        try {
-            await db.collection('ratings').add({
-                stars: userRating,
-                comment: comment || "",
-                time: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            localStorage.setItem('hasRated', 'true');
-            alert("تم إرسال تقييمك بنجاح!");
-            document.getElementById('ratingModal')?.classList.add('hidden');
-            addPoints(30);
-        } catch(e) { alert("خطأ في الإرسال."); }
-    };
+    const submitBtn = document.getElementById('submitRatingBtn');
+    if (submitBtn) {
+        submitBtn.onclick = async () => {
+            const comment = document.getElementById('ratingComment')?.value.trim();
+            try {
+                await db.collection('ratings').add({
+                    stars: userRating,
+                    comment: comment || "",
+                    time: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                localStorage.setItem('hasRated', 'true');
+                alert("تم إرسال تقييمك بنجاح!");
+                document.getElementById('ratingModal')?.classList.add('hidden');
+                addPoints(30);
+            } catch(e) { alert("خطأ في الإرسال."); }
+        };
+    }
 }
 
 // ==========================================
-// 8. المظهر و PWA والتشغيل
+// 8. المظهر و PWA والتشغيل النهائي
 // ==========================================
 function initUIHandlers() {
-    // زر المظهر
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.onclick = () => {
@@ -221,7 +218,6 @@ function initUIHandlers() {
         };
     }
 
-    // زر الحكمة العشوائية
     const wisdomBtn = document.getElementById('wisdomBtn');
     if (wisdomBtn) {
         wisdomBtn.onclick = () => {
@@ -253,6 +249,26 @@ function initUIHandlers() {
     }
 }
 
+// تسجيل الـ Service Worker مع نظام التحديث v4
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js?v=4')
+            .then(reg => {
+                console.log('مملكة أبا مالك: تم تحديث النظام لـ v4');
+                reg.onupdatefound = () => {
+                    const installingWorker = reg.installing;
+                    installingWorker.onstatechange = () => {
+                        if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            alert("تحديث جديد متوفر! سيتم الآن إعادة تحميل المملكة.");
+                            location.reload();
+                        }
+                    };
+                };
+            })
+            .catch(err => console.log('خطأ في التسجيل:', err));
+    });
+}
+
 // الإطلاق العظيم
 document.addEventListener('DOMContentLoaded', () => {
     const pDisplay = document.getElementById('userPoints');
@@ -272,4 +288,4 @@ document.addEventListener('DOMContentLoaded', () => {
         if (vCount) vCount.innerText = s.size;
     });
 });
-     
+                            

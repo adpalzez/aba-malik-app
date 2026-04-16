@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة المملكة | أبا مالك</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-image: url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); background-size: cover; background-position: center; }
+        .glass { background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; }
+        .input-glass { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 15px; color: white; width: 100%; outline: none; transition: 0.3s; }
+        .input-glass:focus { border-color: #fbbf24; background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <div class="glass w-full max-w-md p-10 text-center animate__animated animate__zoomIn">
+        <h2 class="text-3xl font-black text-white mb-2 uppercase">بوابة المملكة</h2>
+        <p class="text-yellow-500 text-[10px] font-bold tracking-widest mb-10 uppercase">سجّل دخولك لجمع نقاط الأثر</p>
+
+        <div class="space-y-4">
+            <input type="email" id="email" class="input-glass text-center" placeholder="البريد الإلكتروني">
+            <input type="password" id="password" class="input-glass text-center" placeholder="كلمة المرور">
+            
+            <button onclick="login()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-black py-4 rounded-2xl shadow-xl transition transform active:scale-95 uppercase text-xs tracking-widest">
+                دخول المملكة
+            </button>
+
+            <button onclick="register()" class="w-full bg-white/5 border border-white/10 text-gray-400 font-bold py-3 rounded-2xl mt-4 text-[10px] uppercase">
+                إنشاء حساب ملكي جديد
+            </button>
+        </div>
+        
+        <p id="errorMsg" class="text-rose-500 text-[10px] mt-6 hidden"></p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // دالة التسجيل
+        async function register() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                await firebase.auth().createUserWithEmailAndPassword(email, password);
+                alert("تم إنشاء حسابك الملكي بنجاح!");
+                window.location.href = 'index.html';
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        // دالة الدخول
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                await firebase.auth().signInWithEmailAndPassword(email, password);
+                window.location.href = 'index.html';
+            } catch (error) {
+                alert("خطأ في بيانات الدخول");
+            }
+        }
+    </script>
+</body>
+</html>
+  

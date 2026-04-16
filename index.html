@@ -56,7 +56,7 @@
     </header>
 
     <main class="glass w-full max-w-md p-8 text-center mb-6 border border-white/5 animate__animated animate__zoomIn">
-        <h2 class="text-4xl font-black mb-1 tracking-tighter">أبا مالك العقيلي</h2>
+        <h2 class="text-4xl font-black mb-1 tracking-tighter uppercase tracking-widest">أبا مالك العقيلي</h2>
         <p class="text-blue-400 text-[9px] font-bold tracking-[0.4em] uppercase mb-10 opacity-80">المملكة النخبوية 2026</p>
 
         <div class="bg-white/5 rounded-[30px] p-5 mb-8 border border-white/5">
@@ -75,11 +75,11 @@
         </button>
 
         <div class="menu-grid mb-8">
-            <a href="prayer.html" class="btn-mosque btn-premium p-5 rounded-[30px] shadow-lg">
+            <a href="prayer.html?v=1.1" class="btn-mosque btn-premium p-5 rounded-[30px] shadow-lg">
                 <i class="fas fa-mosque text-2xl"></i>
                 <span class="text-[10px] font-black uppercase">ركن المسجد</span>
             </a>
-            <a href="azkar.html" class="btn-azkar btn-premium p-5 rounded-[30px] shadow-lg">
+            <a href="azkar.html?v=1.1" class="btn-azkar btn-premium p-5 rounded-[30px] shadow-lg">
                 <i class="fas fa-book-open text-2xl"></i>
                 <span class="text-[10px] font-black uppercase">الأذكار</span>
             </a>
@@ -91,7 +91,7 @@
                 <i class="fas fa-star text-2xl"></i>
                 <span class="text-[10px] font-black uppercase">التقييم</span>
             </button>
-            <a href="games.html" class="full-width bg-gradient-to-r from-emerald-900 to-green-600 py-5 rounded-[30px] flex items-center justify-center gap-3 shadow-xl border border-white/10">
+            <a href="games.html?v=1.1" class="full-width bg-gradient-to-r from-emerald-900 to-green-600 py-5 rounded-[30px] flex items-center justify-center gap-3 shadow-xl border border-white/10">
                 <i class="fas fa-chess-rook text-xl text-yellow-400"></i>
                 <span class="text-xs font-black text-white uppercase tracking-widest">مملكة صلاح الدين</span>
             </a>
@@ -110,15 +110,15 @@
 
     <section class="posts-container w-full max-w-md space-y-4"></section>
 
-    <nav class="nav-bottom">
-        <a href="index.html" class="nav-item active"><i class="fas fa-home"></i></a>
-        <a href="prayer.html" class="nav-item"><i class="fas fa-mosque"></i></a>
-        <a href="posts.html" class="nav-item"><i class="fas fa-paper-plane"></i></a>
-        <a href="azkar.html" class="nav-item"><i class="fas fa-book-open"></i></a>
+    <nav class="nav-bottom shadow-2xl">
+        <a href="index.html?v=1.1" class="nav-item active"><i class="fas fa-home"></i></a>
+        <a href="prayer.html?v=1.1" class="nav-item"><i class="fas fa-mosque"></i></a>
+        <a href="posts.html?v=1.1" class="nav-item"><i class="fas fa-paper-plane"></i></a>
+        <a href="azkar.html?v=1.1" class="nav-item"><i class="fas fa-book-open"></i></a>
     </nav>
 
     <div id="wisdomModal" class="fixed inset-0 z-[2000] hidden flex items-center justify-center p-6 bg-black/95 backdrop-blur-md">
-        <div class="glass p-10 max-w-sm w-full text-center border-2 border-yellow-500/30">
+        <div class="glass p-10 max-w-sm w-full text-center border-2 border-yellow-500/30 animate__animated animate__zoomIn">
             <i class="fas fa-quote-right text-yellow-500 text-5xl mb-6"></i>
             <div id="wisdomText" class="text-lg font-black leading-relaxed mb-8 text-white"></div>
             <button onclick="closeWisdom()" class="w-full py-4 bg-yellow-600 rounded-full font-black text-white shadow-xl">آمنت بالله</button>
@@ -128,7 +128,7 @@
     <div id="ratingModal" class="fixed inset-0 z-[1100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
         <div class="glass p-8 max-w-sm w-full text-center relative border-2 border-orange-500/50">
             <button onclick="document.getElementById('ratingModal').classList.add('hidden')" class="absolute top-4 left-4 text-gray-400"><i class="fas fa-times text-xl"></i></button>
-            <h3 class="text-xl font-black mb-6">رأيك يهمنا</h3>
+            <h3 class="text-xl font-black mb-6 text-white uppercase tracking-widest">رأيك يهمنا</h3>
             <div class="flex justify-center gap-2 mb-6 text-4xl">
                 <i class="far fa-star cursor-pointer text-gray-500 star-btn" data-value="1"></i>
                 <i class="far fa-star cursor-pointer text-gray-500 star-btn" data-value="2"></i>
@@ -147,8 +147,9 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="app.js"></script>
-    <script src="wisdoms.js"></script>
+    
+    <script src="app.js?v=1.1"></script>
+    <script src="wisdoms.js?v=1.1"></script>
 </body>
-                    </html>
-                    
+                </html>
+    

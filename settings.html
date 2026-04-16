@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعدادات المملكة | 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Cairo', sans-serif; transition: 0.5s; background-attachment: fixed; overflow-x: hidden; }
+        .glass { background: rgba(0,0,0,0.65); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; }
+        .bg-image { background-image: url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); background-size: cover; background-position: center; }
+        
+        .setting-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; margin-bottom: 15px; transition: 0.3s; }
+        .setting-card:active { background: rgba(255,255,255,0.1); }
+
+        .input-glass { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 15px; color: white; width: 100%; focus: outline-none; focus: border-blue-500; }
+        
+        .nav-bottom { position: fixed; bottom: 20px; left: 20px; right: 20px; z-index: 2000; background: rgba(0,0,0,0.85); backdrop-filter: blur(30px); padding: 15px; display: flex; justify-content: space-around; border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); }
+        .nav-item { color: rgba(255,255,255,0.4); font-size: 1.2rem; }
+        .nav-item.active { color: #fbbf24; transform: translateY(-5px); text-shadow: 0 0 15px #fbbf24; }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen bg-image flex flex-col items-center p-4 pb-40">
+
+    <header class="w-full max-w-md flex justify-between items-center mb-8 mt-4">
+        <h1 class="text-2xl font-black uppercase tracking-widest text-blue-400">الإعدادات</h1>
+        <a href="index.html" class="glass w-10 h-10 flex items-center justify-center border border-white/10">
+            <i class="fas fa-times"></i>
+        </a>
+    </header>
+
+    <main class="w-full max-w-md animate__animated animate__fadeIn">
+        
+        <section class="glass p-6 mb-6">
+            <h2 class="text-xs font-black text-gray-400 uppercase mb-4 tracking-widest"><i class="fas fa-id-badge ml-2"></i> الهوية الملكية</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] text-blue-300 mb-2 block uppercase">اسم الأيقونة العلوية</label>
+                    <input type="text" id="royalNameInput" class="input-glass" placeholder="أبا مالك العقيلي">
+                </div>
+                <button onclick="saveIdentity()" class="w-full bg-blue-600 py-3 rounded-xl text-xs font-black uppercase shadow-lg active:scale-95 transition">حفظ التغييرات</button>
+            </div>
+        </section>
+
+        <section class="glass p-6 mb-6">
+            <h2 class="text-xs font-black text-gray-400 uppercase mb-4 tracking-widest"><i class="fas fa-paint-brush ml-2"></i> المظهر النخبوي</h2>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="changeBg('default')" class="setting-card text-center text-[10px] font-bold">الخلفية الأصلية</button>
+                <button onclick="changeBg('dark')" class="setting-card text-center text-[10px] font-bold">الوضع الليلي الحالك</button>
+            </div>
+        </section>
+
+        <section class="glass p-6">
+            <h2 class="text-xs font-black text-gray-400 uppercase mb-4 tracking-widest"><i class="fas fa-server ml-2"></i> النظام</h2>
+            
+            <div class="space-y-3">
+                <div class="flex justify-between items-center px-2">
+                    <span class="text-xs font-bold">صوت الإشعارات</span>
+                    <input type="checkbox" class="w-10 h-5 bg-white/10 rounded-full appearance-none checked:bg-blue-500 transition relative cursor-pointer border border-white/10">
+                </div>
+                <hr class="border-white/5">
+                <button onclick="clearCache()" class="w-full text-rose-500 text-[10px] font-black uppercase py-2">مسح ذاكرة التخزين المؤقت</button>
+            </div>
+        </section>
+
+    </main>
+
+    <nav class="nav-bottom w-[92%] max-w-md mx-auto">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="prayer.html" class="nav-item"><i class="fas fa-mosque"></i></a>
+        <a href="posts.html" class="nav-item"><i class="fas fa-paper-plane"></i></a>
+        <a href="azkar.html" class="nav-item"><i class="fas fa-book-open"></i></a>
+        <a href="settings.html" class="nav-item active"><i class="fas fa-cog"></i></a>
+    </nav>
+
+    <script>
+        // دالة حفظ الاسم الجديد للهوية
+        function saveIdentity() {
+            const newName = document.getElementById('royalNameInput').value;
+            if(newName) {
+                localStorage.setItem('royalName', newName);
+                alert('تم تحديث هوية الملك بنجاح! سيظهر الاسم الجديد في شريط النبض.');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // دالة تغيير الخلفية (مثال بسيط)
+        function changeBg(type) {
+            if(type === 'dark') {
+                document.body.style.backgroundImage = "none";
+                document.body.style.backgroundColor = "#050505";
+            } else {
+                document.body.style.backgroundImage = "url('https://i.ibb.co/pBhzxHdM/1000027317.jpg')";
+            }
+        }
+
+        function clearCache() {
+            if(confirm('هل تريد مسح بيانات التطبيق المؤقتة؟')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+    </script>
+</body>
+      </html>
+          

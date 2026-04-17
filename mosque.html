@@ -17,8 +17,6 @@
         .active-prayer { background: #fbbf24 !important; color: #064e3b !important; transform: scale(1.05); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
         .countdown-display { background: rgba(0,0,0,0.3); border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 30px; }
         .back-btn { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); width: 45px; height: 45px; border-radius: 15px; display: flex; align-items: center; justify-content: center; }
-        #locationTag { cursor: pointer; transition: 0.3s; }
-        #locationTag:active { transform: scale(0.95); background: #d1fae5; }
     </style>
 </head>
 <body class="pb-32">
@@ -104,14 +102,25 @@
             }
         }
 
-        // طلب إذن الإشعارات
+        function activateCompass() {
+            if(confirm("سيتم توجيهك الآن لخدمة القبلة من جوجل لضمان الدقة العالية.")) {
+                window.location.href = "https://quranalyze.com/qibla/";
+            }
+        }
+
+        function resetLocation() {
+            localStorage.removeItem('aba_malik_lat');
+            localStorage.removeItem('aba_malik_lon');
+            location.reload();
+        }
+
         async function requestNotification() {
             if ("Notification" in window) {
                 const permission = await Notification.requestPermission();
                 if (permission === "granted") {
                     notificationEnabled = true;
                     document.getElementById('notifIcon').className = 'fas fa-bell-slash text-yellow-500';
-                    alert("تم تفعيل إشعار العد التنازلي في شاشة التليفون.");
+                    alert("تم تفعيل الإشعارات بنجاح.");
                 }
             }
         }
@@ -124,9 +133,11 @@
                         const lon = p.coords.longitude;
                         localStorage.setItem('aba_malik_lat', lat);
                         localStorage.setItem('aba_malik_lon', lon);
+                        document.getElementById('locationTag').innerHTML = '<i class="fas fa-location-dot"></i> موقعك الحالي';
                         await getLivePrayers(lat, lon);
                     },
                     async () => {
+                        alert("لم نتمكن من تحديد موقعك، سيتم استخدام توقيت القاهرة افتراضياً.");
                         await getLivePrayers(30.0444, 31.2357);
                     }
                 );
@@ -140,7 +151,7 @@
                 timings = data.data.timings;
                 renderUI(data.data);
                 startEngine();
-            } catch (e) { console.error("Error"); }
+            } catch (e) { console.error("Error fetching prayers"); }
         }
 
         function renderUI(data) {
@@ -151,7 +162,7 @@
                 {n:'المغرب', t:timings.Maghrib, id:'Maghrib'}, {n:'العشاء', t:timings.Isha, id:'Isha'}
             ];
             grid.innerHTML = pList.map(p => `
-                <div id="card-${p.id}" class="prayer-card p-4 text-center shadow-md animate__animated animate__fadeInUp">
+                <div id="card-${p.id}" class="prayer-card p-4 text-center shadow-md">
                     <p class="text-[10px] font-bold text-emerald-600 mb-1">${p.n}</p>
                     <p class="font-black text-lg">${p.t.substring(0,5)}</p>
                 </div>
@@ -161,13 +172,12 @@
         }
 
         function startEngine() {
-            let lastUpdate = 0;
             setInterval(() => {
                 const now = new Date();
                 const prayers = [
-                    {n:'الفجر', t:timings.Fajr, id:'Fajr'}, {n:'الظهر', t:timings.Dhuhr, id:'Dhuhr'},
-                    {n:'العصر', t:timings.Asr, id:'Asr'}, {n:'المغرب', t:timings.Maghrib, id:'Maghrib'},
-                    {n:'العشاء', t:timings.Isha, id:'Isha'}
+                    {n:'الفجر', t:timings.Fajr}, {n:'الظهر', t:timings.Dhuhr},
+                    {n:'العصر', t:timings.Asr}, {n:'المغرب', t:timings.Maghrib},
+                    {n:'العشاء', t:timings.Isha}
                 ];
                 let next = null;
                 prayers.forEach((p) => {
@@ -186,32 +196,16 @@
                 const mins = Math.floor((diff % 3600000) / 60000);
                 const secs = Math.floor((diff % 60000) / 1000);
 
-                const timeStr = `${String(hrs).padStart(2,'0')} : ${String(mins).padStart(2,'0')} : ${String(secs).padStart(2,'0')}`;
-                document.getElementById('countdownTimer').innerText = timeStr;
+                document.getElementById('countdownTimer').innerText = `${String(hrs).padStart(2,'0')} : ${String(mins).padStart(2,'0')} : ${String(secs).padStart(2,'0')}`;
                 document.getElementById('nextPrayerLabel').innerText = `باقي على صلاة ${next.n}`;
                 document.getElementById('currentTime').innerText = now.toLocaleTimeString('ar-EG');
+                
+                // تمييز الصلاة القادمة بلون مختلف
+                document.querySelectorAll('.prayer-card').forEach(c => c.classList.remove('active-prayer'));
+                const nextCard = document.getElementById(`card-${next.id}`);
+                if(nextCard) nextCard.classList.add('active-prayer');
 
-                // تحديث الإشعار كل دقيقة لضمان عدم استهلاك البطارية
-                if (notificationEnabled && now.getTime() - lastUpdate > 60000) {
-                    updateNotification(next.n, `${hrs}س و ${mins}د`);
-                    lastUpdate = now.getTime();
-                }
             }, 1000);
-        }
-
-        async function updateNotification(name, remain) {
-            if ('serviceWorker' in navigator && notificationEnabled) {
-                const reg = await navigator.serviceWorker.ready;
-                reg.showNotification("موعد الصلاة القادمة", {
-                    body: `صلاة ${name} بعد ${remain}`,
-                    icon: "https://i.ibb.co/pBhzxHdM/1000027317.jpg",
-                    badge: "https://i.ibb.co/pBhzxHdM/1000027317.jpg",
-                    tag: "prayer-timer",
-                    renotify: false,
-                    silent: true,
-                    actions: [{ action: "close", title: "إزالة الإشعار" }]
-                });
-            }
         }
 
         initApp();

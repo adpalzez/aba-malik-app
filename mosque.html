@@ -3,19 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ركن المسجد | أبا مالك العقيلي</title>
+    <title>ركن المسجد | أبا مالك العقيلي (8)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main-teal: #064e3b; --accent-gold: #fbbf24; }
-        body { font-family: 'Cairo', sans-serif; background-color: #f1f5f9; color: #1e293b; touch-action: manipulation; }
+        :root { --main-teal: #064e3b; --accent-gold: #fbbf24; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #1e293b; }
+        
+        /* قواعد الوضع الليلي */
+        body.dark-mode { --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #f1f5f9; }
+        body.dark-mode .prayer-card { background: #1e293b; border-color: #334155; color: white; }
+        body.dark-mode .section-title span { color: white; }
+        body.dark-mode .content-card { background: #1e293b; border-color: #334155; color: #f1f5f9; }
+        body.dark-mode .note-area { background: #0f172a; color: #fbbf24; border-color: #fbbf24; }
+
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); color: var(--text-main); transition: 0.3s; overflow-x: hidden; }
         .hero-section { background: linear-gradient(rgba(6, 78, 59, 0.85), rgba(6, 78, 59, 0.95)), url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); background-size: cover; background-position: center; border-radius: 0 0 45px 45px; color: white; }
-        .prayer-card { background: white; border-radius: 20px; transition: 0.3s; border: 1px solid #e2e8f0; min-width: 100px; flex-shrink: 0; }
-        .prayer-card.active { border: 2px solid var(--accent-gold); background: #f0fdf4; }
-        .settings-panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 40px 40px 0 0; transform: translateY(100%); transition: 0.5s; z-index: 3000; }
+        .prayer-card { background: var(--card-bg); border-radius: 20px; transition: 0.3s; border: 1px solid #e2e8f0; min-width: 100px; flex-shrink: 0; }
+        .settings-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-radius: 40px 40px 0 0; transform: translateY(100%); transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 3000; box-shadow: 0 -10px 40px rgba(0,0,0,0.3); }
         .settings-panel.active { transform: translateY(0); }
+        .note-area { background: #fffde7; border: 1px dashed #facc15; border-radius: 20px; padding: 15px; width: 100%; min-height: 120px; color: #854d0e; outline: none; font-weight: 600; transition: 0.3s; }
+        
+        .toggle-switch { width: 45px; height: 22px; background: #cbd5e1; border-radius: 50px; position: relative; cursor: pointer; }
+        .toggle-switch.active { background: var(--accent-gold); }
+        .toggle-knob { width: 16px; height: 16px; background: white; border-radius: 50%; position: absolute; top: 3px; right: 3px; transition: 0.3s; }
+        .toggle-switch.active .toggle-knob { right: 26px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -25,20 +38,21 @@
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center gap-2">
                 <img src="https://i.ibb.co/pBhzxHdM/1000027317.jpg" class="w-9 h-9 rounded-full border-2 border-yellow-500 shadow-lg">
-                <span class="text-xs font-black">أبا مالك العقيلي</span>
+                <span class="text-xs font-black text-white">أبا مالك العقيلي</span>
             </div>
-            <i onclick="toggleSettings()" class="fas fa-cog text-2xl text-white/70 cursor-pointer"></i>
+            <i onclick="toggleSettings()" class="fas fa-sliders-h text-2xl text-white/70 cursor-pointer transition hover:text-yellow-500"></i>
         </div>
 
         <div class="py-10">
-            <p id="nextPrayerTitle" class="text-yellow-400 font-black mb-2 animate__animated animate__pulse animate__infinite">جاري جلب البيانات...</p>
+            <p id="nextPrayerTitle" class="text-yellow-400 font-black mb-2 tracking-wide">جاري الحساب...</p>
             <h2 id="mainCountdown" class="text-6xl font-black mb-6 tracking-tighter">00:00:00</h2>
-            <p id="locationStatus" class="text-[10px] opacity-60 font-bold tracking-widest uppercase"></p>
+            <div id="digitalClock" class="hidden text-4xl font-black opacity-90 mb-6">00:00</div>
+            <p id="locationStatus" class="text-[10px] opacity-60 font-bold tracking-widest uppercase">Version 8</p>
         </div>
 
-        <div class="flex justify-between items-center text-[11px] bg-black/30 p-4 rounded-[25px]">
-            <div class="text-right leading-tight"><p class="opacity-50">التاريخ الهجري</p><p id="hijriDate" class="font-black text-yellow-500 text-sm"></p></div>
-            <div class="text-left leading-tight"><p class="opacity-50">التاريخ الميلادي</p><p id="gregDate" class="font-black text-sm"></p></div>
+        <div id="dateSection" class="flex justify-between items-center text-[11px] bg-black/30 p-4 rounded-[25px]">
+            <div class="text-right leading-tight"><p class="opacity-50">الهجري</p><p id="hijriDate" class="font-black text-yellow-500 text-sm">-- ---</p></div>
+            <div class="text-left leading-tight"><p class="opacity-50">الميلادي</p><p id="gregDate" class="font-black text-sm">-- --</p></div>
         </div>
     </section>
 
@@ -47,47 +61,96 @@
 
         <div class="grid grid-cols-4 gap-4 mb-10 text-center">
             <div onclick="window.location.href='https://quranalyze.com/qibla/'" class="flex flex-col items-center gap-2">
-                <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-md text-teal-800"><i class="fas fa-compass text-xl"></i></div>
+                <div class="w-14 h-14 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-md text-teal-800"><i class="fas fa-compass text-xl text-teal-800"></i></div>
                 <span class="text-[10px] font-black">القبلة</span>
             </div>
             <div onclick="window.location.href='azkar.html'" class="flex flex-col items-center gap-2">
-                <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-md text-teal-800"><i class="fas fa-fingerprint text-xl"></i></div>
+                <div class="w-14 h-14 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-md text-teal-800"><i class="fas fa-fingerprint text-xl text-teal-800"></i></div>
                 <span class="text-[10px] font-black">المسبحة</span>
             </div>
             <div onclick="window.location.href='https://quran.com/ar'" class="flex flex-col items-center gap-2">
-                <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-md text-teal-800"><i class="fas fa-book-quran text-xl"></i></div>
+                <div class="w-14 h-14 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-md text-teal-800"><i class="fas fa-book-quran text-xl text-teal-800"></i></div>
                 <span class="text-[10px] font-black">المصحف</span>
             </div>
             <div onclick="alert('سُبْحَانَ اللهِ، وَالْحَمْدُ للهِ، وَلَا إِلَهَ إِلَّا اللهُ، وَاللهُ أَكْبَرُ')" class="flex flex-col items-center gap-2">
-                <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-md text-teal-800"><i class="fas fa-heart text-xl"></i></div>
+                <div class="w-14 h-14 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-md text-teal-800"><i class="fas fa-heart text-xl text-teal-800"></i></div>
                 <span class="text-[10px] font-black">أدعية</span>
             </div>
         </div>
 
-        <div class="section-title border-r-4 border-yellow-500 pr-3 mb-4"><span class="font-black text-teal-900">أذكار المسجد</span></div>
-        <div class="space-y-4">
-            <div onclick="alert('اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ')" class="bg-white p-6 rounded-[30px] shadow-sm flex justify-between items-center border border-emerald-50">
-                <div><p class="text-[10px] opacity-40 font-bold mb-1">عند الدخول</p><p class="font-black text-teal-900 text-lg">دعاء دخول المسجد</p></div>
-                <i class="fas fa-door-open text-emerald-600 text-2xl"></i>
-            </div>
+        <div class="section-title border-r-4 border-yellow-500 pr-3 mb-4"><span class="font-black">النوته الملكية</span></div>
+        <textarea id="userNote" class="note-area mb-8" placeholder="سجل وردك هنا يا أبا مالك..." oninput="saveNote()"></textarea>
+
+        <div class="section-title border-r-4 border-yellow-500 pr-3 mb-4"><span class="font-black">أذكار المسجد</span></div>
+        <div onclick="alert('بِسْمِ اللهِ، وَالصَّلاةُ وَالسَّلامُ عَلَى رَسُولِ اللهِ، اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ')" class="content-card bg-white p-6 rounded-[30px] shadow-sm flex justify-between items-center border border-emerald-50 mb-4">
+            <div><p class="text-[10px] opacity-40 font-bold">عند الدخول</p><p class="font-black text-teal-900 text-lg">دعاء دخول المسجد</p></div>
+            <i class="fas fa-mosque text-emerald-600 text-2xl"></i>
         </div>
     </main>
 
-    <div id="settingsPanel" class="settings-panel p-10">
+    <div id="settingsPanel" class="settings-panel p-8">
         <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-8"></div>
-        <h3 class="text-2xl font-black text-teal-900 mb-8">إعدادات المواقيت</h3>
-        <button onclick="requestLocation()" class="w-full bg-teal-800 text-white py-5 rounded-3xl font-black mb-4"><i class="fas fa-location-crosshairs ml-2"></i> تحديث الموقع الآن</button>
-        <button onclick="toggleSettings()" class="w-full bg-gray-100 text-gray-500 py-5 rounded-3xl font-black">إغلاق</button>
+        <h3 class="text-xl font-black text-teal-900 mb-8 border-b pb-4">إعدادات المحراب (إصدار 8)</h3>
+        <div class="space-y-6">
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-gray-700">الوضع الليلي</span>
+                <div id="darkToggle" onclick="toggleDarkMode()" class="toggle-switch"><div class="toggle-knob"></div></div>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-gray-700">عرض التاريخ</span>
+                <div id="dateToggle" onclick="toggleDateDisplay()" class="toggle-switch active"><div class="toggle-knob"></div></div>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-gray-700">الساعة الرقمية</span>
+                <div id="clockToggle" onclick="toggleClockType()" class="toggle-switch"><div class="toggle-knob"></div></div>
+            </div>
+            <button onclick="requestLocation()" class="w-full bg-teal-800 text-white py-5 rounded-3xl font-black mt-4 shadow-lg">تحديث الموقع والوقت</button>
+            <button onclick="toggleSettings()" class="w-full bg-gray-100 text-gray-500 py-4 rounded-3xl font-bold">إغلاق</button>
+        </div>
     </div>
 
     <script>
         let prayerTimes = {};
 
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            document.getElementById('darkToggle').classList.toggle('active');
+            localStorage.setItem('aba_dark', isDark);
+        }
+
+        function toggleDateDisplay() {
+            const dateSec = document.getElementById('dateSection');
+            const isHidden = dateSec.classList.toggle('hidden');
+            document.getElementById('dateToggle').classList.toggle('active');
+            localStorage.setItem('aba_date_hidden', isHidden);
+        }
+
+        function toggleClockType() {
+            document.getElementById('mainCountdown').classList.toggle('hidden');
+            document.getElementById('digitalClock').classList.toggle('hidden');
+            document.getElementById('clockToggle').classList.toggle('active');
+            const isDigital = !document.getElementById('digitalClock').classList.contains('hidden');
+            localStorage.setItem('aba_digital', isDigital);
+        }
+
+        function saveNote() { localStorage.setItem('aba_note', document.getElementById('userNote').value); }
+
         async function initApp() {
+            // تحميل الإعدادات والنوته
+            document.getElementById('userNote').value = localStorage.getItem('aba_note') || "";
+            if(localStorage.getItem('aba_dark') === 'true') toggleDarkMode();
+            if(localStorage.getItem('aba_date_hidden') === 'true') toggleDateDisplay();
+            if(localStorage.getItem('aba_digital') === 'true') toggleClockType();
+
             const lat = localStorage.getItem('lat') || "30.0444";
             const lon = localStorage.getItem('lon') || "31.2357";
-            document.getElementById('locationStatus').innerText = localStorage.getItem('lat') ? "موقع دقيق (GPS)" : "موقع افتراضي (القاهرة)";
             await fetchPrayers(lat, lon);
+            
+            // تحديث الساعة الرقمية
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('digitalClock').innerText = now.toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+            }, 1000);
         }
 
         async function fetchPrayers(lat, lon) {
@@ -95,81 +158,51 @@
                 const res = await fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=5`);
                 const data = await res.json();
                 prayerTimes = data.data.timings;
-                
                 renderPrayers();
                 updateDates(data.data.date);
                 startCountdown();
-            } catch (e) { alert("تأكد من اتصالك بالإنترنت"); }
+            } catch (e) { document.getElementById('nextPrayerTitle').innerText = "خطأ في الاتصال"; }
         }
 
         function renderPrayers() {
-            const grid = document.getElementById('prayerGrid');
-            const list = [
-                {n:'الفجر', t:prayerTimes.Fajr}, {n:'الشروق', t:prayerTimes.Sunrise}, 
-                {n:'الظهر', t:prayerTimes.Dhuhr}, {n:'العصر', t:prayerTimes.Asr}, 
-                {n:'المغرب', t:prayerTimes.Maghrib}, {n:'العشاء', t:prayerTimes.Isha}
-            ];
-            grid.innerHTML = list.map(p => `
-                <div class="prayer-card p-5 text-center shadow-sm border border-gray-100">
-                    <p class="text-[10px] font-bold text-teal-600 mb-2 uppercase">${p.n}</p>
-                    <p class="font-black text-xl text-teal-900">${p.t}</p>
-                </div>
-            `).join('');
+            const list = [{n:'الفجر', t:prayerTimes.Fajr}, {n:'الشروق', t:prayerTimes.Sunrise}, {n:'الظهر', t:prayerTimes.Dhuhr}, {n:'العصر', t:prayerTimes.Asr}, {n:'المغرب', t:prayerTimes.Maghrib}, {n:'العشاء', t:prayerTimes.Isha}];
+            document.getElementById('prayerGrid').innerHTML = list.map(p => `<div class="prayer-card p-5 text-center"><p class="text-[10px] font-bold text-teal-600 mb-2">${p.n}</p><p class="font-black text-xl">${p.t}</p></div>`).join('');
         }
 
-        function updateDates(dateData) {
-            document.getElementById('hijriDate').innerText = `${dateData.hijri.day} ${dateData.hijri.month.ar} ${dateData.hijri.year}`;
-            document.getElementById('gregDate').innerText = dateData.gregorian.date;
+        function updateDates(d) {
+            document.getElementById('hijriDate').innerText = `${d.hijri.day} ${d.hijri.month.ar} ${d.hijri.year}`;
+            document.getElementById('gregDate').innerText = d.gregorian.date;
         }
 
         function startCountdown() {
             setInterval(() => {
                 const now = new Date();
-                const pList = [
-                    {n:'الفجر', t:prayerTimes.Fajr}, {n:'الظهر', t:prayerTimes.Dhuhr}, 
-                    {n:'العصر', t:prayerTimes.Asr}, {n:'المغرب', t:prayerTimes.Maghrib}, 
-                    {n:'العشاء', t:prayerTimes.Isha}
-                ];
-
+                const pList = [{n:'الفجر', t:prayerTimes.Fajr}, {n:'الظهر', t:prayerTimes.Dhuhr}, {n:'العصر', t:prayerTimes.Asr}, {n:'المغرب', t:prayerTimes.Maghrib}, {n:'العشاء', t:prayerTimes.Isha}];
                 let next = null;
                 for (let p of pList) {
                     const [h, m] = p.t.split(':');
-                    const pDate = new Date();
-                    pDate.setHours(h, m, 0);
+                    const pDate = new Date(); pDate.setHours(h, m, 0);
                     if (pDate > now) { next = { ...p, d: pDate }; break; }
                 }
-
                 if (!next) {
                     const [h, m] = pList[0].t.split(':');
                     const pDate = new Date(); pDate.setDate(pDate.getDate() + 1); pDate.setHours(h, m, 0);
                     next = { ...pList[0], d: pDate };
                 }
-
                 const diff = next.d - now;
                 const hrs = Math.floor(diff / 3600000);
                 const mins = Math.floor((diff % 3600000) / 60000);
                 const secs = Math.floor((diff % 60000) / 1000);
-
-                document.getElementById('mainCountdown').innerText = 
-                    `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+                document.getElementById('mainCountdown').innerText = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
                 document.getElementById('nextPrayerTitle').innerText = `باقي على صلاة ${next.n}`;
             }, 1000);
         }
 
-        function requestLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((p) => {
-                    localStorage.setItem('lat', p.coords.latitude);
-                    localStorage.setItem('lon', p.coords.longitude);
-                    location.reload();
-                }, () => alert("فشل تحديد الموقع. تأكد من تفعيل الـ GPS"));
-            }
-        }
-
         function toggleSettings() { document.getElementById('settingsPanel').classList.toggle('active'); }
+        function requestLocation() { navigator.geolocation.getCurrentPosition(p => { localStorage.setItem('lat', p.coords.latitude); localStorage.setItem('lon', p.coords.longitude); location.reload(); }); }
 
         initApp();
     </script>
 </body>
-        </html>
-                
+    </html>
+    

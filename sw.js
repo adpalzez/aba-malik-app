@@ -7,7 +7,7 @@ const cacheName = 'aba-malik-bypass-v7.7';
 
 const assets = [
   './',
-  './index.html',
+  './index.html?v=7.7',
   './posts.html',
   './prayer.html', 
   './app.js?v=7.7', 

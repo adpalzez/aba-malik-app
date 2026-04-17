@@ -1,30 +1,28 @@
-/* مملكة أبا مالك - الإصدار v7.1 (2026) 🚀
-   نظام التحديث الإجباري الشامل - الانتقال للمحرك الموحد
+/* مملكة أبا مالك - الإصدار v7.7 (2026) 🚀
+   نظام التحديث الإجباري - فتح بوابات المملكة
 */
 
-// تغيير هذا الاسم هو "التعويذة" التي تمسح الذاكرة القديمة فوراً
-const cacheName = 'aba-malik-v7.1'; 
+// تغيير هذا الاسم هو "التعويذة" التي تمسح الذاكرة القديمة وتلغي البوابة
+const cacheName = 'aba-malik-bypass-v7.7'; 
 
 const assets = [
   './',
   './index.html',
   './posts.html',
   './prayer.html', 
-  './login.html',
-  './app.js?v=7.1', // ربط مع رقم إصدار المحرك الجديد
-  './manifest.json?v=7.1',
+  './app.js?v=7.7', 
+  './manifest.json?v=7.7',
   'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
   'https://i.ibb.co/pBhzxHdM/1000027317.jpg'
 ];
 
-// 1. التثبيت: تحميل النسخة الملكية الجديدة
+// 1. التثبيت: تحميل النسخة الجديدة المفتوحة
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(cacheName).then(cache => {
-      console.log('SW: جاري تحديث المملكة إلى الإصدار 7.1...');
-      // استخدام addAll بحذر لضمان عدم توقف الخدمة إذا فشل ملف واحد
+      console.log('SW: جاري تحديث المملكة إلى 7.7 وفتح البوابات...');
       return Promise.all(
         assets.map(url => {
           return cache.add(url).catch(err => console.error('فشل تحميل مورد:', url));
@@ -35,13 +33,13 @@ self.addEventListener('install', e => {
   self.skipWaiting(); 
 });
 
-// 2. التفعيل: طرد الأرواح القديمة (v4, v6.3, إلخ)
+// 2. التفعيل: تنظيف شامل لذاكرة الهاتف من الإصدارات القديمة
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
         keys.filter(key => key !== cacheName).map(key => {
-            console.log('SW: تم حذف الكاش القديم بنجاح:', key);
+            console.log('SW: تم حذف الكاش القديم:', key);
             return caches.delete(key);
         })
       );
@@ -50,16 +48,14 @@ self.addEventListener('activate', e => {
   return self.clients.claim(); 
 });
 
-// 3. الجلب الذكي: الشبكة أولاً للملفات البرمجية لضمان التحديث اللحظي
+// 3. الجلب: الشبكة أولاً لضمان عدم ظهور شاشة الدخول القديمة
 self.addEventListener('fetch', e => {
   const url = e.request.url;
   
-  // استراتيجية التحديث الفوري لملفات البرمجيات
   if (url.includes('.js') || url.includes('.html') || url.includes('manifest')) {
     e.respondWith(
       fetch(e.request)
         .then(res => {
-          // تحديث الكاش في الخلفية بالنسخة الجديدة
           const clone = res.clone();
           caches.open(cacheName).then(cache => cache.put(e.request, clone));
           return res;
@@ -67,14 +63,13 @@ self.addEventListener('fetch', e => {
         .catch(() => caches.match(e.request))
     );
   } else {
-    // الكاش أولاً للصور والخطوط لتوفير البيانات والسرعة
     e.respondWith(
       caches.match(e.request).then(res => res || fetch(e.request))
     );
   }
 });
 
-// --- 4. نظام الإشعارات الملكية ---
+// 4. نظام الإشعارات الملكية
 self.addEventListener('notificationclick', function(event) {
     event.notification.close(); 
     event.waitUntil(
@@ -89,4 +84,4 @@ self.addEventListener('notificationclick', function(event) {
         })
     );
 });
-                      
+                                      

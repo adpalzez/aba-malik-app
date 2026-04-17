@@ -64,8 +64,7 @@ window.updatePrayerWidget = function() {
 
     const now = new Date();
     const nextPrayer = new Date();
-    // توقيت افتراضي صلاة المغرب 6:30 مساءً (يمكنك تعديله)
-    nextPrayer.setHours(18, 30, 0); 
+    nextPrayer.setHours(18, 30, 0); // صلاة المغرب افتراضياً
 
     let diff = nextPrayer - now;
     if (diff < 0) {
@@ -100,6 +99,11 @@ window.addEventListener('beforeinstallprompt', (e) => {
 function initInstallHandler() {
     const installBtn = document.getElementById('installApp');
     if (installBtn) {
+        // إخفاء الزر فوراً إذا كان التطبيق مثبتاً بالفعل
+        if (isAppInstalled()) {
+            installBtn.style.display = 'none';
+        }
+
         installBtn.onclick = async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
@@ -182,19 +186,15 @@ window.openRating = () => {
 // 9. التشغيل النهائي (Main Init)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // تحديث النقاط
     const pDisplay = document.getElementById('userPoints');
     if (pDisplay) pDisplay.innerText = points;
     
-    // تشغيل المحركات
     updateRoyalIdentity();
     initInstallHandler();
     
-    // تشغيل عداد الصلاة كل ثانية
     setInterval(window.updatePrayerWidget, 1000);
     window.updatePrayerWidget(); 
     
-    // المظهر
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.onclick = () => {
@@ -214,5 +214,5 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js?v=6')
         .then(reg => console.log('v6 active'));
     });
-}
-    
+                    }
+        

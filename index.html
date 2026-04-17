@@ -126,9 +126,25 @@
         </div>
     </div>
 
+    <script>
+        window.shareKingdom = function() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'أبا مالك العقيلي | 2026',
+                    text: 'انضم إلي في التطبيق النخبوي، واجمع نقاط الأثر!',
+                    url: window.location.href
+                }).then(() => { if(window.addPoints) window.addPoints(20); })
+                .catch((error) => console.log('خطأ في المشاركة', error));
+            } else {
+                alert("انسخ الرابط وشاركه: " + window.location.href);
+            }
+        };
+    </script>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="app.js?v=5.1"></script>
+    <script src="app.js?v=6.1"></script>
 </body>
-                        </html>
-    
+            </html>
+                

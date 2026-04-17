@@ -1,14 +1,14 @@
 /**
  * مملكة أبا مالك العقيلي - الإصدار 2026
- * المحرك الموحد المصلح (Integrated Core Engine v7.5)
- * مدمج مع نظام الدخول السريع (Fast Login)
+ * المحرك الموحد المصلح (Integrated Core Engine v7.6)
+ * [تحديث]: تم إيقاف بوابة الدخول الإجبارية لتسهيل التطوير
  */
 
 // ==========================================
 // 1. تدشين Firebase (v8)
 // ==========================================
 const firebaseConfig = {
-    apiKey: "AIzaSy...", // ⚠️ ضع مفتاحك الحقيقي هنا
+    apiKey: "AIzaSy...", // ⚠️ ضع مفتاحك الحقيقي هنا ليعمل التقييم
     authDomain: "your-project.firebaseapp.com",
     projectId: "your-project-id",
     storageBucket: "your-project.appspot.com",
@@ -28,48 +28,37 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
   .catch((err) => console.error("نظام التذكر: فشل", err));
 
 // ==========================================
-// 2. نظام الحماية والدخول (Auth & Guard)
+// 2. نظام الحالة (بوابة الدخول معطلة مؤقتاً)
 // ==========================================
 
 auth.onAuthStateChanged((user) => {
-    const isLoginPage = window.location.pathname.includes('login.html');
-    
+    // تم إلغاء التحويل التلقائي لصفحة login.html للسماح بالمعاينة الحرة
     if (user) {
-        // إذا تم التعرف على الملك، وجهه للرئيسية فوراً
-        if (isLoginPage) window.location.href = 'index.html';
         console.log("تم التعرف على الملك: " + user.email);
     } else {
-        // إذا لم يسجل دخوله، وجهه لصفحة الدخول
-        if (!isLoginPage) window.location.href = 'login.html';
+        console.log("تصفح بوضع الضيف - بوابات المملكة مفتوحة للتطوير");
     }
 });
 
-// دالة الدخول السريع
+// دوال الدخول (تعمل عند الطلب فقط)
 window.fastLogin = function() {
     const email = document.getElementById('emailInput')?.value.trim();
     const password = document.getElementById('passwordInput')?.value;
-
     if (!email || !password) return alert("البيانات ناقصة يا ملك");
-
     auth.signInWithEmailAndPassword(email, password)
         .then(() => { window.location.href = 'index.html'; })
         .catch((err) => alert("فشل الدخول: " + err.message));
 };
 
-// دالة إنشاء حساب لأول مرة
 window.createNewAccount = function() {
     const email = document.getElementById('emailInput')?.value.trim();
     const password = document.getElementById('passwordInput')?.value;
-
     if (!email || !password) return alert("يرجى ملء البيانات");
-
     auth.createUserWithEmailAndPassword(email, password)
         .then((cred) => {
             alert("مبارك! تم إنشاء حسابك الملكي.");
             db.collection('users').doc(cred.user.uid).set({
-                email: email,
-                points: 50,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                email: email, points: 50, createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
             window.location.href = 'index.html';
         })
@@ -81,18 +70,16 @@ window.logout = () => {
 };
 
 // ==========================================
-// 3. المحركات الأساسية (الوضع الليلي، العداد، الحكمة)
+// 3. المحركات الأساسية (تعمل بشكل مستقل 100%)
 // ==========================================
 
 function initTheme() {
     const themeToggle = document.getElementById('themeToggle');
     const icon = document.getElementById('themeIcon');
-    
     if (localStorage.getItem('theme') === 'light') {
         document.body.classList.add('light-mode');
         if (icon) icon.classList.replace('fa-moon', 'fa-sun');
     }
-
     if (themeToggle) {
         themeToggle.onclick = () => {
             document.body.classList.toggle('light-mode');
@@ -123,7 +110,6 @@ window.showRandomWisdom = function() {
         "القلوب أوعية، وخيرها أوعاها للخير.",
         "الكلمة الطيبة صدقة."
     ];
-    
     if (modal && txt) {
         txt.innerText = hks[Math.floor(Math.random() * hks.length)];
         modal.classList.remove('hidden');
@@ -170,7 +156,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 // ==========================================
-// 5. التشغيل النهائي (Main Init)
+// 5. التشغيل النهائي
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
@@ -192,4 +178,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const pDisplay = document.getElementById('userPoints');
     if (pDisplay) pDisplay.innerText = localStorage.getItem('userPoints') || 0;
 });
-        
+         

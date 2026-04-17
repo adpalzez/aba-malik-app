@@ -2,7 +2,7 @@
   "name": "مملكة أبا مالك العقيلي",
   "short_name": "أبا مالك",
   "description": "التطبيق الشامل لأبا مالك العقيلي - أذكار، حكم، وأعمال",
-  "start_url": "index.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#000000",
@@ -13,19 +13,19 @@
     {
       "src": "https://i.ibb.co/pBhzxHdM/1000027317.jpg",
       "sizes": "192x192",
-      "type": "image/jpg",
+      "type": "image/jpeg",
       "purpose": "any"
     },
     {
       "src": "https://i.ibb.co/pBhzxHdM/1000027317.jpg",
       "sizes": "512x512",
-      "type": "image/jpg",
+      "type": "image/jpeg",
       "purpose": "any"
     },
     {
       "src": "https://i.ibb.co/pBhzxHdM/1000027317.jpg",
       "sizes": "512x512",
-      "type": "image/jpg",
+      "type": "image/jpeg",
       "purpose": "maskable"
     }
   ]

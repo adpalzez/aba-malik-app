@@ -1,14 +1,14 @@
 /**
- * مملكة أبا مالك العقيلي - الإصدار 2026
- * المحرك الموحد المصلح (Integrated Core Engine v7.6)
- * [تحديث]: تم إيقاف بوابة الدخول الإجبارية لتسهيل التطوير
+ * مملكة أبا مالك العقيلي - الإصدار 7.7 (2026) 🚀
+ * المحرك الموحد المفتوح (Full Access Engine)
+ * تم إلغاء القيود لتسريع العمل والمعاينة الحرة
  */
 
 // ==========================================
 // 1. تدشين Firebase (v8)
 // ==========================================
 const firebaseConfig = {
-    apiKey: "AIzaSy...", // ⚠️ ضع مفتاحك الحقيقي هنا ليعمل التقييم
+    apiKey: "AIzaSy...", // ⚠️ ضع مفتاحك الحقيقي هنا من Firebase Console
     authDomain: "your-project.firebaseapp.com",
     projectId: "your-project-id",
     storageBucket: "your-project.appspot.com",
@@ -22,57 +22,43 @@ if (!firebase.apps.length) {
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-// تفعيل خاصية التذكر الدائم (Persistence)
+// تفعيل خاصية التذكر الدائم
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  .then(() => console.log("نظام الدخول السريع: نشط"))
-  .catch((err) => console.error("نظام التذكر: فشل", err));
+  .then(() => console.log("نظام الجلسة المستمرة: فعال"))
+  .catch((err) => console.error("Persistence Error:", err));
 
 // ==========================================
-// 2. نظام الحالة (بوابة الدخول معطلة مؤقتاً)
+// 2. نظام الحالة (البوابات المفتوحة)
 // ==========================================
 
+// تم تنظيف هذا الجزء تماماً من window.location.href لضمان عدم حدوث تحويل
 auth.onAuthStateChanged((user) => {
-    // تم إلغاء التحويل التلقائي لصفحة login.html للسماح بالمعاينة الحرة
     if (user) {
-        console.log("تم التعرف على الملك: " + user.email);
+        console.log("الملك متصل: " + user.email);
     } else {
-        console.log("تصفح بوضع الضيف - بوابات المملكة مفتوحة للتطوير");
+        console.log("النظام يعمل بوضع المعاينة المفتوحة - البوابات غير مقيدة");
     }
 });
 
-// دوال الدخول (تعمل عند الطلب فقط)
+// دوال تسجيل الدخول (تعمل يدوياً فقط عند الحاجة)
 window.fastLogin = function() {
     const email = document.getElementById('emailInput')?.value.trim();
     const password = document.getElementById('passwordInput')?.value;
-    if (!email || !password) return alert("البيانات ناقصة يا ملك");
+    if (!email || !password) return alert("يرجى إدخال البيانات");
     auth.signInWithEmailAndPassword(email, password)
         .then(() => { window.location.href = 'index.html'; })
-        .catch((err) => alert("فشل الدخول: " + err.message));
-};
-
-window.createNewAccount = function() {
-    const email = document.getElementById('emailInput')?.value.trim();
-    const password = document.getElementById('passwordInput')?.value;
-    if (!email || !password) return alert("يرجى ملء البيانات");
-    auth.createUserWithEmailAndPassword(email, password)
-        .then((cred) => {
-            alert("مبارك! تم إنشاء حسابك الملكي.");
-            db.collection('users').doc(cred.user.uid).set({
-                email: email, points: 50, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            window.location.href = 'index.html';
-        })
-        .catch((err) => alert("خطأ في الإنشاء: " + err.message));
+        .catch((err) => alert("خطأ: " + err.message));
 };
 
 window.logout = () => {
-    auth.signOut().then(() => { window.location.href = 'login.html'; });
+    auth.signOut().then(() => { window.location.href = 'index.html'; });
 };
 
 // ==========================================
-// 3. المحركات الأساسية (تعمل بشكل مستقل 100%)
+// 3. المحركات الأساسية (تعمل فوراً للجميع)
 // ==========================================
 
+// المظهر (الوضع الليلي)
 function initTheme() {
     const themeToggle = document.getElementById('themeToggle');
     const icon = document.getElementById('themeIcon');
@@ -93,6 +79,7 @@ function initTheme() {
     }
 }
 
+// العداد الحي
 window.updatePrayerWidget = function() {
     const timerElem = document.getElementById('prayerTimer');
     if (timerElem) {
@@ -101,6 +88,7 @@ window.updatePrayerWidget = function() {
     }
 };
 
+// نظام الحكمة
 window.showRandomWisdom = function() {
     const modal = document.getElementById('wisdomModal');
     const txt = document.getElementById('wisdomText');
@@ -120,7 +108,7 @@ window.showRandomWisdom = function() {
 window.closeWisdom = () => document.getElementById('wisdomModal')?.classList.add('hidden');
 
 // ==========================================
-// 4. التقييم، النقاط، والتثبيت
+// 4. النقاط والتقييم والتثبيت
 // ==========================================
 
 window.addPoints = function(amount) {
@@ -132,16 +120,16 @@ window.addPoints = function(amount) {
 };
 
 window.openRating = () => {
-    if (localStorage.getItem('hasRated')) return alert("شكراً لتقييمك المسبق!");
-    let rating = prompt("قيم تجربتك من 1 إلى 5 نجوم:", "5");
-    if (rating && rating >= 1 && rating <= 5) {
+    if (localStorage.getItem('hasRated')) return alert("تم التقييم مسبقاً، شكراً لك!");
+    let rating = prompt("قيم تجربتك (1-5 نجوم):", "5");
+    if (rating >= 1 && rating <= 5) {
         db.collection('ratings').add({
             stars: parseInt(rating),
             user: auth.currentUser?.email || "زائر",
             time: firebase.firestore.FieldValue.serverTimestamp()
         }).then(() => {
             localStorage.setItem('hasRated', 'true');
-            alert("تم التقييم بنجاح!");
+            alert("شكراً لك! حصلت على 30 نقطة.");
             window.addPoints(30);
         });
     }
@@ -178,4 +166,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const pDisplay = document.getElementById('userPoints');
     if (pDisplay) pDisplay.innerText = localStorage.getItem('userPoints') || 0;
 });
-         
+    

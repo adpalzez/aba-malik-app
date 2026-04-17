@@ -29,6 +29,11 @@
         
         .nav-bottom { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px; border-top: 1px solid #e2e8f0; z-index: 1000; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        /* ستايل لوحة الإعدادات */
+        .settings-panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 40px 40px 0 0; transform: translateY(100%); transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 3000; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); }
+        .settings-panel.active { transform: translateY(0); }
+        .input-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 15px; padding: 12px; width: 100%; margin-top: 5px; font-weight: bold; }
     </style>
 </head>
 <body class="pb-24">
@@ -39,13 +44,13 @@
                 <img src="https://i.ibb.co/pBhzxHdM/1000027317.jpg" class="w-8 h-8 rounded-full border-2 border-yellow-500">
                 <span class="text-xs font-bold">أبا مالك العقيلي</span>
             </div>
-            <i onclick="refreshLocation()" class="fas fa-location-crosshairs text-yellow-500 cursor-pointer"></i>
+            <i onclick="toggleSettings()" class="fas fa-cog text-white/80 text-xl cursor-pointer hover:rotate-90 transition-all duration-500"></i>
         </div>
 
         <div class="py-8 animate__animated animate__fadeIn">
-            <p id="nextPrayerName" class="text-yellow-400 font-bold mb-1">جاري تحديد الموقع...</p>
+            <p id="nextPrayerName" class="text-yellow-400 font-bold mb-1">جاري الحساب...</p>
             <h2 id="countdownTimer" class="text-5xl font-black mb-4 tracking-tighter">00:00</h2>
-            <p id="cityLabel" class="text-[10px] opacity-70"><i class="fas fa-location-dot"></i> موقع افتراضي (القاهرة)</p>
+            <p id="cityLabel" class="text-[10px] opacity-70"><i class="fas fa-location-dot"></i> القاهرة، مصر</p>
         </div>
 
         <div class="flex justify-between items-center text-[10px] mt-4 bg-black/20 p-3 rounded-2xl">
@@ -70,7 +75,7 @@
                 <div class="tool-icon"><i class="fas fa-book-quran"></i></div>
                 <span class="text-[9px] font-bold">المصحف</span>
             </div>
-            <div onclick="openAzkarModal('سُبْحَانَ اللهِ، وَالْحَمْدُ للهِ، وَلَا إِلَهَ إِلَّا اللهُ، وَاللهُ أَكْبَرُ', 'الباقيات الصالحات')" class="flex flex-col items-center gap-2">
+            <div onclick="openAzkarModal('سُبْحَانَ اللهِ، وَالْحَمْدُ للهِ، وَلَا إِلَهَ إِلَّا اللهُ، وَاللهُ أَكْبَرُ', 'أدعية مأثورة')" class="flex flex-col items-center gap-2">
                 <div class="tool-icon"><i class="fas fa-heart"></i></div>
                 <span class="text-[9px] font-bold">أدعية</span>
             </div>
@@ -80,62 +85,61 @@
         <div class="grid grid-cols-1 gap-3 mb-8">
             <div onclick="openAzkarModal('بِسْمِ اللهِ، وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُولِ اللهِ، اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ.', 'دعاء دخول المسجد')" 
                  class="content-card p-5 flex justify-between items-center border-l-4 border-emerald-600">
-                <div>
-                    <p class="text-[10px] opacity-50 mb-1">عند الدخول</p>
-                    <p class="font-bold text-teal-900">دعاء دخول المسجد</p>
-                </div>
+                <div><p class="text-[10px] opacity-50 mb-1">عند الدخول</p><p class="font-bold text-teal-900">دعاء دخول المسجد</p></div>
                 <i class="fas fa-door-open text-emerald-600 text-xl"></i>
             </div>
-
             <div onclick="openAzkarModal('بِسْمِ اللهِ، وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُولِ اللهِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ.', 'دعاء الخروج من المسجد')" 
                  class="content-card p-5 flex justify-between items-center border-l-4 border-orange-400">
-                <div>
-                    <p class="text-[10px] opacity-50 mb-1">عند الخروج</p>
-                    <p class="font-bold text-teal-900">دعاء الخروج من المسجد</p>
-                </div>
+                <div><p class="text-[10px] opacity-50 mb-1">عند الخروج</p><p class="font-bold text-teal-900">دعاء الخروج من المسجد</p></div>
                 <i class="fas fa-walking text-orange-400 text-xl"></i>
             </div>
         </div>
     </main>
 
-    <div id="azkarModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[2000] hidden flex items-center justify-center p-6">
-        <div class="bg-white w-full max-w-[350px] rounded-[35px] overflow-hidden shadow-2xl animate__animated animate__zoomIn">
+    <div id="settingsOverlay" onclick="toggleSettings()" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2999] hidden"></div>
+    <div id="settingsPanel" class="settings-panel p-8">
+        <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
+        <h3 class="text-xl font-black text-teal-900 mb-6 flex items-center gap-2"><i class="fas fa-sliders"></i> ضبط المواقيت</h3>
+        
+        <div class="mb-6">
+            <label class="text-xs font-bold text-gray-500">طريقة الحساب</label>
+            <select id="calcMethod" class="input-box">
+                <option value="5">الهيئة العامة المصرية للمساحة</option>
+                <option value="4">جامعة أم القرى، مكة المكرمة</option>
+                <option value="2">الجمعية الإسلامية بأمريكا الشمالية</option>
+                <option value="3">رابطة العالم الإسلامي</option>
+                <option value="1">جامعة العلوم الإسلامية، كراتشي</option>
+            </select>
+        </div>
+
+        <button onclick="refreshLocation()" class="w-full bg-teal-800 text-white py-4 rounded-2xl font-bold mb-4 flex items-center justify-center gap-2">
+            <i class="fas fa-location-crosshairs"></i> تحديث الموقع التلقائي
+        </button>
+        
+        <button onclick="saveSettings()" class="w-full bg-yellow-500 text-black py-4 rounded-2xl font-black shadow-lg">حفظ التغييرات</button>
+    </div>
+
+    <div id="azkarModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[4000] hidden flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-[350px] rounded-[35px] overflow-hidden shadow-2xl">
             <div class="bg-teal-800 p-5 text-center text-white relative">
                 <h3 id="modalTitle" class="font-bold">الذكر</h3>
                 <button onclick="closeAzkarModal()" class="absolute left-4 top-5 opacity-70"><i class="fas fa-times"></i></button>
             </div>
-            <div class="p-8 text-center">
-                <p id="modalText" class="text-xl font-black leading-relaxed text-teal-900 mb-8"></p>
-                <button onclick="closeAzkarModal()" class="bg-teal-800 text-white w-full py-4 rounded-2xl font-bold">تمت القراءة</button>
-            </div>
+            <div class="p-8 text-center"><p id="modalText" class="text-xl font-black leading-relaxed text-teal-900 mb-8"></p>
+            <button onclick="closeAzkarModal()" class="bg-teal-800 text-white w-full py-4 rounded-2xl font-bold">تمت القراءة</button></div>
         </div>
     </div>
 
-    <nav class="nav-bottom">
-        <div onclick="window.location.href='index.html'" class="flex flex-col items-center text-gray-400 gap-1 cursor-pointer">
-            <i class="fas fa-th-large text-lg"></i><span class="text-[9px] font-bold">استكشف</span>
-        </div>
-        <div class="flex flex-col items-center text-teal-800 gap-1">
-            <i class="fas fa-mosque text-lg"></i><span class="text-[9px] font-bold">الصلاة</span>
-        </div>
-        <div onclick="window.location.href='azkar.html'" class="flex flex-col items-center text-gray-400 gap-1 cursor-pointer">
-            <i class="fas fa-book-open text-lg"></i><span class="text-[9px] font-bold">الأذكار</span>
-        </div>
-    </nav>
-
     <script>
-        // دالة جلب المواقيت بناءً على الإحداثيات
+        let method = localStorage.getItem('aba_malik_method') || "5";
+
         async function getPrayers() {
-            // جلب الموقع من الذاكرة أو استخدام القاهرة افتراضياً
             const lat = localStorage.getItem('aba_malik_lat') || "30.0444";
             const lon = localStorage.getItem('aba_malik_lon') || "31.2357";
-            
-            if (localStorage.getItem('aba_malik_lat')) {
-                document.getElementById('cityLabel').innerHTML = '<i class="fas fa-location-dot"></i> موقعك الحالي (محفوظ)';
-            }
+            const currentMethod = localStorage.getItem('aba_malik_method') || "5";
 
             try {
-                const res = await fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=5`);
+                const res = await fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=${currentMethod}`);
                 const data = await res.json();
                 const t = data.data.timings;
                 
@@ -155,27 +159,31 @@
                 document.getElementById('hDate').innerText = `${data.data.date.hijri.day} ${data.data.date.hijri.month.ar} ${data.data.date.hijri.year}`;
                 document.getElementById('gDate').innerText = data.data.date.gregorian.date;
                 document.getElementById('nextPrayerName').innerText = "تم تحديث المواقيت";
-                
-            } catch(e) { 
-                console.log("Error loading prayers"); 
-                document.getElementById('nextPrayerName').innerText = "خطأ في الاتصال";
-            }
+            } catch(e) { document.getElementById('nextPrayerName').innerText = "خطأ في الاتصال"; }
         }
 
-        // دالة تحديث وحفظ الموقع الجغرافي
+        function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('active');
+            document.getElementById('settingsOverlay').classList.toggle('hidden');
+        }
+
+        function saveSettings() {
+            const newMethod = document.getElementById('calcMethod').value;
+            localStorage.setItem('aba_malik_method', newMethod);
+            toggleSettings();
+            getPrayers();
+            alert("تم حفظ قواعد الحساب الجديدة");
+        }
+
         function refreshLocation() {
             if (navigator.geolocation) {
-                document.getElementById('nextPrayerName').innerText = "جاري تحديد الموقع...";
                 navigator.geolocation.getCurrentPosition((p) => {
                     localStorage.setItem('aba_malik_lat', p.coords.latitude);
                     localStorage.setItem('aba_malik_lon', p.coords.longitude);
-                    alert("تم حفظ موقعك بنجاح!");
                     getPrayers();
-                }, () => {
-                    alert("يرجى تفعيل GPS وإذن الموقع في المتصفح.");
+                    alert("تم تحديث الموقع الجغرافي");
+                    toggleSettings();
                 });
-            } else {
-                alert("متصفحك لا يدعم تحديد الموقع.");
             }
         }
 
@@ -185,17 +193,12 @@
             document.getElementById('azkarModal').classList.remove('hidden');
         }
 
-        function closeAzkarModal() {
-            document.getElementById('azkarModal').classList.add('hidden');
-        }
+        function closeAzkarModal() { document.getElementById('azkarModal').classList.add('hidden'); }
 
-        // البدء بمحاولة جلب الموقع إذا لم يكن محفوظاً
-        if (!localStorage.getItem('aba_malik_lat')) {
-            refreshLocation();
-        } else {
-            getPrayers();
-        }
+        // تهيئة القيم في القائمة
+        document.getElementById('calcMethod').value = method;
+        getPrayers();
     </script>
 </body>
-    </html>
-                                                       
+                    </html>
+                                                                          

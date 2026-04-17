@@ -2,7 +2,7 @@
   "name": "مملكة أبا مالك العقيلي",
   "short_name": "أبا مالك",
   "description": "التطبيق الشامل لأبا مالك العقيلي - أذكار، حكم، وأعمال",
-  "start_url": "/index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#000000",

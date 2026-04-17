@@ -1,6 +1,7 @@
 /**
  * مملكة أبا مالك العقيلي - الإصدار 2026
- * المحرك البرمجي الموحد (Kingdom Core Engine) مع نظام الحماية
+ * المحرك البرمجي الموحد (Kingdom Core Engine v6.2)
+ * دمج نظام الحماية، التثبيت، عداد الصلاة، الحكمة والتقييم
  */
 
 // ==========================================
@@ -30,12 +31,10 @@ auth.onAuthStateChanged((user) => {
     const isLoginPage = window.location.pathname.includes('login.html');
     
     if (!user) {
-        // إذا لم يكن مسجلاً وليس في صفحة الدخول، يتم توجيهه فوراً
         if (!isLoginPage) {
             window.location.href = 'login.html';
         }
     } else {
-        // إذا كان مسجلاً وحاول دخول صفحة login، يتم توجيهه للرئيسية
         if (isLoginPage) {
             window.location.href = 'index.html';
         }
@@ -43,7 +42,6 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
-// دالة الخروج
 window.logout = function() {
     auth.signOut().then(() => {
         window.location.href = 'login.html';
@@ -58,7 +56,32 @@ let userRating = 0;
 let deferredPrompt; 
 
 // ==========================================
-// 4. نظام التثبيت الذكي (PWA Logic)
+// 4. محرك عداد وقت الصلاة (إصلاح عداد الشاشة)
+// ==========================================
+window.updatePrayerWidget = function() {
+    const timerElem = document.getElementById('prayerTimer');
+    if (!timerElem) return;
+
+    const now = new Date();
+    const nextPrayer = new Date();
+    // توقيت افتراضي صلاة المغرب 6:30 مساءً (يمكنك تعديله)
+    nextPrayer.setHours(18, 30, 0); 
+
+    let diff = nextPrayer - now;
+    if (diff < 0) {
+        nextPrayer.setDate(nextPrayer.getDate() + 1);
+        diff = nextPrayer - now;
+    }
+
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    timerElem.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+};
+
+// ==========================================
+// 5. نظام التثبيت الذكي (PWA Logic)
 // ==========================================
 function isAppInstalled() {
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -91,7 +114,7 @@ function initInstallHandler() {
 }
 
 // ==========================================
-// 5. الهوية الملكية ونقاط الأثر
+// 6. الهوية الملكية ونقاط الأثر
 // ==========================================
 window.addPoints = function(amount) {
     points += amount;
@@ -108,111 +131,70 @@ function updateRoyalIdentity() {
     }
 }
 
-window.saveIdentity = function() {
-    const newName = document.getElementById('royalNameInput').value;
-    if(newName) {
-        localStorage.setItem('royalName', newName);
-        alert('تم تحديث هوية الملك بنجاح!');
-        window.location.href = 'index.html';
-    }
-};
-
 // ==========================================
-// 6. نظام الحكمة (Wisdom System)
+// 7. نظام الحكمة (Wisdom System)
 // ==========================================
 window.showRandomWisdom = function() {
+    const modal = document.getElementById('wisdomModal');
+    const txt = document.getElementById('wisdomText');
+    
     const hks = [
         "من اعتمد على الله كفاه، ومن توكل عليه هداه.",
         "الوقت هو المادة الخام للحياة، فلا تضيعه في التوافه.",
         "إذا أردت أن تعرف قدرك عند الله، فانظر أين أقامك.",
-        "القلوب أوعية، وخيرها أوعاها للخير."
+        "القلوب أوعية، وخيرها أوعاها للخير.",
+        "اتقِ الله حيثما كنت، وأتبع السيئة الحسنة تمحها."
     ];
-    const txt = document.getElementById('wisdomText');
-    if (txt) {
+
+    if (modal && txt) {
         txt.innerText = hks[Math.floor(Math.random() * hks.length)];
-        document.getElementById('wisdomModal')?.classList.remove('hidden');
+        modal.classList.remove('hidden');
         window.addPoints(5);
     }
 };
 
 window.closeWisdom = function() {
-    document.getElementById('wisdomModal')?.classList.add('hidden');
+    const modal = document.getElementById('wisdomModal');
+    if (modal) modal.classList.add('hidden');
 };
 
 // ==========================================
-// 7. نظام التقييم (Rating System)
+// 8. نظام التقييم (Rating System)
 // ==========================================
 window.openRating = () => {
     if (localStorage.getItem('hasRated')) return alert("شكراً لتقييمك المسبق!");
-    document.getElementById('ratingModal')?.classList.remove('hidden');
-};
-
-function initRatingSystem() {
-    const starBtns = document.querySelectorAll('.star-btn');
-    starBtns.forEach(star => {
-        star.onclick = (e) => {
-            userRating = parseInt(e.currentTarget.getAttribute('data-value'));
-            starBtns.forEach((s, i) => {
-                if (i < userRating) {
-                    s.classList.replace('far', 'fas');
-                    s.classList.add('text-yellow-400');
-                } else {
-                    s.classList.replace('fas', 'far');
-                    s.classList.remove('text-yellow-400');
-                }
-            });
-            const submitBtn = document.getElementById('submitRatingBtn');
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('opacity-50');
-            }
-        };
-    });
-
-    const submitBtn = document.getElementById('submitRatingBtn');
-    if (submitBtn) {
-        submitBtn.onclick = async () => {
-            const comment = document.getElementById('ratingComment')?.value.trim();
-            if (userRating === 0) return alert("يرجى اختيار عدد النجوم");
-            try {
-                await db.collection('ratings').add({
-                    stars: userRating,
-                    comment: comment || "",
-                    time: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                localStorage.setItem('hasRated', 'true');
-                alert("تم التقييم بنجاح!");
-                document.getElementById('ratingModal')?.classList.add('hidden');
-                window.addPoints(30);
-            } catch(e) { alert("خطأ في الاتصال."); }
-        };
+    
+    let rating = prompt("قيم تجربتك في المملكة من 1 إلى 5 نجوم:", "5");
+    if (rating && rating >= 1 && rating <= 5) {
+        db.collection('ratings').add({
+            stars: parseInt(rating),
+            user: auth.currentUser ? auth.currentUser.email : "زائر",
+            time: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            localStorage.setItem('hasRated', 'true');
+            alert("تم التقييم بنجاح! نلت 30 نقطة ملكية.");
+            window.addPoints(30);
+        }).catch(e => alert("خطأ في الاتصال. حاول لاحقاً."));
     }
-}
-
-// ==========================================
-// 8. تسجيل الـ Service Worker (v4)
-// ==========================================
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=4')
-        .then(reg => {
-            console.log('مملكة أبا مالك: نظام v4 نشط');
-        });
-    });
-}
+};
 
 // ==========================================
 // 9. التشغيل النهائي (Main Init)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    // تحديث النقاط
     const pDisplay = document.getElementById('userPoints');
     if (pDisplay) pDisplay.innerText = points;
     
+    // تشغيل المحركات
     updateRoyalIdentity();
     initInstallHandler();
-    initRatingSystem();
     
-    // تفعيل أزرار المظهر
+    // تشغيل عداد الصلاة كل ثانية
+    setInterval(window.updatePrayerWidget, 1000);
+    window.updatePrayerWidget(); 
+    
+    // المظهر
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.onclick = () => {
@@ -224,10 +206,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
     }
-
-    // تحديث مواقيت الصلاة (إذا كانت الدالة موجودة)
-    setInterval(() => { 
-        if (typeof updatePrayerWidget === 'function') updatePrayerWidget(); 
-    }, 1000);
 });
+
+// تسجيل الـ Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js?v=6')
+        .then(reg => console.log('v6 active'));
+    });
+}
     

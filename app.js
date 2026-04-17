@@ -1,13 +1,14 @@
 /**
  * مملكة أبا مالك العقيلي - الإصدار 2026
- * المحرك الموحد المصلح (Integrated Core Engine)
+ * المحرك الموحد المصلح (Integrated Core Engine v7.5)
+ * مدمج مع نظام الدخول السريع (Fast Login)
  */
 
 // ==========================================
 // 1. تدشين Firebase (v8)
 // ==========================================
 const firebaseConfig = {
-    apiKey: "AIzaSy...", 
+    apiKey: "AIzaSy...", // ⚠️ ضع مفتاحك الحقيقي هنا
     authDomain: "your-project.firebaseapp.com",
     projectId: "your-project-id",
     storageBucket: "your-project.appspot.com",
@@ -21,16 +22,72 @@ if (!firebase.apps.length) {
 const db = firebase.firestore();
 const auth = firebase.auth();
 
+// تفعيل خاصية التذكر الدائم (Persistence)
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .then(() => console.log("نظام الدخول السريع: نشط"))
+  .catch((err) => console.error("نظام التذكر: فشل", err));
+
 // ==========================================
-// 2. المحركات الأساسية (تعمل فوراً دون قيود)
+// 2. نظام الحماية والدخول (Auth & Guard)
 // ==========================================
 
-// --- محرك الوضع الليلي ---
+auth.onAuthStateChanged((user) => {
+    const isLoginPage = window.location.pathname.includes('login.html');
+    
+    if (user) {
+        // إذا تم التعرف على الملك، وجهه للرئيسية فوراً
+        if (isLoginPage) window.location.href = 'index.html';
+        console.log("تم التعرف على الملك: " + user.email);
+    } else {
+        // إذا لم يسجل دخوله، وجهه لصفحة الدخول
+        if (!isLoginPage) window.location.href = 'login.html';
+    }
+});
+
+// دالة الدخول السريع
+window.fastLogin = function() {
+    const email = document.getElementById('emailInput')?.value.trim();
+    const password = document.getElementById('passwordInput')?.value;
+
+    if (!email || !password) return alert("البيانات ناقصة يا ملك");
+
+    auth.signInWithEmailAndPassword(email, password)
+        .then(() => { window.location.href = 'index.html'; })
+        .catch((err) => alert("فشل الدخول: " + err.message));
+};
+
+// دالة إنشاء حساب لأول مرة
+window.createNewAccount = function() {
+    const email = document.getElementById('emailInput')?.value.trim();
+    const password = document.getElementById('passwordInput')?.value;
+
+    if (!email || !password) return alert("يرجى ملء البيانات");
+
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((cred) => {
+            alert("مبارك! تم إنشاء حسابك الملكي.");
+            db.collection('users').doc(cred.user.uid).set({
+                email: email,
+                points: 50,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            window.location.href = 'index.html';
+        })
+        .catch((err) => alert("خطأ في الإنشاء: " + err.message));
+};
+
+window.logout = () => {
+    auth.signOut().then(() => { window.location.href = 'login.html'; });
+};
+
+// ==========================================
+// 3. المحركات الأساسية (الوضع الليلي، العداد، الحكمة)
+// ==========================================
+
 function initTheme() {
     const themeToggle = document.getElementById('themeToggle');
     const icon = document.getElementById('themeIcon');
     
-    // استعادة الوضع المحفوظ
     if (localStorage.getItem('theme') === 'light') {
         document.body.classList.add('light-mode');
         if (icon) icon.classList.replace('fa-moon', 'fa-sun');
@@ -49,7 +106,6 @@ function initTheme() {
     }
 }
 
-// --- محرك عداد وقت الصلاة (توقيت حي) ---
 window.updatePrayerWidget = function() {
     const timerElem = document.getElementById('prayerTimer');
     if (timerElem) {
@@ -58,7 +114,6 @@ window.updatePrayerWidget = function() {
     }
 };
 
-// --- محرك الحكمة الملكية ---
 window.showRandomWisdom = function() {
     const modal = document.getElementById('wisdomModal');
     const txt = document.getElementById('wisdomText');
@@ -73,37 +128,30 @@ window.showRandomWisdom = function() {
         txt.innerText = hks[Math.floor(Math.random() * hks.length)];
         modal.classList.remove('hidden');
         window.addPoints(5);
-    } else {
-        alert(hks[Math.floor(Math.random() * hks.length)]);
     }
 };
 
-window.closeWisdom = function() {
-    document.getElementById('wisdomModal')?.classList.add('hidden');
+window.closeWisdom = () => document.getElementById('wisdomModal')?.classList.add('hidden');
+
+// ==========================================
+// 4. التقييم، النقاط، والتثبيت
+// ==========================================
+
+window.addPoints = function(amount) {
+    let p = parseInt(localStorage.getItem('userPoints')) || 0;
+    p += amount;
+    localStorage.setItem('userPoints', p);
+    const elem = document.getElementById('userPoints');
+    if (elem) elem.innerText = p;
 };
 
-// ==========================================
-// 3. نظام الحماية (Auth Guard)
-// ==========================================
-auth.onAuthStateChanged((user) => {
-    const isLoginPage = window.location.pathname.includes('login.html');
-    if (!user && !isLoginPage) {
-        window.location.href = 'login.html';
-    } else if (user && isLoginPage) {
-        window.location.href = 'index.html';
-    }
-});
-
-// ==========================================
-// 4. نظام التقييم والتثبيت
-// ==========================================
 window.openRating = () => {
     if (localStorage.getItem('hasRated')) return alert("شكراً لتقييمك المسبق!");
     let rating = prompt("قيم تجربتك من 1 إلى 5 نجوم:", "5");
     if (rating && rating >= 1 && rating <= 5) {
         db.collection('ratings').add({
             stars: parseInt(rating),
-            user: auth.currentUser ? auth.currentUser.email : "زائر",
+            user: auth.currentUser?.email || "زائر",
             time: firebase.firestore.FieldValue.serverTimestamp()
         }).then(() => {
             localStorage.setItem('hasRated', 'true');
@@ -113,7 +161,6 @@ window.openRating = () => {
     }
 };
 
-// نظام التثبيت (PWA)
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -122,38 +169,27 @@ window.addEventListener('beforeinstallprompt', (e) => {
     if (btn) btn.classList.replace('hidden', 'flex');
 });
 
-window.installKingdom = async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') document.getElementById('installApp').style.display = 'none';
-        deferredPrompt = null;
-    }
-};
-
 // ==========================================
 // 5. التشغيل النهائي (Main Init)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // تشغيل المحركات المستقلة فوراً
     initTheme();
     setInterval(window.updatePrayerWidget, 1000);
     window.updatePrayerWidget();
     
-    // ربط زر التثبيت
     const installBtn = document.getElementById('installApp');
-    if (installBtn) installBtn.onclick = window.installKingdom;
+    if (installBtn) {
+        installBtn.onclick = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') installBtn.style.display = 'none';
+                deferredPrompt = null;
+            }
+        };
+    }
 
-    // تحديث النقاط
     const pDisplay = document.getElementById('userPoints');
     if (pDisplay) pDisplay.innerText = localStorage.getItem('userPoints') || 0;
 });
-
-window.addPoints = function(amount) {
-    let p = parseInt(localStorage.getItem('userPoints')) || 0;
-    p += amount;
-    localStorage.setItem('userPoints', p);
-    const elem = document.getElementById('userPoints');
-    if (elem) elem.innerText = p;
-};
-                
+        

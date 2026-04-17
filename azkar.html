@@ -3,30 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أذكار أبا مالك - الموسوعة الكاملة</title>
+    <title>أذكار أبا مالك - الموسوعة الملكية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --bg-main: #0a0a0a; --bg-card: #161616; --green-glow: #10b981; }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-main); color: #e5e7eb; transition: 0.3s; scroll-behavior: smooth; }
+        :root { --bg-main: #0a0a0a; --bg-card: #161616; --gold: #fbbf24; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-main); color: #e5e7eb; scroll-behavior: smooth; }
         .world-header { background: linear-gradient(180deg, #10b981 0%, #059669 100%); border-radius: 0 0 40px 40px; padding: 25px 20px 50px 20px; }
         .date-box { background: rgba(255, 255, 255, 0.15); border-radius: 15px; padding: 10px; backdrop-filter: blur(5px); }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; }
         .category-card { border-radius: 24px; padding: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.3s; }
-        .category-card:active { transform: scale(0.95); }
-        .zekr-item { background: var(--bg-card); border-radius: 25px; margin-bottom: 18px; padding: 22px; border: 1px solid #252525; position: relative; }
-        .completed { opacity: 0.3; transform: scale(0.98); border-color: #10b981; }
+        .zkr-card { transition: 0.4s; position: relative; overflow: hidden; background: var(--bg-card); border: 1px solid #252525; }
+        .progress-bar { height: 6px; background: linear-gradient(90deg, #fbbf24, #f59e0b); transition: width 0.3s; border-radius: 10px; }
+        .done-overlay { position: absolute; inset: 0; background: rgba(16, 185, 129, 0.9); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; animation: zoomIn 0.5s; border-radius: 30px; }
         .nav-bottom { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); max-width: 450px; width: 100%; background: #121212; display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid #222; z-index: 100; }
-        .settings-overlay { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; border-radius: 35px 35px 0 0; transform: translateY(100%); transition: 0.4s; z-index: 200; border-top: 4px solid #10b981; }
-        .show-settings { transform: translateY(0); }
+        .total-counter { background: linear-gradient(145deg, #1a1a1a, #000); border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(251, 191, 36, 0.2); }
     </style>
 </head>
 <body class="pb-32" onload="updateDateTime()">
 
     <div class="max-w-[450px] mx-auto min-h-screen">
-        <header class="world-header text-white">
+        <header class="world-header text-white mb-8">
             <div class="flex justify-between items-center mb-6">
-                <button onclick="toggleSettings()" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fas fa-sliders-h"></i></button>
+                <button onclick="location.href='index.html'" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fas fa-arrow-right"></i></button>
                 <div class="text-center">
                     <h1 class="text-xl font-black">أذكار أبا مالك</h1>
                     <p class="text-[9px] opacity-70 tracking-widest uppercase">The Holy Fortress</p>
@@ -47,13 +48,18 @@
             </div>
         </header>
 
-        <main class="px-5 -mt-8">
-            <div class="bg-white rounded-[30px] p-6 shadow-2xl mb-8 flex items-center gap-4 text-black">
-                <div class="bg-blue-100 p-4 rounded-2xl"><i class="fas fa-cloud-sun text-blue-500 text-2xl"></i></div>
-                <div>
-                    <h2 class="text-xl font-black text-green-700">مرحباً بك</h2>
-                    <p id="timeMsg" class="text-gray-500 text-sm font-bold"></p>
+        <main class="px-5">
+            <div class="total-counter rounded-3xl p-5 flex justify-between items-center mb-8 animate__animated animate__fadeIn">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-yellow-500 rounded-2xl flex items-center justify-center text-black shadow-lg">
+                        <i class="fas fa-fingerprint text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-yellow-500 font-bold uppercase">إجمالي التسبيح</p>
+                        <p id="totalClicks" class="text-3xl font-black font-mono">0000</p>
+                    </div>
                 </div>
+                <button onclick="resetTotal()" class="w-10 h-10 glass rounded-xl text-xs text-gray-400"><i class="fas fa-redo"></i></button>
             </div>
 
             <div id="mainGrid" class="grid grid-cols-2 gap-4">
@@ -67,39 +73,24 @@
                     <i class="fas fa-bed text-3xl"></i><span class="font-black text-sm">أذكار النوم</span>
                 </div>
                 <div onclick="renderSection('hadith')" class="category-card bg-rose-500/10 text-rose-500">
-                    <i class="fas fa-heart text-3xl"></i><span class="font-black text-sm">أحاديث</span>
-                </div>
-                <div onclick="openCounter()" class="category-card bg-emerald-500/10 text-emerald-500 col-span-2 py-5 flex-row">
-                    <i class="fas fa-fingerprint text-2xl"></i><span class="font-black mr-2">المسبحة الإلكترونية</span>
+                    <i class="fas fa-heart text-3xl"></i><span class="font-black text-sm">أحاديث نبوية</span>
                 </div>
             </div>
 
-            <div id="listView" class="hidden">
+            <div id="listView" class="hidden space-y-4">
                 <div id="listItems"></div>
-                <button onclick="closeList()" class="w-full py-5 bg-green-600 text-white rounded-3xl font-black mt-4 shadow-xl mb-10">العودة للرئيسية</button>
+                <button onclick="closeList()" class="w-full py-5 bg-emerald-600 text-white rounded-[25px] font-black shadow-xl mt-4">العودة للرئيسية</button>
             </div>
         </main>
 
-        <div id="settBox" class="settings-overlay p-8">
-            <div class="flex justify-between items-center mb-8">
-                <h3 class="text-xl font-black text-green-500">التحكم بالتطبيق</h3>
-                <button onclick="toggleSettings()" class="text-3xl text-gray-500">&times;</button>
-            </div>
-            <p class="text-xs text-gray-400 mb-4">حجم خط الأذكار:</p>
-            <div class="flex gap-2 bg-gray-800 p-2 rounded-2xl mb-8">
-                <button onclick="setFont(16)" class="flex-1 py-3 rounded-xl hover:bg-green-600 text-sm">صغير</button>
-                <button onclick="setFont(22)" class="flex-1 py-3 bg-green-600 rounded-xl text-sm">متوسط</button>
-                <button onclick="setFont(28)" class="flex-1 py-3 rounded-xl hover:bg-green-600 text-sm">كبير</button>
-            </div>
-        </div>
-
         <nav class="nav-bottom">
-            <i class="fas fa-home text-green-500 text-xl cursor-pointer" onclick="closeList()"></i>
-            <i class="fas fa-book-open text-gray-600 cursor-pointer" onclick="renderSection('hadith')"></i>
-            <i class="fas fa-sliders-h text-gray-600 cursor-pointer" onclick="toggleSettings()"></i>
+            <i class="fas fa-home text-emerald-500 text-xl cursor-pointer" onclick="closeList()"></i>
+            <i class="fas fa-book-open text-gray-600 cursor-pointer" onclick="renderSection('morning')"></i>
+            <i class="fas fa-cog text-gray-600 cursor-pointer"></i>
         </nav>
     </div>
 
+   
     <script>
         const AZKAR_DB = {
             morning: [
@@ -143,23 +134,11 @@
                 {t: "قال ﷺ: «كلمتان خفيفتان على اللسان، ثقيلتان في الميزان: سبحان الله وبحمده، سبحان الله العظيم»", s: "متفق عليه"}
             ]
         };
-
-        let currentSize = 22;
-
         function updateDateTime() {
             const now = new Date();
-            document.getElementById('gDate').innerText = now.toLocaleDateString('ar-EG', {day:'numeric', month:'long', year:'numeric'});
-            try {
-                document.getElementById('hDate').innerText = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-uma', {day:'numeric', month:'long', year:'numeric'}).format(now);
-            } catch(e) {
-                document.getElementById('hDate').innerText = "جاري التحميل...";
-            }
-            
-            const hr = now.getHours();
-            const msg = document.getElementById('timeMsg');
-            if(hr < 12) msg.innerText = "صباح مفعم بالذكر والطاعة";
-            else if(hr < 18) msg.innerText = "مساء عامر بذكر الله";
-            else msg.innerText = "ليلة هادئة في حفظ الله";
+            document.getElementById('gDate').innerText = now.toLocaleDateString('ar-EG');
+            document.getElementById('hDate').innerText = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-uma', {day:'numeric', month:'long'}).format(now);
+            document.getElementById('totalClicks').innerText = totalClicks.toString().padStart(4, '0');
         }
 
         function renderSection(type) {
@@ -169,33 +148,44 @@
             container.innerHTML = '';
             
             AZKAR_DB[type].forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'zekr-item shadow-lg';
-                div.id = `zekr-${index}`;
-                div.innerHTML = `
-                    <p style="font-size: ${currentSize}px" class="font-bold leading-relaxed mb-6 text-right">${item.t}</p>
-                    <div class="flex justify-between items-center">
-                        <button onclick="share('${item.t.replace(/'/g, "\\'")}')" class="text-gray-400 text-xl w-10 h-10 bg-white/5 rounded-full flex items-center justify-center"><i class="fas fa-share-alt"></i></button>
-                        ${item.c ? `<button onclick="doCount(this, 'zekr-${index}')" class="px-10 py-2 bg-green-500 text-white rounded-2xl font-black text-2xl shadow-lg shadow-green-900/30">${item.c}</button>` : ''}
+                container.innerHTML += `
+                    <div id="zkr-${index}" onclick="doCount(${index}, ${item.c}, '${type}')" class="zkr-card p-6 rounded-[30px] mb-4 shadow-lg">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-[10px] text-yellow-500 font-bold uppercase tracking-widest">تكرار: ${item.c}</span>
+                            <span id="count-${index}" class="text-2xl font-black font-mono text-white">${item.c}</span>
+                        </div>
+                        <p class="text-lg font-bold text-right leading-relaxed mb-4">${item.t}</p>
+                        <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                            <div id="bar-${index}" class="progress-bar" style="width: 0%"></div>
+                        </div>
                     </div>
-                    ${item.s ? `<p class="text-[10px] text-rose-500 mt-2 font-bold">${item.s}</p>` : ''}
                 `;
-                container.appendChild(div);
             });
             window.scrollTo(0,0);
         }
 
-        function doCount(btn, id) {
-            let n = parseInt(btn.innerText);
-            if(n > 1) { 
-                btn.innerText = n - 1; 
+        function doCount(index, max, type) {
+            const countElem = document.getElementById(`count-${index}`);
+            const barElem = document.getElementById(`bar-${index}`);
+            const cardElem = document.getElementById(`zkr-${index}`);
+            let current = parseInt(countElem.innerText);
+
+            if(current > 0) {
+                current--;
+                totalClicks++;
+                countElem.innerText = current;
+                localStorage.setItem('totalAzkarClicks', totalClicks);
+                document.getElementById('totalClicks').innerText = totalClicks.toString().padStart(4, '0');
+                
+                let progress = ((max - current) / max) * 100;
+                barElem.style.width = progress + '%';
+                
                 if(navigator.vibrate) navigator.vibrate(40);
-            } else {
-                btn.innerText = "✓";
-                btn.classList.replace('bg-green-500', 'bg-gray-700');
-                btn.classList.add('text-gray-400');
-                if(id !== 'none') document.getElementById(id).classList.add('completed');
-                if(navigator.vibrate) navigator.vibrate(100);
+
+                if(current === 0) {
+                    cardElem.innerHTML += `<div class="done-overlay animate__animated animate__zoomIn"><i class="fas fa-check-circle text-4xl mb-2"></i><span class="font-black">${AZKAR_DB[type][index].m}</span></div>`;
+                    if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                }
             }
         }
 
@@ -204,54 +194,14 @@
             document.getElementById('mainGrid').classList.remove('hidden');
         }
 
-        function toggleSettings() {
-            document.getElementById('settBox').classList.toggle('show-settings');
-        }
-
-        function setFont(s) {
-            currentSize = s;
-            alert("تم تغيير حجم الخط");
-            toggleSettings();
-        }
-
-        function share(t) {
-            if(navigator.share) {
-                navigator.share({text: t});
-            } else {
-                navigator.clipboard.writeText(t);
-                alert("تم نسخ النص");
+        function resetTotal() {
+            if(confirm("هل تريد تصفير العداد الإجمالي؟")) {
+                totalClicks = 0;
+                localStorage.setItem('totalAzkarClicks', 0);
+                document.getElementById('totalClicks').innerText = "0000";
             }
-        }
-function startDigitalClock() {
-    const clockElement = document.getElementById('digitalClock');
-    const amPmElement = document.getElementById('timeAmPm');
-
-    function update() {
-        const now = new Date();
-        let hours = now.getHours();
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        const ampm = hours >= 12 ? 'مساءً' : 'صباحاً';
-
-        hours = hours % 12;
-        hours = hours ? hours : 12; // الساعة 0 تصبح 12
-        const strHours = String(hours).padStart(2, '0');
-
-        clockElement.innerText = `${strHours}:${minutes}:${seconds}`;
-        amPmElement.innerText = ampm;
-    }
-
-    update();
-    setInterval(update, 1000);
-}
-
-
-window.addEventListener('load', startDigitalClock);
-
-        function openCounter() {
-            alert("المسبحة قيد التطوير حالياً");
         }
     </script>
 </body>
-                  </html>
-  
+                        </html>
+                        

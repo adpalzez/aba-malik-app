@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>أبا مالك العقيلي | 2026</title>
     
-    <link rel="manifest" href="manifest.json?v=6.3">
+    <link rel="manifest" href="manifest.json?v=7.0">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" href="https://i.ibb.co/pBhzxHdM/1000027317.jpg">
 
@@ -18,16 +18,11 @@
         body { font-family: 'Cairo', sans-serif; transition: 0.5s; background-attachment: fixed; overflow-x: hidden; }
         .glass { background: rgba(0,0,0,0.65); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); border-radius: 35px; }
         .bg-image { background-image: url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); background-size: cover; background-position: center; }
-        
         .mood-bar { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 50px; padding: 5px 15px; }
-        
         .nav-bottom { background: rgba(0,0,0,0.85); backdrop-filter: blur(30px); padding: 15px; display: flex; justify-content: space-around; border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 50px rgba(0,0,0,0.5); position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 400px; z-index: 2000; }
         .nav-item { color: rgba(255,255,255,0.4); font-size: 1.2rem; transition: 0.4s; }
         .nav-item.active { color: #fbbf24; transform: translateY(-5px); text-shadow: 0 0 15px #fbbf24; }
-
         .btn-premium { transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .btn-premium:active { transform: scale(0.92); }
-
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; }
         .full-width { grid-column: span 2; }
     </style>
@@ -56,12 +51,11 @@
             </div>
         </div>
 
-        <div class="mood-bar flex justify-between items-center animate__animated animate__fadeInDown relative overflow-hidden">
-            <div class="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full border border-white/10 shadow-inner">
+        <div class="mood-bar flex justify-between items-center animate__animated animate__fadeInDown">
+            <div class="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full border border-white/10">
                 <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                <span class="text-[9px] font-black text-blue-400 uppercase tracking-tighter">أبا مالك العقيلي</span>
+                <span class="text-[9px] font-black text-blue-400 uppercase">أبا مالك العقيلي</span>
             </div>
-
             <div class="flex gap-4">
                 <button onclick="window.setMood('happy')" class="text-lg hover:scale-125 transition">😊</button>
                 <button onclick="window.setMood('grateful')" class="text-lg hover:scale-125 transition">🤲</button>
@@ -72,7 +66,7 @@
     </header>
 
     <main class="glass w-full max-w-md p-8 text-center mb-6 border border-white/5 animate__animated animate__zoomIn">
-        <h2 class="text-4xl font-black mb-1 tracking-tighter uppercase">أبا مالك العقيلي</h2>
+        <h2 class="text-4xl font-black mb-1 tracking-tighter uppercase text-white">أبا مالك العقيلي</h2>
         <p class="text-blue-400 text-[9px] font-bold tracking-[0.4em] uppercase mb-10 opacity-80">الإصدار النخبوي 2026</p>
 
         <button id="installApp" class="hidden w-full bg-white/10 border border-dashed border-white/30 py-4 rounded-[25px] mb-6 flex items-center justify-center gap-2 animate__animated animate__pulse animate__infinite">
@@ -97,7 +91,7 @@
                 <i class="fas fa-star text-2xl"></i>
                 <span class="text-[9px] font-black uppercase">التقييم</span>
             </button>
-            <a href="games.html" class="full-width bg-gradient-to-r from-emerald-900 to-green-600 py-6 rounded-[35px] flex items-center justify-center gap-4 border border-white/10 shadow-2xl active:scale-95 transition">
+            <a href="games.html" class="full-width bg-gradient-to-r from-emerald-900 to-green-600 py-6 rounded-[35px] flex items-center justify-center gap-4 border border-white/10 shadow-2xl">
                 <i class="fas fa-chess-rook text-2xl text-yellow-400"></i>
                 <span class="text-xs font-black text-white uppercase tracking-widest text-[10px]">مملكة صلاح الدين</span>
             </a>
@@ -116,7 +110,7 @@
         <div class="glass p-10 max-w-sm w-full text-center border-2 border-yellow-500/30">
             <i class="fas fa-quote-right text-yellow-500 text-5xl mb-6"></i>
             <div id="wisdomText" class="text-lg font-bold leading-relaxed mb-8 text-white"></div>
-            <button onclick="window.closeWisdom()" class="w-full py-4 bg-yellow-600 rounded-full font-black text-white shadow-xl active:scale-95 transition">آمنت بالله</button>
+            <button onclick="window.closeWisdom()" class="w-full py-4 bg-yellow-600 rounded-full font-black text-white shadow-xl">آمنت بالله</button>
         </div>
     </div>
 
@@ -129,18 +123,16 @@
             if (navigator.share) {
                 navigator.share({
                     title: 'أبا مالك العقيلي | 2026',
-                    text: 'انضم إلي في التطبيق النخبوي، واجمع نقاط الأثر!',
+                    text: 'انضم إلي في التطبيق النخبوي!',
                     url: window.location.href
-                }).then(() => { if(window.addPoints) window.addPoints(20); })
-                .catch((error) => console.log('خطأ في المشاركة', error));
+                }).then(() => { if(window.addPoints) window.addPoints(20); });
             } else {
                 alert("انسخ الرابط وشاركه: " + window.location.href);
             }
         };
     </script>
 
-    <script src="app.js?v=6.3"></script>
-    <script src="wisdoms.js?v=6.3"></script>
+    <script src="app.js?v=7.0"></script>
 </body>
     </html>
-        
+    

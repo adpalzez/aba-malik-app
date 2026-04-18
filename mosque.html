@@ -57,6 +57,98 @@
     </section>
 
     <main class="p-5">
+  <section class="main-card mt-8 animate__animated animate__fadeIn">
+    <div class="flex justify-between items-end mb-6">
+        <div>
+            <h3 class="text-xl font-black text-emerald-900 dark:text-yellow-500">ورد اليوم</h3>
+            <p class="text-[10px] opacity-60 font-bold">لا يزال لسانك رطباً بذكر الله</p>
+        </div>
+        <div class="text-left">
+            <span id="progressText" class="text-2xl font-black text-emerald-600">0%</span>
+            <p class="text-[9px] font-bold uppercase tracking-tighter">نسبة الإنجاز</p>
+        </div>
+    </div>
+
+    <div class="w-full bg-gray-200 dark:bg-white/5 h-3 rounded-full mb-8 overflow-hidden">
+        <div id="progressBar" class="bg-gradient-to-r from-emerald-500 to-yellow-500 h-full transition-all duration-700 shadow-[0_0_10px_#10b981]" style="width: 0%"></div>
+    </div>
+
+    <div id="wirdList" class="space-y-4">
+        </div>
+
+    <div class="mt-8 flex gap-2">
+        <input id="newWirdInput" type="text" placeholder="أضف عبادة خاصة..." class="flex-1 bg-white dark:bg-white/5 border border-emerald-100 dark:border-white/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-emerald-500 transition">
+        <button onclick="addNewWird()" class="bg-emerald-800 text-white w-12 h-12 rounded-2xl flex items-center justify-center active:scale-90 transition shadow-lg">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+</section>
+
+<script>
+    // قائمة المهام الافتراضية
+    const defaultWird = [
+        { text: "أذكار الصباح", done: false },
+        { text: "أذكار المساء", done: false },
+        { text: "ورد القرآن اليومي", done: false },
+        { text: "صلاة الضحى", done: false },
+        { text: "الاستغفار (100 مرة)", done: false }
+    ];
+
+    let myWird = JSON.parse(localStorage.getItem('aba_malik_wird')) || defaultWird;
+
+    function renderWird() {
+        const list = document.getElementById('wirdList');
+        list.innerHTML = myWird.map((item, index) => `
+            <div class="flex items-center justify-between p-4 bg-white dark:bg-white/5 border border-emerald-50 dark:border-white/10 rounded-[25px] transition hover:border-emerald-200">
+                <div class="flex items-center gap-4">
+                    <div onclick="toggleWird(${index})" class="w-7 h-7 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all ${item.done ? 'bg-emerald-500 border-emerald-500' : 'border-emerald-200'}">
+                        ${item.done ? '<i class="fas fa-check text-white text-xs"></i>' : ''}
+                    </div>
+                    <span class="text-sm font-bold ${item.done ? 'line-through opacity-40' : 'text-teal-900 dark:text-gray-200'}">${item.text}</span>
+                </div>
+                <button onclick="deleteWird(${index})" class="text-red-400 opacity-20 hover:opacity-100 transition px-2">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `).join('');
+        
+        updateProgress();
+        localStorage.setItem('aba_malik_wird', JSON.stringify(myWird));
+    }
+
+    function toggleWird(index) {
+        myWird[index].done = !myWird[index].done;
+        if (myWird[index].done && navigator.vibrate) navigator.vibrate(50);
+        renderWird();
+    }
+
+    function addNewWird() {
+        const input = document.getElementById('newWirdInput');
+        if (input.value.trim() !== "") {
+            myWird.push({ text: input.value, done: false });
+            input.value = "";
+            renderWird();
+        }
+    }
+
+    function deleteWird(index) {
+        myWird.splice(index, 1);
+        renderWird();
+    }
+
+    function updateProgress() {
+        const total = myWird.length;
+        const done = myWird.filter(i => i.done).length;
+        const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+        
+        document.getElementById('progressBar').style.width = percent + '%';
+        document.getElementById('progressText').innerText = percent + '%';
+    }
+
+    // التشغيل الأولي
+    renderWird();
+</script>
+        
         <div id="prayerGrid" class="flex gap-4 overflow-x-auto pb-6 no-scrollbar"></div>
 
         <div class="grid grid-cols-4 gap-4 mb-10 text-center">

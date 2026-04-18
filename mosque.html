@@ -293,7 +293,27 @@
         function toggleSettings() { document.getElementById('settingsPanel').classList.toggle('active'); }
         function requestLocation() { navigator.geolocation.getCurrentPosition(p => { localStorage.setItem('lat', p.coords.latitude); localStorage.setItem('lon', p.coords.longitude); location.reload(); }); }
 
-        initApp();
+        initApp(function checkDailyReset() {
+    const lastResetDate = localStorage.getItem('aba_malik_last_reset');
+    const today = new Date().toDateString(); // جلب تاريخ اليوم بصيغة نصية
+
+    // إذا كان تاريخ اليوم يختلف عن آخر تاريخ تصفير محفوظ
+    if (lastResetDate !== today) {
+        // قم بتصفير جميع المهام
+        myWird = myWird.map(item => ({ ...item, done: false }));
+        
+        // احفظ التاريخ الجديد ليصبح هو "آخر تاريخ تصفير"
+        localStorage.setItem('aba_malik_last_reset', today);
+        localStorage.setItem('aba_malik_wird', JSON.stringify(myWird));
+        
+        console.log("تم تصفير الورد اليومي ليوم جديد بنجاح!");
+        renderWird(); // تحديث الواجهة
+    }
+}
+
+// استدعاء الدالة فور فتح التطبيق
+checkDailyReset();
+    );
     </script>
 </body>
     </html>

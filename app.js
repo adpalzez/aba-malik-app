@@ -202,4 +202,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const pDisplay = document.getElementById('userPointsDisplay');
     if (pDisplay) pDisplay.innerText = localStorage.getItem('userPoints') || 0;
 });
-            
+        

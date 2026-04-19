@@ -1,41 +1,42 @@
-/* مملكة أبا مالك - الإصدار v13.0 (2026) 
+/* مملكة أبا مالك - الإصدار v13.5 (2026) 
    نظام التحديث الإجباري والمزامنة الفائقة
 */
 
-// تحديث اسم الكاش لضمان مسح v12.0 وتحميل v13.0 الجديد
-const cacheName = 'aba-malik-royal-v13.0'; 
+// تحديث اسم الكاش إلى v13.5 لإجبار المتصفح على جلب إصلاحات البوصلة والمصحف
+const cacheName = 'aba-malik-royal-v13.5'; 
 
 const assets = [
   './',
-  './index.html?v=13.0',
-  './mosque.html?v=13.0', 
-  './azkar.html?v=13.0',
-  './manifest.json?v=13.0',
-  './sw.js?v=13.0',
+  './index.html?v=13.5',
+  './mosque.html?v=13.5', 
+  './azkar.html?v=13.5',
+  './manifest.json?v=13.5',
+  './sw.js?v=13.5',
+  './app.js?v=13.5',
   'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://i.ibb.co/pBhzxHdM/1000027317.jpg'
 ];
 
-// 1. التثبيت (Install): جلب النسخة الجديدة v13.0
+// 1. التثبيت (Install): تحميل ملفات v13.5 الجديدة في ذاكرة الهاتف
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(cacheName).then(cache => {
-      console.log('SW: جاري تجهيز محراب أبا مالك v13.0...');
+      console.log('SW: جاري تحديث المحراب إلى v13.5...');
       return cache.addAll(assets);
     })
   );
   self.skipWaiting(); 
 });
 
-// 2. التفعيل (Activate): مسح كاش v12.0 وكافة النسخ القديمة
+// 2. التفعيل (Activate): مسح كاش v13.0 وكافة النسخ القديمة لفتح المجال للإصلاحات
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
         keys.filter(key => key !== cacheName).map(key => {
-            console.log('SW: تم تنظيف النسخة القديمة:', key);
+            console.log('SW: تم حذف الكاش القديم بنجاح:', key);
             return caches.delete(key);
         })
       );
@@ -44,7 +45,7 @@ self.addEventListener('activate', e => {
   return self.clients.claim(); 
 });
 
-// 3. الجلب (Fetch): استراتيجية الشبكة أولاً لضمان التحديث
+// 3. الجلب (Fetch): استراتيجية "الشبكة أولاً" لضمان عمل البوصلة والمصحف
 self.addEventListener('fetch', e => {
   e.respondWith(
     fetch(e.request)
@@ -57,7 +58,7 @@ self.addEventListener('fetch', e => {
   );
 });
 
-// 4. نظام التنبيهات: فتح صفحة المحراب مباشرة عند الضغط
+// 4. نظام التنبيهات: العودة للمحراب عند الضغط على الإشعار
 self.addEventListener('notificationclick', function(event) {
     event.notification.close(); 
     event.waitUntil(
@@ -72,4 +73,3 @@ self.addEventListener('notificationclick', function(event) {
         })
     );
 });
-     

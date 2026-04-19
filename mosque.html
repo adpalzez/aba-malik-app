@@ -63,15 +63,15 @@
             <p id="nextPrayerTitle" class="text-yellow-400 font-black mb-2 text-sm">جاري الحساب...</p>
             <h2 id="mainCountdown" class="text-6xl font-black mb-4 tracking-tighter">00:00:00</h2>
         </div>
-        <div class="flex justify-between items-center text-[11px] bg-black/30 p-4 rounded-[25px] border border-white/5 mx-2">
-            <div class="text-right leading-tight text-white"><p class="opacity-50 mb-1 font-bold">الهجري</p><p id="hijriDate" class="font-black text-yellow-500 text-sm">-- ---</p></div>
-            <div class="text-left leading-tight text-white"><p class="opacity-50 mb-1 font-bold">الميلادي</p><p id="gregDate" class="font-black text-sm">-- --</p></div>
+        <div class="flex justify-between items-center text-[11px] bg-black/30 p-4 rounded-[25px] border border-white/5 mx-2 text-white">
+            <div class="text-right leading-tight"><p class="opacity-50 mb-1 font-bold">الهجري</p><p id="hijriDate" class="font-black text-yellow-500 text-sm">-- ---</p></div>
+            <div class="text-left leading-tight"><p class="opacity-50 mb-1 font-bold">الميلادي</p><p id="gregDate" class="font-black text-sm">-- --</p></div>
         </div>
     </section>
 
     <main class="p-5">
         <div class="grid grid-cols-4 gap-4 mb-10 text-center">
-            <div onclick="alert('جاري العمل على البوصلة...')" class="flex flex-col items-center gap-2 cursor-pointer">
+            <div onclick="alert('جاري تحديث البوصلة...')" class="flex flex-col items-center gap-2 cursor-pointer">
                 <div class="w-14 h-14 bg-yellow-600/20 rounded-full flex items-center justify-center shadow-lg text-yellow-500"><i class="fas fa-compass text-2xl"></i></div>
                 <span class="text-[10px] font-black uppercase">البوصلة</span>
             </div>
@@ -79,8 +79,10 @@
                 <div class="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center shadow-lg text-blue-400 border border-blue-500/20"><i class="fas fa-fingerprint text-2xl"></i></div>
                 <span class="text-[10px] font-black uppercase">المسبحة</span>
             </div>
-            <div onclick="window.location.href='https://quran.com/ar'" class="flex flex-col items-center gap-2 cursor-pointer">
-                <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center shadow-lg text-white/50"><i class="fas fa-book-quran text-2xl"></i></div>
+            <div onclick="openQuranApp()" class="flex flex-col items-center gap-2 cursor-pointer">
+                <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center shadow-lg text-white/50 border border-white/10">
+                    <i class="fas fa-book-quran text-2xl"></i>
+                </div>
                 <span class="text-[10px] font-black uppercase">المصحف</span>
             </div>
             <div onclick="window.location.href='azkar.html'" class="flex flex-col items-center gap-2 cursor-pointer">
@@ -94,8 +96,7 @@
                 <h3 class="font-black text-lg text-white">ورد اليوم</h3>
                 <span id="progressText" class="text-yellow-500 font-black">0%</span>
             </div>
-            <div id="wirdList" class="space-y-4">
-                </div>
+            <div id="wirdList" class="space-y-4"></div>
         </section>
 
         <div id="prayerGrid" class="flex gap-4 overflow-x-auto pb-8 no-scrollbar"></div>
@@ -116,15 +117,22 @@
     </div>
 
     <script>
-        // --- تسجيل محرك المملكة ---
+        // تسجيل محرك المملكة
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(() => console.log('تم تسجيل المحرك بنجاح'));
+            navigator.serviceWorker.register('sw.js').then(() => console.log('SW Registered'));
         }
 
-        let prayerTimes = {};
-        let tCount = 0;
-        let zikrIndex = 0;
-        const azkarList = ["سبحان الله", "الحمد لله", "لا إله إلا الله", "الله أكبر", "أستغفر الله"];
+        // --- دالة فتح تطبيق المصحف (Image 3) ---
+        function openQuranApp() {
+            // رابط محاولة فتح التطبيق (Package Name للتطبيق في صورتك)
+            const intent = "intent://#Intent;scheme=http;package=com.simppro.qurankarim;end";
+            window.location.href = intent;
+
+            // بديل في حال لم يفتح التطبيق
+            setTimeout(() => {
+                if (!document.hidden) window.location.href = "https://quran.com/ar";
+            }, 2500);
+        }
 
         // --- محرك الورد المطور ---
         const defaultWird = [
@@ -138,7 +146,7 @@
             const list = document.getElementById('wirdList');
             if(!list) return;
             list.innerHTML = myWird.map((item, index) => `
-                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 transition">
                     <div class="flex items-center gap-4">
                         <div onclick="toggleWirdAction(${index})" class="w-7 h-7 rounded-full border-2 flex items-center justify-center cursor-pointer ${item.done ? 'bg-yellow-600 border-yellow-600' : 'border-white/20'}">
                             ${item.done ? '<i class="fas fa-check text-white text-[10px]"></i>' : ''}
@@ -159,6 +167,8 @@
         }
 
         // --- المسبحة ---
+        let tCount = 0; let zikrIndex = 0;
+        const azkarList = ["سبحان الله", "الحمد لله", "لا إله إلا الله", "الله أكبر", "أستغفر الله"];
         function openTasbih() { document.getElementById('tasbihModal').style.display = 'flex'; }
         function closeTasbih() { document.getElementById('tasbihModal').style.display = 'none'; }
         function nextZikr() { zikrIndex = (zikrIndex + 1) % azkarList.length; document.getElementById('currentZikrText').innerText = azkarList[zikrIndex]; resetTasbih(); }
@@ -166,7 +176,7 @@
         function countTasbih() { tCount++; document.getElementById('tasbihCounter').innerText = tCount; if (navigator.vibrate) navigator.vibrate(50); }
         function resetTasbih() { tCount = 0; document.getElementById('tasbihCounter').innerText = 0; }
 
-        // --- الإعدادات ---
+        // --- الإعدادات والوضع الليلي ---
         function toggleSettings() { document.getElementById('settingsPanel').classList.toggle('active'); }
         function toggleDarkMode() {
             const isDark = document.body.classList.toggle('dark-mode');
@@ -175,22 +185,19 @@
         }
 
         async function fetchPrayers() {
-            const lat = localStorage.getItem('lat') || "30.0444";
-            const lon = localStorage.getItem('lon') || "31.2357";
+            const lat = localStorage.getItem('lat') || "30.0444"; const lon = localStorage.getItem('lon') || "31.2357";
             const res = await fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=5`);
             const data = await res.json();
-            prayerTimes = data.data.timings;
+            const prayerTimes = data.data.timings;
             document.getElementById('prayerGrid').innerHTML = [
                 {n:'الفجر', t:prayerTimes.Fajr}, {n:'الظهر', t:prayerTimes.Dhuhr}, 
                 {n:'العصر', t:prayerTimes.Asr}, {n:'المغرب', t:prayerTimes.Maghrib}, 
                 {n:'العشاء', t:prayerTimes.Isha}
-            ].map(p => `<div class="prayer-card p-5 text-center min-w-[100px]"><p class="text-[10px] font-bold text-yellow-500 mb-2">${p.n}</p><p class="font-black text-xl text-white">${p.t}</p></div>`).join('');
+            ].map(p => `<div class="prayer-card p-5 text-center min-w-[100px] text-white"><p class="text-[10px] font-bold text-yellow-500 mb-2">${p.n}</p><p class="font-black text-xl">${p.t}</p></div>`).join('');
             document.getElementById('hijriDate').innerText = `${data.data.date.hijri.day} ${data.data.date.hijri.month.ar}`;
             document.getElementById('gregDate').innerText = data.data.date.gregorian.date;
-            startCountdown();
-        }
-
-        function startCountdown() {
+            
+            // العد التنازلي
             setInterval(() => {
                 const now = new Date();
                 const pList = [{n:'الفجر', t:prayerTimes.Fajr}, {n:'الظهر', t:prayerTimes.Dhuhr}, {n:'العصر', t:prayerTimes.Asr}, {n:'المغرب', t:prayerTimes.Maghrib}, {n:'العشاء', t:prayerTimes.Isha}];
@@ -215,14 +222,13 @@
         function requestLocation() { navigator.geolocation.getCurrentPosition(p => { localStorage.setItem('lat', p.coords.latitude); localStorage.setItem('lon', p.coords.longitude); location.reload(); }); }
         function updateApp() { location.reload(true); }
 
-        // تشغيل نهائي
+        // تهيئة
         if(localStorage.getItem('aba_dark') === 'true') {
             document.body.classList.add('dark-mode');
             document.getElementById('darkToggle').classList.add('active');
         }
-        renderWird();
-        fetchPrayers();
+        renderWird(); fetchPrayers();
     </script>
 </body>
-    </html>
-    
+                    </html>
+                                                                                                                                    

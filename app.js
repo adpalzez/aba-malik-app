@@ -1,7 +1,6 @@
 /**
- * مملكة أبا مالك العقيلي - الإصدار 12.0 (2026) ⚔️
- * المحرك الموحد المفتوح (Full Access Engine)
- * دمج Firebase + المواقيت + المسبحة + البوصلة + النقاط
+ * مملكة أبا مالك العقيلي - الإصدار المدمج v12.0 (2026) ⚔️
+ * المحرك الموحد: Firebase + المواقيت + المسبحة + الورد المطور + النقاط
  */
 
 // ==========================================
@@ -37,7 +36,6 @@ async function fetchPrayers() {
         const data = await res.json();
         prayerTimes = data.data.timings;
         
-        // تحديث واجهة الشبكة
         const grid = document.getElementById('prayerGrid');
         if (grid) {
             grid.innerHTML = [
@@ -102,44 +100,63 @@ window.countTasbih = () => {
     tCount++;
     document.getElementById('tasbihCounter').innerText = tCount;
     if (localStorage.getItem('aba_vibrate') !== 'false' && navigator.vibrate) navigator.vibrate(50);
-    window.addPoints(1); // نقطة لكل تسبيحة
+    window.addPoints(1);
 };
 
 window.resetTasbih = () => { tCount = 0; document.getElementById('tasbihCounter').innerText = 0; };
 
 // ==========================================
-// 4. محرك الورد اليومي والبوصلة
+// 4. محرك الورد الملكي المطور (تم الدمج هنا)
 // ==========================================
-let qiblaDeg = 135;
-
-window.toggleWird = (index) => {
-    let wirds = JSON.parse(localStorage.getItem('aba_wird_v8'));
-    wirds[index].done = !wirds[index].done;
-    if (wirds[index].done) window.addPoints(10); // 10 نقاط لكل طاعة
-    localStorage.setItem('aba_wird_v8', JSON.stringify(wirds));
-    renderWird();
-};
-
 function renderWird() {
-    const list = document.getElementById('wirdList');
-    if (!list) return;
-    const wirds = JSON.parse(localStorage.getItem('aba_wird_v8')) || [
+    const listContainer = document.getElementById('wirdList');
+    if (!listContainer) return;
+
+    const defaultWird = [
         { text: "قراءة صفحة من القرآن الكريم", done: false },
-        { text: "أذكار الصباح والمساء", done: false },
-        { text: "الاستغفار (100 مرة)", done: false }
+        { text: "أذكار الصباح", done: false },
+        { text: "أذكار المساء", done: false },
+        { text: "الاستغفار (100 مرة)", done: false },
+        { text: "الصلاة على النبي (100 مرة)", done: false }
     ];
-    list.innerHTML = wirds.map((item, index) => `
-        <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl mb-2">
+
+    let myWird = JSON.parse(localStorage.getItem('aba_wird_v12')) || defaultWird;
+
+    listContainer.innerHTML = myWird.map((item, index) => `
+        <div class="flex items-center justify-between p-4 bg-white/5 rounded-[25px] border border-white/5 transition hover:border-yellow-500/20 animate__animated animate__fadeIn">
             <div class="flex items-center gap-4">
-                <div onclick="toggleWird(${index})" class="w-7 h-7 rounded-full border-2 flex items-center justify-center cursor-pointer ${item.done ? 'bg-yellow-600 border-yellow-600' : 'border-white/20'}">
-                    ${item.done ? '<i class="fas fa-check text-white text-[10px]"></i>' : ''}
+                <div onclick="toggleWirdAction(${index})" class="w-8 h-8 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all ${item.done ? 'bg-yellow-600 border-yellow-600' : 'border-white/20'}">
+                    ${item.done ? '<i class="fas fa-check text-white text-xs"></i>' : ''}
                 </div>
-                <span class="text-sm font-bold ${item.done ? 'line-through opacity-30' : ''}">${item.text}</span>
+                <span class="text-sm font-bold ${item.done ? 'line-through opacity-30 text-yellow-500' : 'text-white'}">${item.text}</span>
             </div>
         </div>
     `).join('');
+
+    const doneCount = myWird.filter(i => i.done).length;
+    const percent = Math.round((doneCount / myWird.length) * 100);
+    const progressText = document.getElementById('progressText');
+    if (progressText) progressText.innerText = percent + '%';
+    
+    localStorage.setItem('aba_wird_v12', JSON.stringify(myWird));
 }
 
+window.toggleWirdAction = (index) => {
+    let myWird = JSON.parse(localStorage.getItem('aba_wird_v12'));
+    myWird[index].done = !myWird[index].done;
+    localStorage.setItem('aba_wird_v12', JSON.stringify(myWird));
+    
+    if(myWird[index].done) {
+        window.addPoints(10);
+        if(navigator.vibrate) navigator.vibrate([50, 30, 50]);
+    }
+    renderWird();
+};
+
+// ==========================================
+// 5. محرك البوصلة
+// ==========================================
+let qiblaDeg = 135;
 window.toggleCompass = async () => {
     const cont = document.getElementById('qiblaContainer');
     const timer = document.getElementById('countdownContainer');
@@ -156,7 +173,7 @@ window.toggleCompass = async () => {
 };
 
 // ==========================================
-// 5. نظام النقاط والتقييم والضبط
+// 6. نظام النقاط والضبط
 // ==========================================
 window.addPoints = (amount) => {
     let p = parseInt(localStorage.getItem('userPoints')) || 0;
@@ -173,7 +190,7 @@ window.toggleDarkMode = () => {
 };
 
 // ==========================================
-// 6. التشغيل النهائي عند التحميل
+// 7. التشغيل النهائي
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     renderWird();
@@ -185,4 +202,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const pDisplay = document.getElementById('userPointsDisplay');
     if (pDisplay) pDisplay.innerText = localStorage.getItem('userPoints') || 0;
 });
-                
+            

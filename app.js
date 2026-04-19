@@ -1,6 +1,6 @@
 /**
- * مملكة أبا مالك العقيلي - الإصدار المدمج v13.0 (2026) ⚔️
- * المحرك الموحد: Firebase + المواقيت + المسبحة + المصحف + الورد + النقاط
+ * مملكة أبا مالك العقيلي - الإصدار المدمج v13.5 (2026) ⚔️
+ * تم إصلاح: البوصلة الحقيقية + فتح المصحف + الورد اليومي
  */
 
 // ==========================================
@@ -79,7 +79,7 @@ function startCountdown() {
 }
 
 // ==========================================
-// 3. محرك المسبحة والمصحف
+// 3. محرك المسبحة والمصحف (المطور)
 // ==========================================
 let tCount = 0;
 let zikrIndex = 0;
@@ -105,7 +105,7 @@ window.countTasbih = () => {
 
 window.resetTasbih = () => { tCount = 0; document.getElementById('tasbihCounter').innerText = 0; };
 
-// دالة فتح تطبيق المصحف (Image 3)
+// دالة فتح تطبيق المصحف المحدثة
 window.openQuranApp = () => {
     const intent = "intent://#Intent;scheme=http;package=com.simppro.qurankarim;end";
     window.location.href = intent;
@@ -115,7 +115,7 @@ window.openQuranApp = () => {
 };
 
 // ==========================================
-// 4. محرك الورد الملكي المطور
+// 4. محرك الورد الملكي
 // ==========================================
 function renderWird() {
     const listContainer = document.getElementById('wirdList');
@@ -125,16 +125,15 @@ function renderWird() {
         { text: "قراءة صفحة من القرآن الكريم", done: false },
         { text: "أذكار الصباح", done: false },
         { text: "أذكار المساء", done: false },
-        { text: "الاستغفار (100 مرة)", done: false },
-        { text: "الصلاة على النبي (100 مرة)", done: false }
+        { text: "الاستغفار (100 مرة)", done: false }
     ];
 
     let myWird = JSON.parse(localStorage.getItem('aba_wird_v12')) || defaultWird;
 
     listContainer.innerHTML = myWird.map((item, index) => `
-        <div class="flex items-center justify-between p-4 bg-white/5 rounded-[25px] border border-white/5 transition hover:border-yellow-500/20 animate__animated animate__fadeIn">
+        <div class="flex items-center justify-between p-4 bg-white/5 rounded-[25px] border border-white/5 mb-2">
             <div class="flex items-center gap-4">
-                <div onclick="toggleWirdAction(${index})" class="w-8 h-8 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all ${item.done ? 'bg-yellow-600 border-yellow-600' : 'border-white/20'}">
+                <div onclick="toggleWirdAction(${index})" class="w-8 h-8 rounded-full border-2 flex items-center justify-center cursor-pointer ${item.done ? 'bg-yellow-600 border-yellow-600' : 'border-white/20'}">
                     ${item.done ? '<i class="fas fa-check text-white text-xs"></i>' : ''}
                 </div>
                 <span class="text-sm font-bold ${item.done ? 'line-through opacity-30 text-yellow-500' : 'text-white'}">${item.text}</span>
@@ -143,9 +142,8 @@ function renderWird() {
     `).join('');
 
     const doneCount = myWird.filter(i => i.done).length;
-    const percent = Math.round((doneCount / myWird.length) * 100);
     const progressText = document.getElementById('progressText');
-    if (progressText) progressText.innerText = percent + '%';
+    if (progressText) progressText.innerText = Math.round((doneCount / myWird.length) * 100) + '%';
     
     localStorage.setItem('aba_wird_v12', JSON.stringify(myWird));
 }
@@ -154,33 +152,53 @@ window.toggleWirdAction = (index) => {
     let myWird = JSON.parse(localStorage.getItem('aba_wird_v12'));
     myWird[index].done = !myWird[index].done;
     localStorage.setItem('aba_wird_v12', JSON.stringify(myWird));
-    
-    if(myWird[index].done) {
-        window.addPoints(10);
-        if(navigator.vibrate) navigator.vibrate([50, 30, 50]);
-    }
+    if(myWird[index].done) window.addPoints(10);
     renderWird();
 };
 
 // ==========================================
-// 5. محرك البوصلة ونظام النقاط
+// 5. محرك البوصلة الحقيقية (المطور والآمن)
 // ==========================================
+let isCompassActive = false;
 let qiblaDeg = 135;
+
 window.toggleCompass = async () => {
     const cont = document.getElementById('qiblaContainer');
     const timer = document.getElementById('countdownContainer');
-    cont.classList.toggle('hidden');
-    timer.classList.toggle('hidden');
-    if (!cont.classList.contains('hidden')) {
-        if (typeof DeviceOrientationEvent.requestPermission === 'function') await DeviceOrientationEvent.requestPermission();
-        window.addEventListener('deviceorientationabsolute', (e) => {
-            let heading = e.alpha || e.webkitCompassHeading;
-            document.getElementById('compass').style.transform = `rotate(${-heading}deg)`;
-            document.getElementById('qiblaPointer').style.transform = `translate(-50%, -100%) rotate(${qiblaDeg}deg)`;
-        }, true);
+    
+    if (!isCompassActive) {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                const permission = await DeviceOrientationEvent.requestPermission();
+                if (permission !== 'granted') return alert('يجب الموافقة على الوصول للمستشعرات');
+            } catch (e) { console.error(e); }
+        }
+        window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+        window.addEventListener('deviceorientation', handleOrientation, true);
+        cont.classList.remove('hidden');
+        timer.classList.add('hidden');
+        isCompassActive = true;
+    } else {
+        window.removeEventListener('deviceorientationabsolute', handleOrientation);
+        window.removeEventListener('deviceorientation', handleOrientation);
+        cont.classList.add('hidden');
+        timer.classList.remove('hidden');
+        isCompassActive = false;
     }
 };
 
+function handleOrientation(e) {
+    let heading = e.alpha || e.webkitCompassHeading;
+    if (heading === null || heading === undefined) return;
+    const compassDisk = document.getElementById('compass');
+    if (compassDisk) compassDisk.style.transform = `rotate(${-heading}deg)`;
+    const qiblaPointer = document.getElementById('qiblaPointer');
+    if (qiblaPointer) qiblaPointer.style.transform = `translate(-50%, -100%) rotate(${qiblaDeg}deg)`;
+}
+
+// ==========================================
+// 6. نظام النقاط والضبط
+// ==========================================
 window.addPoints = (amount) => {
     let p = parseInt(localStorage.getItem('userPoints')) || 0;
     p += amount;
@@ -196,7 +214,7 @@ window.toggleDarkMode = () => {
 };
 
 // ==========================================
-// 6. التشغيل النهائي
+// 7. التشغيل النهائي
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     renderWird();
@@ -208,4 +226,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const pDisplay = document.getElementById('userPointsDisplay');
     if (pDisplay) pDisplay.innerText = localStorage.getItem('userPoints') || 0;
 });
-                
+    

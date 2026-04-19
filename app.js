@@ -1,6 +1,6 @@
 /**
- * مملكة أبا مالك العقيلي - الإصدار المدمج v12.0 (2026) ⚔️
- * المحرك الموحد: Firebase + المواقيت + المسبحة + الورد المطور + النقاط
+ * مملكة أبا مالك العقيلي - الإصدار المدمج v13.0 (2026) ⚔️
+ * المحرك الموحد: Firebase + المواقيت + المسبحة + المصحف + الورد + النقاط
  */
 
 // ==========================================
@@ -79,7 +79,7 @@ function startCountdown() {
 }
 
 // ==========================================
-// 3. محرك المسبحة الذكية
+// 3. محرك المسبحة والمصحف
 // ==========================================
 let tCount = 0;
 let zikrIndex = 0;
@@ -105,8 +105,17 @@ window.countTasbih = () => {
 
 window.resetTasbih = () => { tCount = 0; document.getElementById('tasbihCounter').innerText = 0; };
 
+// دالة فتح تطبيق المصحف (Image 3)
+window.openQuranApp = () => {
+    const intent = "intent://#Intent;scheme=http;package=com.simppro.qurankarim;end";
+    window.location.href = intent;
+    setTimeout(() => {
+        if (!document.hidden) window.location.href = "https://quran.com/ar";
+    }, 2500);
+};
+
 // ==========================================
-// 4. محرك الورد الملكي المطور (تم الدمج هنا)
+// 4. محرك الورد الملكي المطور
 // ==========================================
 function renderWird() {
     const listContainer = document.getElementById('wirdList');
@@ -154,7 +163,7 @@ window.toggleWirdAction = (index) => {
 };
 
 // ==========================================
-// 5. محرك البوصلة
+// 5. محرك البوصلة ونظام النقاط
 // ==========================================
 let qiblaDeg = 135;
 window.toggleCompass = async () => {
@@ -172,9 +181,6 @@ window.toggleCompass = async () => {
     }
 };
 
-// ==========================================
-// 6. نظام النقاط والضبط
-// ==========================================
 window.addPoints = (amount) => {
     let p = parseInt(localStorage.getItem('userPoints')) || 0;
     p += amount;
@@ -190,7 +196,7 @@ window.toggleDarkMode = () => {
 };
 
 // ==========================================
-// 7. التشغيل النهائي
+// 6. التشغيل النهائي
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     renderWird();
@@ -202,4 +208,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const pDisplay = document.getElementById('userPointsDisplay');
     if (pDisplay) pDisplay.innerText = localStorage.getItem('userPoints') || 0;
 });
-        
+                

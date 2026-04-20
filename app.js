@@ -1,4 +1,4 @@
-// 1. نظام التثبيت (PWA Install)
+// ==================== 1. نظام التثبيت والإعدادات ====================
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault(); 
@@ -11,26 +11,35 @@ window.installApp = async () => {
     if (deferredPrompt) {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') document.getElementById('installBtn').classList.add('hidden');
+        if (outcome === 'accepted') {
+            const btn = document.getElementById('installBtn');
+            if(btn) btn.classList.add('hidden');
+        }
         deferredPrompt = null;
     }
 };
 
-// 2. إعدادات الواجهة
-window.toggleSettings = () => document.getElementById('settingsPanel').classList.toggle('active');
+window.toggleSettings = () => {
+    const panel = document.getElementById('settingsPanel');
+    if(panel) panel.classList.toggle('active');
+};
+
 window.updateApp = () => location.reload(true);
+
 window.requestLocation = () => navigator.geolocation.getCurrentPosition(p => { 
     localStorage.setItem('lat', p.coords.latitude); 
     localStorage.setItem('lon', p.coords.longitude); 
     location.reload(); 
 });
+
 window.toggleDarkMode = () => { 
     const isDark = document.body.classList.toggle('dark-mode'); 
     localStorage.setItem('aba_dark', isDark); 
-    document.getElementById('darkToggle').classList.toggle('active', isDark); 
+    const toggleBtn = document.getElementById('darkToggle');
+    if(toggleBtn) toggleBtn.classList.toggle('active', isDark); 
 };
 
-// 3. المواقيت والعد التنازلي
+// ==================== 2. المواقيت والعد التنازلي ====================
 let prayerTimes = {};
 async function fetchPrayers() {
     const lat = localStorage.getItem('lat') || "30.0444"; 
@@ -39,12 +48,20 @@ async function fetchPrayers() {
         const res = await fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=5`);
         const data = await res.json(); 
         prayerTimes = data.data.timings;
-        document.getElementById('prayerGrid').innerHTML = [
-            {n:'الفجر', t:prayerTimes.Fajr}, {n:'الظهر', t:prayerTimes.Dhuhr}, 
-            {n:'العصر', t:prayerTimes.Asr}, {n:'المغرب', t:prayerTimes.Maghrib}, {n:'العشاء', t:prayerTimes.Isha}
-        ].map(p => `<div class="prayer-card p-5 text-center min-w-[100px] shadow-sm"><p class="text-[10px] font-bold text-yellow-500 mb-2">${p.n}</p><p class="font-black text-xl">${p.t}</p></div>`).join('');
-        document.getElementById('hijriDate').innerText = `${data.data.date.hijri.day} ${data.data.date.hijri.month.ar}`;
-        document.getElementById('gregDate').innerText = data.data.date.gregorian.date;
+        const grid = document.getElementById('prayerGrid');
+        if(grid) {
+            grid.innerHTML = [
+                {n:'الفجر', t:prayerTimes.Fajr}, {n:'الظهر', t:prayerTimes.Dhuhr}, 
+                {n:'العصر', t:prayerTimes.Asr}, {n:'المغرب', t:prayerTimes.Maghrib}, {n:'العشاء', t:prayerTimes.Isha}
+            ].map(p => `<div class="prayer-card p-5 text-center min-w-[100px] shadow-sm"><p class="text-[10px] font-bold text-yellow-500 mb-2">${p.n}</p><p class="font-black text-xl">${p.t}</p></div>`).join('');
+        }
+        
+        const hDate = document.getElementById('hijriDate');
+        if(hDate) hDate.innerText = `${data.data.date.hijri.day} ${data.data.date.hijri.month.ar}`;
+        
+        const gDate = document.getElementById('gregDate');
+        if(gDate) gDate.innerText = data.data.date.gregorian.date;
+        
         startCountdown();
     } catch (e) { console.log("خطأ في الاتصال"); }
 }
@@ -55,63 +72,141 @@ function startCountdown() {
         const pList = [{n:'الفجر', t:prayerTimes.Fajr}, {n:'الظهر', t:prayerTimes.Dhuhr}, {n:'العصر', t:prayerTimes.Asr}, {n:'المغرب', t:prayerTimes.Maghrib}, {n:'العشاء', t:prayerTimes.Isha}];
         let next = null;
         for (let p of pList) { 
+            if(!p.t) continue;
             const [h, m] = p.t.split(':'); 
             const pDate = new Date(); pDate.setHours(h, m, 0); 
             if (pDate > now) { next = { ...p, d: pDate }; break; } 
         }
-        if (!next) { 
+        if (!next && pList[0].t) { 
             const [h, m] = pList[0].t.split(':'); 
             const pDate = new Date(); pDate.setDate(pDate.getDate()+1); pDate.setHours(h, m, 0); 
             next = { ...pList[0], d: pDate }; 
         }
-        const diff = next.d - now; 
-        const hrs = Math.floor(diff/3600000); const mins = Math.floor((diff%3600000)/60000); const secs = Math.floor((diff%60000)/1000);
-        document.getElementById('mainCountdown').innerText = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-        document.getElementById('nextPrayerTitle').innerText = `باقي على موعد ${next.n}`;
+        
+        if(next) {
+            const diff = next.d - now; 
+            const hrs = Math.floor(diff/3600000); const mins = Math.floor((diff%3600000)/60000); const secs = Math.floor((diff%60000)/1000);
+            const countElem = document.getElementById('mainCountdown');
+            if(countElem) countElem.innerText = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+            
+            const titleElem = document.getElementById('nextPrayerTitle');
+            if(titleElem) titleElem.innerText = `باقي على موعد ${next.n}`;
+        }
     }, 1000);
 }
 
-// 4. البوصلة الحقيقية
-let isCompassActive = false; let qiblaDeg = 135;
+// ==================== 3. محرك البوصلة المطابق للفيديو ====================
+let isCompassActive = false; 
+const QIBLA_DEGREE = 136.2; // درجة القبلة في مصر
+
 window.toggleCompass = async () => {
     const cont = document.getElementById('qiblaContainer'); 
-    const timer = document.getElementById('countdownContainer');
+    if(!cont) return;
+
     if (!isCompassActive) {
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            try { const permission = await DeviceOrientationEvent.requestPermission(); if (permission !== 'granted') return alert('يجب الموافقة على وصول المستشعرات'); } catch (e) { }
+            try { 
+                const permission = await DeviceOrientationEvent.requestPermission(); 
+                if (permission !== 'granted') return alert('يجب الموافقة على المستشعرات'); 
+            } catch (e) { console.error(e); }
         }
+        
+        // تثبيت موقع الكعبة على القرص بشكل دائم
+        const kaaba = document.getElementById('kaabaMarker');
+        if(kaaba) kaaba.style.transform = `rotate(${QIBLA_DEGREE}deg)`;
+
         window.addEventListener('deviceorientationabsolute', handleOrientation, true);
         window.addEventListener('deviceorientation', handleOrientation, true);
-        cont.style.display = 'block'; timer.style.display = 'none'; isCompassActive = true;
+        
+        cont.classList.remove('hidden');
+        cont.classList.add('flex');
+        isCompassActive = true;
     } else {
-        window.removeEventListener('deviceorientationabsolute', handleOrientation); window.removeEventListener('deviceorientation', handleOrientation);
-        cont.style.display = 'none'; timer.style.display = 'block'; isCompassActive = false;
+        window.removeEventListener('deviceorientationabsolute', handleOrientation); 
+        window.removeEventListener('deviceorientation', handleOrientation);
+        
+        cont.classList.add('hidden');
+        cont.classList.remove('flex');
+        isCompassActive = false;
     }
 };
 
 function handleOrientation(e) {
-    let heading = e.alpha || e.webkitCompassHeading; if (heading == null) return;
-    document.getElementById('compass').style.transform = `rotate(${-heading}deg)`;
-    document.getElementById('qiblaPointer').style.transform = `translate(-50%, -100%) rotate(${qiblaDeg}deg)`;
+    let heading = e.webkitCompassHeading || Math.abs(e.alpha - 360);
+    if (heading == null) return;
+
+    // دوران قرص البوصلة بالكامل (الكعبة ستدور معه لأنها بداخله)
+    const dial = document.getElementById('compassDial');
+    if(dial) dial.style.transform = `rotate(${-heading}deg)`;
+    
+    // كتابة الدرجة الحالية
+    const textElem = document.getElementById('headingText');
+    if(textElem) textElem.innerText = heading.toFixed(1) + '°';
+
+    // التحقق من التطابق (مثل الفيديو)
+    let diff = Math.abs(heading - QIBLA_DEGREE);
+    
+    const innerDrop = document.getElementById('teardropInner');
+    const iconDrop = document.getElementById('teardropIcon');
+
+    if(innerDrop && iconDrop) {
+        if (diff < 3 || diff > 357) {
+            // حالة النجاح (القطرة تضيء)
+            innerDrop.style.backgroundColor = '#2a7a6c'; 
+            iconDrop.style.color = 'white';              
+            if (navigator.vibrate) navigator.vibrate(20); 
+        } else {
+            // الحالة العادية (بحث)
+            innerDrop.style.backgroundColor = '#eaf5f4'; 
+            iconDrop.style.color = '#2a7a6c';            
+        }
+    }
 }
 
-// 5. المسبحة
+// ==================== 4. المسبحة ====================
 let tCount = 0; let zikrIndex = 0; const azkarList = ["سبحان الله", "الحمد لله", "لا إله إلا الله", "الله أكبر"];
-window.openTasbih = () => document.getElementById('tasbihModal').style.display = 'flex';
-window.closeTasbih = () => document.getElementById('tasbihModal').style.display = 'none';
-window.nextZikr = () => { zikrIndex = (zikrIndex + 1) % azkarList.length; document.getElementById('currentZikrText').innerText = azkarList[zikrIndex]; window.resetTasbih(); };
-window.prevZikr = () => { zikrIndex = (zikrIndex - 1 + azkarList.length) % azkarList.length; document.getElementById('currentZikrText').innerText = azkarList[zikrIndex]; window.resetTasbih(); };
-window.countTasbih = () => { tCount++; document.getElementById('tasbihCounter').innerText = tCount; if (navigator.vibrate) navigator.vibrate(50); };
-window.resetTasbih = () => { tCount = 0; document.getElementById('tasbihCounter').innerText = 0; };
+window.openTasbih = () => {
+    const modal = document.getElementById('tasbihModal');
+    if(modal) modal.style.display = 'flex';
+};
+window.closeTasbih = () => {
+    const modal = document.getElementById('tasbihModal');
+    if(modal) modal.style.display = 'none';
+};
+window.nextZikr = () => { 
+    zikrIndex = (zikrIndex + 1) % azkarList.length; 
+    const txt = document.getElementById('currentZikrText');
+    if(txt) txt.innerText = azkarList[zikrIndex]; 
+    window.resetTasbih(); 
+};
+window.prevZikr = () => { 
+    zikrIndex = (zikrIndex - 1 + azkarList.length) % azkarList.length; 
+    const txt = document.getElementById('currentZikrText');
+    if(txt) txt.innerText = azkarList[zikrIndex]; 
+    window.resetTasbih(); 
+};
+window.countTasbih = () => { 
+    tCount++; 
+    const tc = document.getElementById('tasbihCounter');
+    if(tc) tc.innerText = tCount; 
+};
+window.resetTasbih = () => { 
+    tCount = 0; 
+    const tc = document.getElementById('tasbihCounter');
+    if(tc) tc.innerText = 0; 
+};
 
-// 6. الورد اليومي
+// ==================== 5. الورد اليومي ====================
 function renderWird() {
     const list = document.getElementById('wirdList'); if (!list) return;
     let myWird = JSON.parse(localStorage.getItem('aba_wird_v12')) || [
         { text: "قراءة صفحة من القرآن", done: false }, { text: "أذكار الصباح", done: false }, { text: "الاستغفار (100)", done: false }
     ];
     list.innerHTML = myWird.map((item, i) => `<div class="flex items-center justify-between p-4 bg-white/5 rounded-[25px] border border-white/5 mb-2"><div class="flex items-center gap-4"><div onclick="toggleWirdAction(${i})" class="w-8 h-8 rounded-full border-2 flex items-center justify-center cursor-pointer ${item.done ? 'bg-yellow-600 border-yellow-600' : 'border-white/20'}">${item.done ? '<i class="fas fa-check text-white text-xs"></i>' : ''}</div><span class="text-sm font-bold ${item.done ? 'line-through opacity-30 text-yellow-500' : 'text-white'}">${item.text}</span></div></div>`).join('');
-    document.getElementById('progressText').innerText = Math.round((myWird.filter(i => i.done).length / myWird.length) * 100) + '%';
+    
+    const prog = document.getElementById('progressText');
+    if(prog) prog.innerText = Math.round((myWird.filter(i => i.done).length / myWird.length) * 100) + '%';
+    
     localStorage.setItem('aba_wird_v12', JSON.stringify(myWird));
 }
 
@@ -122,13 +217,15 @@ window.toggleWirdAction = (i) => {
     renderWird(); 
 };
 
-// 7. التشغيل عند التحميل
+// ==================== 6. التشغيل عند التحميل ====================
 document.addEventListener('DOMContentLoaded', () => {
     renderWird(); 
     fetchPrayers();
     if (localStorage.getItem('aba_dark') === 'true') { 
         document.body.classList.add('dark-mode'); 
-        document.getElementById('darkToggle').classList.add('active'); 
+        const tog = document.getElementById('darkToggle');
+        if(tog) tog.classList.add('active'); 
     }
 });
+                
             

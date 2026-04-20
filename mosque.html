@@ -69,23 +69,20 @@
         </div>
 
         <div class="relative flex items-center justify-center w-[300px] h-[300px]">
-            <div id="compass" class="absolute inset-0 rounded-full bg-white flex items-center justify-center shadow-2xl transition-transform duration-75 ease-out"
-                 style="border: 2px solid #2a7a6c;">
-                 
+            <div id="compassDial" class="absolute inset-0 rounded-full bg-white flex items-center justify-center shadow-2xl transition-transform duration-100 ease-out" style="border: 2px solid #2a7a6c;">
                 <div class="absolute inset-0 rounded-full opacity-30" style="background: repeating-conic-gradient(from 0deg, #2a7a6c 0deg 1deg, transparent 1deg 6deg);"></div>
                 <div class="absolute inset-[6px] rounded-full bg-white"></div>
-                
                 <div class="absolute inset-3 rounded-full border-[8px] border-[#f1f0ea] opacity-80"></div>
                 <div class="absolute inset-8 rounded-full border border-[#2a7a6c]/20" style="background: repeating-radial-gradient(circle, #eaf5f4, transparent 15px);"></div>
                 <div class="absolute inset-14 rounded-full border-[6px] border-[#f1f0ea] opacity-80"></div>
 
-                <span class="absolute top-2 font-black text-[#2a7a6c] text-xs">0</span>
+                <span class="absolute top-2 font-black text-[#2a7a6c] text-xs">N</span>
                 <span class="absolute right-3 font-black text-[#2a7a6c] text-sm">E</span>
-                <span class="absolute bottom-2 font-black text-[#2a7a6c] text-xs">180</span>
+                <span class="absolute bottom-2 font-black text-[#2a7a6c] text-xs">S</span>
                 <span class="absolute left-3 font-black text-[#2a7a6c] text-sm">W</span>
 
-                <div id="qiblaPointerWrapper" class="absolute inset-0 pointer-events-none" style="transform: rotate(135deg);">
-                    <div class="absolute flex items-center justify-center" style="top: -20px; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; border-radius: 50%; border: 2px solid #d32f2f; background: #eaf5f4; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                <div id="kaabaMarker" class="absolute inset-0 pointer-events-none">
+                    <div class="absolute flex items-center justify-center" style="top: -15px; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; border-radius: 50%; border: 2px solid #d32f2f; background: #eaf5f4; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                         <div class="w-[22px] h-[24px] bg-[#1a1a1a] border border-gray-600 flex flex-col justify-start items-center rounded-sm pt-[2px]">
                             <div class="w-full h-1 bg-yellow-500"></div>
                         </div>
@@ -93,10 +90,10 @@
                 </div>
             </div>
 
-            <div class="z-10 w-[110px] h-[110px] bg-[#2a7a6c] flex items-center justify-center"
+            <div class="z-10 w-[110px] h-[110px] bg-[#2a7a6c] flex items-center justify-center transition-all duration-300"
                  style="border-radius: 50% 50% 50% 0; transform: rotate(45deg); box-shadow: inset 0 0 15px rgba(0,0,0,0.15), 0 15px 25px rgba(0,0,0,0.2);">
-                <div class="w-[50px] h-[50px] bg-[#eaf5f4] rounded-full flex items-center justify-center shadow-inner" style="transform: rotate(-45deg);">
-                    <i class="fas fa-check text-[#2a7a6c] text-2xl"></i>
+                <div id="teardropInner" class="w-[50px] h-[50px] bg-[#eaf5f4] rounded-full flex items-center justify-center shadow-inner transition-colors duration-300" style="transform: rotate(-45deg);">
+                    <i id="teardropIcon" class="fas fa-check text-[#2a7a6c] text-2xl transition-colors duration-300"></i>
                 </div>
             </div>
         </div>
@@ -232,5 +229,5 @@
     <script src="quran.js"></script>
     <script src="app.js"></script>
 </body>
-                </html>
-                    
+    </html>
+    

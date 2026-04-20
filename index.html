@@ -6,30 +6,23 @@
     <title>محراب أبا مالك العقيلي</title>
     
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#064e3b">
-
+    
     <script>
-        // 2. تسجيل المحرك قبل التحويل لضمان التعرف على التطبيق
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js?v=14.0');
         }
-
-        // 3. التحويل الذكي بعد التأكد من تحميل الأساسيات
         window.onload = () => {
             setTimeout(() => {
                 window.location.replace("mosque.html");
-            }, 500); // تأخير بسيط لضمان التقاط المتصفح للمانيفست
+            }, 500); 
         };
     </script>
 </head>
 <body style="background: #0f172a; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
-    <div style="text-align: center; color: #fbbf24; font-family: 'Cairo', sans-serif;">
+    <div style="text-align: center; color: #fbbf24; font-family: sans-serif;">
         <div style="border: 4px solid #fbbf24; border-top: 4px solid transparent; width: 40px; height: 40px; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-        <p style="font-weight: 900; letter-spacing: 2px;">جاري فتح المحراب...</p>
+        <p style="font-weight: bold; font-size: 1.2rem;">جاري فتح المحراب...</p>
     </div>
-
-    <style>
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
 </body>
 </html>

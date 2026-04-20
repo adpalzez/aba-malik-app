@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>موسوعة الحديث الشريف | محراب أبا مالك</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        :root { --accent-gold: #fbbf24; --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f1f5f9; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
+        
+        .header { background: linear-gradient(180deg, var(--accent-gold) 0%, #000 100%); padding: 20px; border-radius: 0 0 35px 35px; text-align: center; color: white; position: sticky; top: 0; z-index: 50; border-bottom: 3px solid var(--accent-gold); }
+        
+        .tab-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 25px; font-weight: 900; font-size: 13px; white-space: nowrap; transition: 0.3s; cursor: pointer; }
+        .tab-btn.active { background: var(--accent-gold); color: black; border-color: var(--accent-gold); transform: scale(1.05); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        .hadith-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; padding: 25px; margin-bottom: 20px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .hadith-text { font-family: 'Amiri Quran', serif; font-size: 24px; line-height: 2.2; text-align: justify; color: #e2e8f0; margin-top: 15px; }
+        .hadith-number { display: inline-block; background: rgba(251, 191, 36, 0.1); color: var(--accent-gold); padding: 5px 12px; border-radius: 10px; font-weight: 900; font-size: 12px; margin-bottom: 10px; border: 1px solid rgba(251, 191, 36, 0.3); }
+        
+        .copy-btn { position: absolute; top: 25px; left: 25px; color: #94a3b8; font-size: 20px; cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 50%; }
+        .copy-btn:active { color: var(--accent-gold); transform: scale(0.9); background: rgba(251, 191, 36, 0.2); }
+        
+        #loader { display: none; text-align: center; padding: 60px 20px; color: var(--accent-gold); }
+        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--accent-gold); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* إشعار النسخ */
+        #toast { position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%); background: var(--accent-gold); color: black; padding: 12px 25px; border-radius: 30px; font-weight: 900; font-size: 13px; transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 9999; box-shadow: 0 10px 20px rgba(251,191,36,0.3); }
+        #toast.show { bottom: 30px; }
+    </style>
+</head>
+<body class="pb-10">
+
+    <header class="header shadow-2xl">
+        <div class="flex justify-between items-center mb-2">
+            <button onclick="window.location.href='mosque.html'" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md hover:bg-white/20 transition"><i class="fas fa-arrow-right"></i></button>
+            <div class="flex items-center gap-2">
+                <h1 class="text-2xl font-black">الموسوعة العلمية</h1>
+            </div>
+            <div class="w-10"></div> 
+        </div>
+        <p class="text-xs opacity-70 font-bold uppercase mt-1">آلاف الأحاديث الصحيحة بين يديك</p>
+    </header>
+
+    <div class="flex gap-3 overflow-x-auto p-5 no-scrollbar border-b border-white/5" id="bookTabs">
+        <button onclick="loadBook('bukhari', this)" class="tab-btn active">صحيح البخاري</button>
+        <button onclick="loadBook('muslim', this)" class="tab-btn">صحيح مسلم</button>
+        <button onclick="loadBook('tirmidzi', this)" class="tab-btn">سنن الترمذي</button>
+        <button onclick="loadBook('abudawud', this)" class="tab-btn">سنن أبي داود</button>
+    </div>
+
+    <div id="loader">
+        <div class="spinner"></div>
+        <p class="font-black text-sm mt-4">جاري الاتصال بقاعدة البيانات...</p>
+    </div>
+
+    <main id="hadithContainer" class="p-5">
+        </main>
+
+    <div id="toast"><i class="fas fa-check-circle ml-2"></i> تم نسخ الحديث بنجاح</div>
+
+    <script>
+        const API_BASE = 'https://api.hadith.gading.dev/books';
+        const container = document.getElementById('hadithContainer');
+        const loader = document.getElementById('loader');
+        
+        let currentBookName = 'صحيح البخاري';
+
+        // محرك الجلب العلمي
+        async function loadBook(bookId, element) {
+            // تحديث شكل الأزرار
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            if(element) {
+                element.classList.add('active');
+                currentBookName = element.innerText;
+            }
+
+            container.innerHTML = '';
+            loader.style.display = 'block';
+
+            try {
+                // جلب 50 حديثاً في كل مرة لسرعة الأداء
+                const res = await fetch(`${API_BASE}/${bookId}?range=1-50`);
+                const json = await res.json();
+                
+                let html = '';
+                json.data.hadiths.forEach((h, index) => {
+                    html += `
+                        <div class="hadith-card animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.05}s">
+                            <i onclick="copyText('${escapeHtml(h.arab)}')" class="fas fa-copy copy-btn" title="نسخ الحديث"></i>
+                            <div class="hadith-number">${currentBookName} - حديث رقم ${h.number}</div>
+                            <div class="hadith-text">${h.arab}</div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+                loader.style.display = 'none';
+            } catch (err) {
+                loader.style.display = 'none';
+                container.innerHTML = '<div class="text-center p-8 bg-red-500/10 border border-red-500/30 rounded-3xl mt-10"><i class="fas fa-wifi text-4xl text-red-500 mb-4"></i><p class="text-red-400 font-bold">حدث خطأ في جلب الأحاديث. يرجى التأكد من اتصالك بالإنترنت.</p></div>';
+            }
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+        }
+
+        // محرك النسخ الذكي
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2500);
+            });
+        }
+
+        // التشغيل التلقائي عند فتح القسم
+        window.onload = () => loadBook('bukhari', document.querySelector('.tab-btn.active'));
+    </script>
+</body>
+  </html>
+  

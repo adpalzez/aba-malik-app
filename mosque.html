@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* إضافة متغيرات الألوان الديناميكية */
         :root { --main-teal: #064e3b; --accent-gold: #fbbf24; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-color: #1e293b; }
         body.dark-mode { --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f1f5f9; }
         body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); color: var(--text-color); transition: 0.5s; overflow-x: hidden; }
@@ -22,14 +21,9 @@
         .hero-section { background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); background-size: cover; border-radius: 0 0 45px 45px; padding-bottom: 30px; color: white; position: relative; border-bottom: 3px solid var(--accent-gold); }
         body.dark-mode .hero-section { background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.95)), url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); border-bottom: 3px solid var(--accent-gold); }
 
-        #qiblaContainer { display: none; padding: 20px 0; }
-        .compass-disk { width: 150px; height: 150px; border: 4px solid var(--accent-gold); border-radius: 50%; margin: 0 auto; position: relative; background: rgba(255,255,255,0.1); }
-        .qibla-arrow { position: absolute; top: 50%; left: 50%; width: 4px; height: 60px; background: #ef4444; transform-origin: bottom center; transform: translate(-50%, -100%) rotate(0deg); transition: 0.2s; }
-
         #tasbihModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); z-index: 6000; display: none; align-items: center; justify-content: center; }
         .tasbih-circle { width: 240px; height: 240px; border-radius: 50%; border: 8px solid var(--accent-gold); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 60px rgba(var(--accent-gold), 0.15); }
         
-        /* لوحة الإعدادات المحدثة قابلة للتمرير */
         .settings-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-radius: 40px 40px 0 0; transform: translateY(100%); transition: 0.5s; z-index: 5000; padding: 30px; border-top: 1px solid rgba(255,255,255,0.1); max-height: 85vh; overflow-y: auto; }
         .settings-panel.active { transform: translateY(0); }
         
@@ -65,6 +59,57 @@
         </div>
     </div>
 
+    <div id="qiblaContainer" class="fixed inset-0 z-[7000] hidden flex-col items-center justify-between" style="background-color: #eaf5f4; font-family: 'Cairo', sans-serif;">
+        <div class="w-full p-6 flex justify-between items-center text-[#654f43]">
+            <i class="fas fa-cog text-3xl cursor-pointer" onclick="toggleCompass(); toggleSettings();"></i>
+            <div class="flex items-center gap-3 cursor-pointer" onclick="toggleCompass()">
+                <span class="text-2xl font-black">القبلة</span>
+                <i class="fas fa-chevron-right text-3xl"></i>
+            </div>
+        </div>
+
+        <div class="relative flex items-center justify-center w-[300px] h-[300px]">
+            <div id="compass" class="absolute inset-0 rounded-full bg-white flex items-center justify-center shadow-2xl transition-transform duration-75 ease-out"
+                 style="border: 2px solid #2a7a6c;">
+                 
+                <div class="absolute inset-0 rounded-full opacity-30" style="background: repeating-conic-gradient(from 0deg, #2a7a6c 0deg 1deg, transparent 1deg 6deg);"></div>
+                <div class="absolute inset-[6px] rounded-full bg-white"></div>
+                
+                <div class="absolute inset-3 rounded-full border-[8px] border-[#f1f0ea] opacity-80"></div>
+                <div class="absolute inset-8 rounded-full border border-[#2a7a6c]/20" style="background: repeating-radial-gradient(circle, #eaf5f4, transparent 15px);"></div>
+                <div class="absolute inset-14 rounded-full border-[6px] border-[#f1f0ea] opacity-80"></div>
+
+                <span class="absolute top-2 font-black text-[#2a7a6c] text-xs">0</span>
+                <span class="absolute right-3 font-black text-[#2a7a6c] text-sm">E</span>
+                <span class="absolute bottom-2 font-black text-[#2a7a6c] text-xs">180</span>
+                <span class="absolute left-3 font-black text-[#2a7a6c] text-sm">W</span>
+
+                <div id="qiblaPointerWrapper" class="absolute inset-0 pointer-events-none" style="transform: rotate(135deg);">
+                    <div class="absolute flex items-center justify-center" style="top: -20px; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; border-radius: 50%; border: 2px solid #d32f2f; background: #eaf5f4; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                        <div class="w-[22px] h-[24px] bg-[#1a1a1a] border border-gray-600 flex flex-col justify-start items-center rounded-sm pt-[2px]">
+                            <div class="w-full h-1 bg-yellow-500"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="z-10 w-[110px] h-[110px] bg-[#2a7a6c] flex items-center justify-center"
+                 style="border-radius: 50% 50% 50% 0; transform: rotate(45deg); box-shadow: inset 0 0 15px rgba(0,0,0,0.15), 0 15px 25px rgba(0,0,0,0.2);">
+                <div class="w-[50px] h-[50px] bg-[#eaf5f4] rounded-full flex items-center justify-center shadow-inner" style="transform: rotate(-45deg);">
+                    <i class="fas fa-check text-[#2a7a6c] text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="pb-16 text-center text-[#654f43]">
+            <div class="flex items-center justify-center gap-3 mb-2">
+                <i class="fas fa-question-circle text-2xl text-[#2a7a6c]"></i>
+                <span id="headingText" class="text-4xl font-black" dir="ltr" style="font-family: monospace;">---°</span>
+            </div>
+            <p class="text-3xl font-black mt-2">من الشمال</p>
+        </div>
+    </div>
+
     <section class="hero-section p-6 text-center shadow-2xl">
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center gap-2">
@@ -77,11 +122,6 @@
         <div id="countdownContainer" class="py-6">
             <p id="nextPrayerTitle" class="text-[var(--accent-gold)] font-black mb-2 text-sm">جاري الحساب...</p>
             <h2 id="mainCountdown" class="text-6xl font-black mb-4 tracking-tighter">00:00:00</h2>
-        </div>
-
-        <div id="qiblaContainer" class="animate__animated animate__fadeIn">
-            <div class="compass-disk" id="compass"><div class="qibla-arrow" id="qiblaPointer"></div></div>
-            <p class="text-[10px] text-[var(--accent-gold)] font-bold mt-4 uppercase">وجه الهاتف نحو القبلة</p>
         </div>
 
         <div class="flex justify-between items-center text-[11px] bg-black/30 p-4 rounded-[25px] border border-white/5 mx-2 text-white">
@@ -164,17 +204,12 @@
         function changeThemeColor(color, element) {
             document.documentElement.style.setProperty('--accent-gold', color);
             localStorage.setItem('aba_theme_color', color);
-            
-            // تحديث واجهة الأزرار
             document.querySelectorAll('.color-selector').forEach(el => el.classList.remove('active'));
             if(element) element.classList.add('active');
         }
 
-        // استرجاع اللون المحفوظ عند فتح التطبيق
         const savedColor = localStorage.getItem('aba_theme_color');
-        if (savedColor) {
-            changeThemeColor(savedColor, null);
-        }
+        if (savedColor) changeThemeColor(savedColor, null);
 
         // 2. نظام الاهتزاز في المسبحة
         let isVibrationOn = localStorage.getItem('aba_vibrate') !== 'false';
@@ -186,7 +221,6 @@
             document.getElementById('vibrateToggle').classList.toggle('active');
         }
 
-        // دالة المسبحة المحدثة لتقرأ من الإعدادات
         const oldTasbihCount = window.countTasbih;
         window.countTasbih = () => {
             let tc = document.getElementById('tasbihCounter');
@@ -198,5 +232,5 @@
     <script src="quran.js"></script>
     <script src="app.js"></script>
 </body>
-    </html>
-                        
+                </html>
+                    

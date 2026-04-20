@@ -39,11 +39,30 @@ window.toggleDarkMode = () => {
     if(toggleBtn) toggleBtn.classList.toggle('active', isDark); 
 };
 
-// ==================== 2. المواقيت والعد التنازلي ====================
+// ==================== 2. المواقيت وحساب القبلة الدقيق ====================
 let prayerTimes = {};
+let QIBLA_DEGREE = 136.2; // قيمة ابتدائية سيتم تحديثها بالـ GPS
+
+// خوارزمية حساب القبلة الدقيقة بناءً على خطوط الطول والعرض
+function calculateQibla(lat, lon) {
+    const makkahLat = 21.422487 * (Math.PI / 180);
+    const makkahLon = 39.826206 * (Math.PI / 180);
+    const userLat = lat * (Math.PI / 180);
+    const userLon = lon * (Math.PI / 180);
+    const dLon = makkahLon - userLon;
+    const y = Math.sin(dLon);
+    const x = Math.cos(userLat) * Math.tan(makkahLat) - Math.sin(userLat) * Math.cos(dLon);
+    let qibla = Math.atan2(y, x) * (180 / Math.PI);
+    return parseFloat(((qibla + 360) % 360).toFixed(1));
+}
+
 async function fetchPrayers() {
     const lat = localStorage.getItem('lat') || "30.0444"; 
     const lon = localStorage.getItem('lon') || "31.2357";
+    
+    // حساب القبلة الدقيقة فوراً لموقعك الحالي
+    QIBLA_DEGREE = calculateQibla(parseFloat(lat), parseFloat(lon));
+
     try {
         const res = await fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=5`);
         const data = await res.json(); 
@@ -97,7 +116,6 @@ function startCountdown() {
 
 // ==================== 3. محرك البوصلة المطابق للفيديو ====================
 let isCompassActive = false; 
-const QIBLA_DEGREE = 136.2; // درجة القبلة في مصر
 
 window.toggleCompass = async () => {
     const cont = document.getElementById('qiblaContainer'); 
@@ -107,11 +125,11 @@ window.toggleCompass = async () => {
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
             try { 
                 const permission = await DeviceOrientationEvent.requestPermission(); 
-                if (permission !== 'granted') return alert('يجب الموافقة على المستشعرات'); 
+                if (permission !== 'granted') return alert('يجب الموافقة على المستشعرات لتعمل البوصلة'); 
             } catch (e) { console.error(e); }
         }
         
-        // تثبيت موقع الكعبة على القرص بشكل دائم
+        // تثبيت موقع الكعبة بناءً على الحساب الدقيق لموقعك
         const kaaba = document.getElementById('kaabaMarker');
         if(kaaba) kaaba.style.transform = `rotate(${QIBLA_DEGREE}deg)`;
 
@@ -132,10 +150,17 @@ window.toggleCompass = async () => {
 };
 
 function handleOrientation(e) {
-    let heading = e.webkitCompassHeading || Math.abs(e.alpha - 360);
-    if (heading == null) return;
+    let heading;
+    // دعم دقيق للآيفون والأندرويد
+    if (e.webkitCompassHeading !== undefined) {
+        heading = e.webkitCompassHeading;
+    } else if (e.alpha !== null) {
+        heading = 360 - e.alpha;
+    } else {
+        return;
+    }
 
-    // دوران قرص البوصلة بالكامل (الكعبة ستدور معه لأنها بداخله)
+    // دوران قرص البوصلة بالكامل
     const dial = document.getElementById('compassDial');
     if(dial) dial.style.transform = `rotate(${-heading}deg)`;
     
@@ -143,7 +168,7 @@ function handleOrientation(e) {
     const textElem = document.getElementById('headingText');
     if(textElem) textElem.innerText = heading.toFixed(1) + '°';
 
-    // التحقق من التطابق (مثل الفيديو)
+    // التحقق من التطابق مع درجة القبلة الدقيقة
     let diff = Math.abs(heading - QIBLA_DEGREE);
     
     const innerDrop = document.getElementById('teardropInner');
@@ -151,12 +176,12 @@ function handleOrientation(e) {
 
     if(innerDrop && iconDrop) {
         if (diff < 3 || diff > 357) {
-            // حالة النجاح (القطرة تضيء)
+            // حالة النجاح
             innerDrop.style.backgroundColor = '#2a7a6c'; 
             iconDrop.style.color = 'white';              
             if (navigator.vibrate) navigator.vibrate(20); 
         } else {
-            // الحالة العادية (بحث)
+            // الحالة العادية
             innerDrop.style.backgroundColor = '#eaf5f4'; 
             iconDrop.style.color = '#2a7a6c';            
         }
@@ -227,5 +252,4 @@ document.addEventListener('DOMContentLoaded', () => {
         if(tog) tog.classList.add('active'); 
     }
 });
-                
-            
+        

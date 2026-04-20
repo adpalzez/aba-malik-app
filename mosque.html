@@ -4,47 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>محراب أبا مالك العقيلي</title>
+    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#064e3b">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
+        /* إضافة متغيرات الألوان الديناميكية */
         :root { --main-teal: #064e3b; --accent-gold: #fbbf24; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-color: #1e293b; }
         body.dark-mode { --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f1f5f9; }
         body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); color: var(--text-color); transition: 0.5s; overflow-x: hidden; }
-        .hero-section { background: linear-gradient(rgba(6, 78, 59, 0.9), rgba(6, 78, 59, 0.95)), url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); background-size: cover; border-radius: 0 0 45px 45px; padding-bottom: 30px; color: white; }
-        body.dark-mode .hero-section { background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.95)), url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); }
+        
+        .hero-section { background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); background-size: cover; border-radius: 0 0 45px 45px; padding-bottom: 30px; color: white; position: relative; border-bottom: 3px solid var(--accent-gold); }
+        body.dark-mode .hero-section { background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.95)), url('https://i.ibb.co/pBhzxHdM/1000027317.jpg'); border-bottom: 3px solid var(--accent-gold); }
+
         #qiblaContainer { display: none; padding: 20px 0; }
         .compass-disk { width: 150px; height: 150px; border: 4px solid var(--accent-gold); border-radius: 50%; margin: 0 auto; position: relative; background: rgba(255,255,255,0.1); }
         .qibla-arrow { position: absolute; top: 50%; left: 50%; width: 4px; height: 60px; background: #ef4444; transform-origin: bottom center; transform: translate(-50%, -100%) rotate(0deg); transition: 0.2s; }
+
         #tasbihModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); z-index: 6000; display: none; align-items: center; justify-content: center; }
-        .tasbih-circle { width: 240px; height: 240px; border-radius: 50%; border: 8px solid var(--accent-gold); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-        .settings-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-radius: 40px 40px 0 0; transform: translateY(100%); transition: 0.5s; z-index: 5000; padding: 30px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .tasbih-circle { width: 240px; height: 240px; border-radius: 50%; border: 8px solid var(--accent-gold); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 60px rgba(var(--accent-gold), 0.15); }
+        
+        /* لوحة الإعدادات المحدثة قابلة للتمرير */
+        .settings-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-radius: 40px 40px 0 0; transform: translateY(100%); transition: 0.5s; z-index: 5000; padding: 30px; border-top: 1px solid rgba(255,255,255,0.1); max-height: 85vh; overflow-y: auto; }
         .settings-panel.active { transform: translateY(0); }
+        
         .toggle-switch { width: 50px; height: 25px; background: #334155; border-radius: 20px; position: relative; cursor: pointer; }
         .toggle-switch.active { background: var(--accent-gold); }
         .toggle-knob { width: 21px; height: 21px; background: white; border-radius: 50%; position: absolute; top: 2px; right: 2px; transition: 0.3s; }
         .toggle-switch.active .toggle-knob { right: 27px; }
+        
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .prayer-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; min-width: 100px; transition: 0.3s; }
+        
+        .color-selector { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.3s; }
+        .color-selector.active { border-color: white; transform: scale(1.1); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
     </style>
 </head>
 <body class="pb-32">
+
     <div id="tasbihModal">
         <div class="w-full max-w-sm text-center px-6">
             <button onclick="closeTasbih()" class="absolute top-10 left-10 text-white/50 text-2xl"><i class="fas fa-times"></i></button>
             <div class="mb-12">
                 <div class="flex justify-between items-center bg-white/5 p-4 rounded-2xl mb-4 text-white">
-                    <button onclick="prevZikr()" class="text-yellow-500"><i class="fas fa-chevron-right text-xl"></i></button>
+                    <button onclick="prevZikr()" class="text-[var(--accent-gold)]"><i class="fas fa-chevron-right text-xl"></i></button>
                     <h3 id="currentZikrText" class="text-xl font-black text-white">سبحان الله</h3>
-                    <button onclick="nextZikr()" class="text-yellow-500"><i class="fas fa-chevron-left text-xl"></i></button>
+                    <button onclick="nextZikr()" class="text-[var(--accent-gold)]"><i class="fas fa-chevron-left text-xl"></i></button>
                 </div>
             </div>
-            <div onclick="countTasbih()" class="tasbih-circle mx-auto mb-10 shadow-[0_0_60px_rgba(251,191,36,0.15)]">
+            <div onclick="countTasbih()" class="tasbih-circle mx-auto mb-10">
                 <span id="tasbihCounter" class="text-7xl font-black text-white">0</span>
-                <span class="text-[10px] text-yellow-500 font-bold mt-4 uppercase">اضغط للتسبيح</span>
+                <span class="text-[10px] text-[var(--accent-gold)] font-bold mt-4 uppercase">اضغط للتسبيح</span>
             </div>
             <button onclick="resetTasbih()" class="bg-red-500/10 text-red-500 px-6 py-3 rounded-2xl font-bold text-xs uppercase">تصفير العداد</button>
         </div>
@@ -53,24 +68,24 @@
     <section class="hero-section p-6 text-center shadow-2xl">
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center gap-2">
-                <img src="https://i.ibb.co/pBhzxHdM/1000027317.jpg" class="w-10 h-10 rounded-full border-2 border-yellow-500">
+                <img src="https://i.ibb.co/pBhzxHdM/1000027317.jpg" class="w-10 h-10 rounded-full border-2 border-[var(--accent-gold)]">
                 <span class="text-xs font-black">أبا مالك العقيلي</span>
             </div>
-            <i onclick="toggleSettings()" class="fas fa-cog text-2xl text-white/70 cursor-pointer"></i>
+            <i onclick="toggleSettings()" class="fas fa-cog text-2xl text-white/70 cursor-pointer hover:text-[var(--accent-gold)] transition"></i>
         </div>
 
         <div id="countdownContainer" class="py-6">
-            <p id="nextPrayerTitle" class="text-yellow-400 font-black mb-2 text-sm">جاري الحساب...</p>
+            <p id="nextPrayerTitle" class="text-[var(--accent-gold)] font-black mb-2 text-sm">جاري الحساب...</p>
             <h2 id="mainCountdown" class="text-6xl font-black mb-4 tracking-tighter">00:00:00</h2>
         </div>
 
         <div id="qiblaContainer" class="animate__animated animate__fadeIn">
             <div class="compass-disk" id="compass"><div class="qibla-arrow" id="qiblaPointer"></div></div>
-            <p class="text-[10px] text-yellow-500 font-bold mt-4 uppercase">وجه الهاتف نحو القبلة</p>
+            <p class="text-[10px] text-[var(--accent-gold)] font-bold mt-4 uppercase">وجه الهاتف نحو القبلة</p>
         </div>
 
         <div class="flex justify-between items-center text-[11px] bg-black/30 p-4 rounded-[25px] border border-white/5 mx-2 text-white">
-            <div class="text-right leading-tight"><p class="opacity-50 mb-1 font-bold uppercase">الهجري</p><p id="hijriDate" class="font-black text-yellow-500 text-sm">-- ---</p></div>
+            <div class="text-right leading-tight"><p class="opacity-50 mb-1 font-bold uppercase">الهجري</p><p id="hijriDate" class="font-black text-[var(--accent-gold)] text-sm">-- ---</p></div>
             <div class="text-left leading-tight"><p class="opacity-50 mb-1 font-bold uppercase">الميلادي</p><p id="gregDate" class="font-black text-sm">-- --</p></div>
         </div>
     </section>
@@ -78,17 +93,21 @@
     <main class="p-5">
         <div class="grid grid-cols-4 gap-4 mb-10 text-center">
             <div onclick="toggleCompass()" class="flex flex-col items-center gap-2 cursor-pointer">
-                <div class="w-14 h-14 bg-yellow-600/20 rounded-full flex items-center justify-center shadow-lg text-yellow-500"><i class="fas fa-compass text-2xl"></i></div>
+                <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center shadow-lg text-[var(--accent-gold)] border border-[var(--accent-gold)]"><i class="fas fa-compass text-2xl"></i></div>
                 <span class="text-[10px] font-black uppercase">البوصلة</span>
             </div>
             <div onclick="openTasbih()" class="flex flex-col items-center gap-2 cursor-pointer">
-                <div class="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center shadow-lg text-blue-400 border border-blue-500/20"><i class="fas fa-fingerprint text-2xl"></i></div>
+                <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center shadow-lg text-blue-400 border border-blue-500/20"><i class="fas fa-fingerprint text-2xl"></i></div>
                 <span class="text-[10px] font-black uppercase">المسبحة</span>
             </div>
-            <div onclick="openQuranApp()" class="flex flex-col items-center gap-2 cursor-pointer">
-                <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center shadow-lg text-white/50 border border-white/10"><i class="fas fa-book-quran text-2xl"></i></div>
+            
+            <div onclick="window.location.href='quran-read.html'" class="flex flex-col items-center gap-2 cursor-pointer">
+                <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center shadow-lg text-white/50 border border-white/10">
+                    <i class="fas fa-book-quran text-2xl"></i>
+                </div>
                 <span class="text-[10px] font-black uppercase">المصحف</span>
             </div>
+
             <div onclick="window.location.href='azkar.html'" class="flex flex-col items-center gap-2 cursor-pointer">
                 <div class="w-14 h-14 bg-emerald-600/20 rounded-full flex items-center justify-center shadow-lg text-emerald-400 border border-emerald-500/20"><i class="fas fa-pray text-2xl"></i></div>
                 <span class="text-[10px] font-black uppercase">الأذكار</span>
@@ -98,7 +117,7 @@
         <section class="bg-[#1e293b] p-6 rounded-[35px] shadow-lg mb-8 border border-white/5">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="font-black text-lg text-white">ورد اليوم</h3>
-                <span id="progressText" class="text-yellow-500 font-black">0%</span>
+                <span id="progressText" class="text-[var(--accent-gold)] font-black">0%</span>
             </div>
             <div id="wirdList" class="space-y-4"></div>
         </section>
@@ -106,22 +125,78 @@
         <div id="prayerGrid" class="flex gap-4 overflow-x-auto pb-8 no-scrollbar"></div>
     </main>
 
-    <div id="settingsPanel" class="settings-panel">
-        <div class="w-12 h-1.5 bg-gray-200 dark:bg-white/10 rounded-full mx-auto mb-8"></div>
+    <div id="settingsPanel" class="settings-panel no-scrollbar">
+        <div class="w-12 h-1.5 bg-gray-200 dark:bg-white/10 rounded-full mx-auto mb-6"></div>
+        
         <div class="space-y-6 pb-10">
             <button id="installBtn" onclick="installApp()" class="hidden w-full bg-blue-600 text-white py-5 rounded-3xl font-black shadow-lg flex items-center justify-center gap-3"><i class="fas fa-download"></i> تثبيت التطبيق</button>
-            <div class="flex justify-between items-center bg-gray-50 dark:bg-white/5 p-4 rounded-2xl">
-                <div><p class="font-bold text-sm">الوضع الليلي</p></div>
-                <div id="darkToggle" onclick="toggleDarkMode()" class="toggle-switch"><div class="toggle-knob"></div></div>
+            
+            <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl">
+                <p class="font-bold text-sm mb-3">ألوان المملكة</p>
+                <div class="flex gap-4 justify-center">
+                    <div onclick="changeThemeColor('#fbbf24', this)" class="color-selector bg-yellow-400 active"></div>
+                    <div onclick="changeThemeColor('#10b981', this)" class="color-selector bg-emerald-500"></div>
+                    <div onclick="changeThemeColor('#3b82f6', this)" class="color-selector bg-blue-500"></div>
+                    <div onclick="changeThemeColor('#a855f7', this)" class="color-selector bg-purple-500"></div>
+                </div>
             </div>
-            <button onclick="updateApp()" class="w-full bg-emerald-600/10 text-emerald-500 py-4 rounded-3xl font-bold border border-emerald-500/20"><i class="fas fa-sync-alt"></i> تحديث التطبيق (V14.0)</button>
-            <button onclick="requestLocation()" class="w-full bg-yellow-600 text-white py-5 rounded-3xl font-black"><i class="fas fa-location-arrow"></i> تحديث الـ GPS</button>
-            <button onclick="toggleSettings()" class="w-full bg-gray-100 dark:bg-white/5 text-gray-500 py-4 rounded-3xl font-bold uppercase">إغلاق</button>
+
+            <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl space-y-4">
+                <p class="font-bold text-sm mb-1 border-b border-gray-200 dark:border-white/10 pb-2">قواعد الأذكار</p>
+                <div class="flex justify-between items-center">
+                    <p class="text-xs font-bold">الاهتزاز عند التسبيح</p>
+                    <div id="vibrateToggle" onclick="toggleVibration()" class="toggle-switch active"><div class="toggle-knob"></div></div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <p class="text-xs font-bold">الوضع الليلي</p>
+                    <div id="darkToggle" onclick="toggleDarkMode()" class="toggle-switch"><div class="toggle-knob"></div></div>
+                </div>
+            </div>
+
+            <button onclick="updateApp()" class="w-full bg-[var(--accent-gold)] text-black py-4 rounded-3xl font-black shadow-lg"><i class="fas fa-sync-alt"></i> تحديث التطبيق (V14.0)</button>
+            <button onclick="requestLocation()" class="w-full bg-white/5 text-gray-500 py-4 rounded-3xl font-bold border border-white/10"><i class="fas fa-location-arrow"></i> تحديث الـ GPS</button>
+            <button onclick="toggleSettings()" class="w-full bg-red-500/10 text-red-500 py-4 rounded-3xl font-bold uppercase">إغلاق</button>
         </div>
     </div>
+
+    <script>
+        // 1. نظام الألوان الملكية
+        function changeThemeColor(color, element) {
+            document.documentElement.style.setProperty('--accent-gold', color);
+            localStorage.setItem('aba_theme_color', color);
+            
+            // تحديث واجهة الأزرار
+            document.querySelectorAll('.color-selector').forEach(el => el.classList.remove('active'));
+            if(element) element.classList.add('active');
+        }
+
+        // استرجاع اللون المحفوظ عند فتح التطبيق
+        const savedColor = localStorage.getItem('aba_theme_color');
+        if (savedColor) {
+            changeThemeColor(savedColor, null);
+        }
+
+        // 2. نظام الاهتزاز في المسبحة
+        let isVibrationOn = localStorage.getItem('aba_vibrate') !== 'false';
+        if (!isVibrationOn) document.getElementById('vibrateToggle').classList.remove('active');
+
+        function toggleVibration() {
+            isVibrationOn = !isVibrationOn;
+            localStorage.setItem('aba_vibrate', isVibrationOn);
+            document.getElementById('vibrateToggle').classList.toggle('active');
+        }
+
+        // دالة المسبحة المحدثة لتقرأ من الإعدادات
+        const oldTasbihCount = window.countTasbih;
+        window.countTasbih = () => {
+            let tc = document.getElementById('tasbihCounter');
+            tc.innerText = parseInt(tc.innerText) + 1;
+            if (isVibrationOn && navigator.vibrate) navigator.vibrate(50);
+        };
+    </script>
 
     <script src="quran.js"></script>
     <script src="app.js"></script>
 </body>
     </html>
-            
+                        

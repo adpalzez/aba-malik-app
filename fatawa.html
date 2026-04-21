@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>المكتبة والفتاوى | محراب أبا مالك</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <style>
+        :root { --accent-gold: #fbbf24; --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f1f5f9; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
+        
+        .header { background: linear-gradient(180deg, var(--accent-gold) 0%, #000 100%); padding: 20px; border-radius: 0 0 35px 35px; text-align: center; color: white; position: sticky; top: 0; z-index: 50; border-bottom: 3px solid var(--accent-gold); }
+        
+        .tab-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 25px; font-weight: 900; font-size: 13px; white-space: nowrap; transition: 0.3s; cursor: pointer; }
+        .tab-btn.active { background: var(--accent-gold); color: black; border-color: var(--accent-gold); transform: scale(1.05); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        .article-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; padding: 20px; margin-bottom: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .article-card:active { transform: scale(0.98); border-color: var(--accent-gold); }
+        
+        .category-badge { background: rgba(251, 191, 36, 0.15); color: var(--accent-gold); padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
+        
+        /* شاشة القراءة (القارئ الذكي) */
+        #readerModal { position: fixed; inset: 0; background: var(--bg-color); z-index: 9000; display: none; flex-direction: column; overflow-y: auto; }
+        .reader-header { background: var(--card-bg); padding: 20px; position: sticky; top: 0; z-index: 9001; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .reader-content { padding: 30px 20px; font-family: 'Amiri', serif; font-size: 22px; line-height: 2.2; text-align: justify; color: #e2e8f0; }
+        .reader-title { font-family: 'Cairo', sans-serif; font-size: 24px; font-weight: 900; color: var(--accent-gold); margin-bottom: 20px; text-align: center; line-height: 1.5; }
+    </style>
+</head>
+<body class="pb-10">
+
+    <header class="header shadow-2xl">
+        <div class="flex justify-between items-center mb-2">
+            <button onclick="window.location.href='mosque.html'" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md hover:bg-white/20 transition"><i class="fas fa-arrow-right"></i></button>
+            <div class="flex items-center gap-2">
+                <h1 class="text-2xl font-black">المكتبة والفتاوى</h1>
+            </div>
+            <div class="w-10"></div> 
+        </div>
+        <p class="text-xs opacity-70 font-bold uppercase mt-1">مقالات علمية وفتاوى شرعية موثوقة</p>
+    </header>
+
+    <div class="flex gap-3 overflow-x-auto p-5 no-scrollbar border-b border-white/5" id="categoryTabs">
+        <button onclick="filterArticles('all', this)" class="tab-btn active">الكل</button>
+        <button onclick="filterArticles('عقيدة', this)" class="tab-btn">عقيدة</button>
+        <button onclick="filterArticles('فقه', this)" class="tab-btn">فقه وعبادات</button>
+        <button onclick="filterArticles('سيرة', this)" class="tab-btn">سيرة وتاريخ</button>
+    </div>
+
+    <main id="articlesContainer" class="p-5">
+        </main>
+
+    <div id="readerModal" class="animate__animated animate__slideInUp animate__faster">
+        <div class="reader-header shadow-lg">
+            <button onclick="closeReader()" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center text-white"><i class="fas fa-times text-xl"></i></button>
+            <span id="readerCategory" class="text-xs font-bold text-gray-400 bg-white/5 px-3 py-1 rounded-full">تصنيف</span>
+            <button onclick="copyArticle()" class="w-10 h-10 bg-yellow-500/10 rounded-full flex items-center justify-center text-yellow-500"><i class="fas fa-copy"></i></button>
+        </div>
+        <div class="reader-content">
+            <h2 id="readerTitle" class="reader-title">عنوان المقال</h2>
+            <div id="readerBody">نص المقال يظهر هنا...</div>
+        </div>
+    </div>
+
+    <script>
+        // قاعدة البيانات العلمية (يمكنك إضافة مئات المقالات هنا)
+        const articlesDB = [
+            {
+                id: 1,
+                category: "عقيدة",
+                title: "ما هي أركان الإيمان الستة؟",
+                summary: "شرح مبسط لأركان الإيمان التي لا يصح إسلام العبد إلا بها.",
+                content: "أركان الإيمان ستة، وقد بيّنها النبي ﷺ في حديث جبريل المشهور عندما سأله عن الإيمان فقال: (أن تؤمن بالله، وملائكته، وكتبه، ورسله، واليوم الآخر، وتؤمن بالقدر خيره وشره).<br><br>1. الإيمان بالله: وهو الاعتقاد الجازم بوجود الله وربوبيته وألوهيته وأسمائه وصفاته.<br>2. الإيمان بالملائكة: وهم مخلوقات من نور خلقهم الله لطاعته.<br>3. الإيمان بالكتب: كالقرآن والتوراة والإنجيل والزبور.<br>4. الإيمان بالرسل: أولهم نوح وآخرهم محمد ﷺ.<br>5. الإيمان باليوم الآخر: وهو يوم الحساب والجزاء.<br>6. الإيمان بالقدر: أن كل ما يقع في الكون هو بتقدير الله وعلمه."
+            },
+            {
+                id: 2,
+                category: "فقه",
+                title: "شروط صحة الصلاة وأركانها",
+                summary: "تفصيل لأهم الشروط التي تسبق الصلاة والأركان التي بداخلها.",
+                content: "للصلاة شروط تسبقها ولا تصح إلا بها، وأركان داخلة فيها تبطل بتركها.<br><br><b>أولاً: شروط صحة الصلاة:</b><br>1. الإسلام والعقل والتمييز.<br>2. الطهارة (الوضوء أو الغسل).<br>3. دخول الوقت.<br>4. ستر العورة.<br>5. استقبال القبلة.<br>6. النية (محلها القلب).<br><br><b>ثانياً: أركان الصلاة:</b><br>القيام مع القدرة، وتكبيرة الإحرام، وقراءة الفاتحة، والركوع، والرفع منه، والسجود على الأعضاء السبعة، والجلوس بين السجدتين، والتشهد الأخير، والتسليم."
+            },
+            {
+                id: 3,
+                category: "سيرة",
+                title: "دروس وعبر من غزوة بدر الكبرى",
+                summary: "نظرة تحليلية لأول معركة فاصلة في تاريخ الإسلام.",
+                content: "وقعت غزوة بدر في السابع عشر من رمضان في السنة الثانية للهجرة، وهي معركة فاصلة سماها القرآن (يوم الفرقان).<br><br>رغم قلة عدد المسلمين (313 رجلاً) مقارنة بجيش قريش (1000 رجل)، إلا أن النصر كان حليف المؤمنين.<br><br><b>أهم الدروس المستفادة:</b><br>- النصر من عند الله وليس بكثرة العدد والعتاد: ﴿وَمَا النَّصْرُ إِلَّا مِنْ عِندِ اللَّهِ﴾.<br>- أهمية الشورى: حيث استشار النبي ﷺ أصحابه قبل المعركة وأخذ برأي الحباب بن المنذر في اختيار موقع الجيش.<br>- الدعاء والتضرع: بات النبي ﷺ ليلته يدعو ربه حتى سقط رداؤه."
+            }
+        ];
+
+        let currentArticleText = "";
+
+        // عرض المقالات
+        function renderArticles(category = 'all') {
+            const container = document.getElementById('articlesContainer');
+            container.innerHTML = '';
+            
+            const filtered = category === 'all' ? articlesDB : articlesDB.filter(a => a.category === category);
+            
+            if(filtered.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 mt-10">لا توجد مقالات في هذا التصنيف حالياً.</p>';
+                return;
+            }
+
+            filtered.forEach((article, index) => {
+                container.innerHTML += `
+                    <div onclick="openReader(${article.id})" class="article-card animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s">
+                        <span class="category-badge">${article.category}</span>
+                        <h3 class="font-black text-lg text-white mb-2 leading-tight">${article.title}</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">${article.summary}</p>
+                        <div class="mt-4 flex justify-end">
+                            <span class="text-xs text-[var(--accent-gold)] font-bold flex items-center gap-1">اقرأ المزيد <i class="fas fa-chevron-left text-[10px]"></i></span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // فلترة الأقسام
+        function filterArticles(category, element) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            renderArticles(category);
+        }
+
+        // فتح القارئ الذكي
+        function openReader(id) {
+            const article = articlesDB.find(a => a.id === id);
+            if(!article) return;
+
+            document.getElementById('readerCategory').innerText = article.category;
+            document.getElementById('readerTitle').innerText = article.title;
+            document.getElementById('readerBody').innerHTML = article.content;
+            
+            // تجهيز النص للنسخ (بدون أكواد HTML)
+            currentArticleText = `${article.title}\n\n${article.content.replace(/<br>/g, '\n').replace(/<\/?b>/g, '')}`;
+
+            document.getElementById('readerModal').style.display = 'flex';
+        }
+
+        // إغلاق القارئ
+        function closeReader() {
+            document.getElementById('readerModal').style.display = 'none';
+        }
+
+        // نسخ المقال
+        function copyArticle() {
+            navigator.clipboard.writeText(currentArticleText).then(() => {
+                alert("تم نسخ المقال بنجاح!");
+            });
+        }
+
+        // التشغيل الأولي
+        window.onload = () => renderArticles('all');
+    </script>
+</body>
+          </html>
+          

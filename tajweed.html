@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>أحكام التجويد | محراب أبا مالك</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <style>
+        :root { --accent-gold: #fbbf24; --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f1f5f9; --quran-color: #fcd34d; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
+        
+        .header { background: linear-gradient(180deg, #10b981 0%, #064e3b 100%); padding: 20px; border-radius: 0 0 35px 35px; text-align: center; color: white; position: sticky; top: 0; z-index: 50; border-bottom: 3px solid #34d399; }
+        
+        /* تصميم البطاقات التفاعلية */
+        .tajweed-card { background: var(--card-bg); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px; margin-bottom: 15px; overflow: hidden; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .tajweed-card.active { border-color: #10b981; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.15); }
+        
+        .tajweed-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: rgba(255,255,255,0.02); }
+        .tajweed-header:active { background: rgba(255,255,255,0.05); }
+        
+        .tajweed-icon { width: 40px; height: 40px; background: rgba(16, 185, 129, 0.1); color: #34d399; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; }
+        .tajweed-card.active .tajweed-icon { transform: rotate(180deg); background: #10b981; color: white; }
+        
+        .tajweed-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0, 1, 0, 1); background: rgba(0,0,0,0.2); }
+        .tajweed-card.active .tajweed-content { max-height: 2000px; transition: max-height 0.5s ease-in-out; }
+        
+        .content-inner { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); line-height: 1.8; }
+        
+        /* تنسيق الأمثلة القرآنية */
+        .quran-example { font-family: 'Amiri Quran', serif; color: var(--quran-color); font-size: 22px; margin: 10px 0; display: inline-block; padding: 5px 15px; background: rgba(251, 191, 36, 0.1); border-radius: 10px; border: 1px solid rgba(251, 191, 36, 0.2); }
+        .letters-box { font-weight: 900; color: #34d399; letter-spacing: 2px; }
+    </style>
+</head>
+<body class="pb-10">
+
+    <header class="header shadow-2xl">
+        <div class="flex justify-between items-center mb-2">
+            <button onclick="window.location.href='mosque.html'" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md hover:bg-white/20 transition"><i class="fas fa-arrow-right"></i></button>
+            <div class="flex items-center gap-2">
+                <h1 class="text-2xl font-black">أحكام التجويد</h1>
+            </div>
+            <div class="w-10"></div> 
+        </div>
+        <p class="text-xs opacity-90 font-bold uppercase mt-1">رتل القرآن ترتيلاً مع شرح مبسط</p>
+    </header>
+
+    <main class="p-5" id="tajweedContainer">
+        </main>
+
+    <script>
+        // قاعدة بيانات أحكام التجويد الميسرة
+        const tajweedDB = [
+            {
+                title: "أحكام النون الساكنة والتنوين",
+                desc: "لها أربعة أحكام رئيسية تختلف باختلاف الحرف الذي يأتي بعدها.",
+                details: `
+                    <div class="mb-4">
+                        <h4 class="text-[#34d399] font-black text-lg mb-1">1. الإظهار الحلقي</h4>
+                        <p class="text-sm text-gray-300">أن تنطق النون واضحة بدون غنة زائدة إذا جاء بعدها أحد حروف الحلق.</p>
+                        <p class="text-xs mt-1">حروفه: <span class="letters-box">ء هـ ع ح غ خ</span> (أخي هاك علماً حازه غير خاسر)</p>
+                        <div class="quran-example">﴿ مَنْ ءَامَنَ ﴾ - ﴿ عَلِيمٌ حَكِيمٌ ﴾</div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="text-[#34d399] font-black text-lg mb-1">2. الإدغام</h4>
+                        <p class="text-sm text-gray-300">إدخال النون الساكنة في الحرف الذي يليها بحيث يصيران حرفاً واحداً مشدداً. ينقسم لـ (بغنة) و (بغير غنة).</p>
+                        <p class="text-xs mt-1">حروفه مجموعة في كلمة: <span class="letters-box">يَرْمِلُون</span></p>
+                        <div class="quran-example">﴿ مَن يَعْمَلْ ﴾ - ﴿ مِن رَّبِّهِمْ ﴾</div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="text-[#34d399] font-black text-lg mb-1">3. الإقلاب</h4>
+                        <p class="text-sm text-gray-300">قلب النون الساكنة أو التنوين ميماً مخفاة مع الغنة عند ملاقاتها حرف الباء.</p>
+                        <p class="text-xs mt-1">حروفه: <span class="letters-box">ب</span> فقط.</p>
+                        <div class="quran-example">﴿ مِن بَعْدِ ﴾ - ﴿ سَمِيعٌ بَصِيرٌ ﴾</div>
+                    </div>
+                    <div>
+                        <h4 class="text-[#34d399] font-black text-lg mb-1">4. الإخفاء الحقيقي</h4>
+                        <p class="text-sm text-gray-300">النطق بالنون بحالة وسط بين الإظهار والإدغام مع بقاء الغنة. ويقع في الـ 15 حرفاً المتبقية.</p>
+                        <div class="quran-example">﴿ مِن شَرِّ ﴾ - ﴿ كُنتُمْ ﴾</div>
+                    </div>
+                `
+            },
+            {
+                title: "أحكام الميم الساكنة",
+                desc: "للميم الساكنة ثلاثة أحكام عندما يأتي بعدها أحد حروف الهجاء.",
+                details: `
+                    <div class="mb-4">
+                        <h4 class="text-[#34d399] font-black text-lg mb-1">1. الإخفاء الشفوي</h4>
+                        <p class="text-sm text-gray-300">إخفاء الميم الساكنة مع الغنة إذا جاء بعدها حرف الباء.</p>
+                        <p class="text-xs mt-1">حروفه: <span class="letters-box">ب</span></p>
+                        <div class="quran-example">﴿ وَمَا هُم بِمُؤْمِنِينَ ﴾</div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="text-[#34d399] font-black text-lg mb-1">2. الإدغام الشفوي (إدغام متماثلين صغير)</h4>
+                        <p class="text-sm text-gray-300">إدغام الميم الساكنة في ميم متحركة بعدها لتصبحا ميماً واحدة مشددة مع الغنة.</p>
+                        <p class="text-xs mt-1">حروفه: <span class="letters-box">م</span></p>
+                        <div class="quran-example">﴿ لَهُم مَّا يَشَاؤُونَ ﴾</div>
+                    </div>
+                    <div>
+                        <h4 class="text-[#34d399] font-black text-lg mb-1">3. الإظهار الشفوي</h4>
+                        <p class="text-sm text-gray-300">نطق الميم الساكنة واضحة من غير غنة مع باقي الحروف، ويكون أشد إظهاراً عند حرفي (الواو) و(الفاء).</p>
+                        <div class="quran-example">﴿ هُمْ فِيهَا ﴾ - ﴿ أَلَمْ تَرَ ﴾</div>
+                    </div>
+                `
+            },
+            {
+                title: "القلقلة",
+                desc: "هي اضطراب الصوت عند النطق بالحرف الساكن حتى يُسمع له نبرة قوية.",
+                details: `
+                    <p class="text-sm text-gray-300 mb-2">حروف القلقلة خمسة، مجموعة في كلمتي: <span class="letters-box text-xl">قُطْبُ جَدّ</span></p>
+                    <p class="text-sm text-gray-300 mb-4">وتكون القلقلة كبرى إذا جاء الحرف في آخر الكلمة ووقفنا عليه، وصغرى إذا كان في وسط الكلمة.</p>
+                    <div class="mb-2">
+                        <span class="text-yellow-500 font-bold">مثال قلقلة صغرى (في الوسط):</span><br>
+                        <div class="quran-example">﴿ يَقْطَعُونَ ﴾ - ﴿ يَجْعَلْ ﴾</div>
+                    </div>
+                    <div>
+                        <span class="text-yellow-500 font-bold">مثال قلقلة كبرى (عند الوقف):</span><br>
+                        <div class="quran-example">﴿ الْفَلَقِ ﴾ - ﴿ مَسَدٍ ﴾</div>
+                    </div>
+                `
+            },
+            {
+                title: "أحكام المدود (مختصر)",
+                desc: "المد هو إطالة الصوت بحرف من حروف المد الثلاثة (الألف، الواو، الياء).",
+                details: `
+                    <div class="mb-4">
+                        <h4 class="text-[#34d399] font-black text-lg mb-1">المد الطبيعي (الأصلي)</h4>
+                        <p class="text-sm text-gray-300">هو الذي لا تقوم ذات الحرف إلا به، ولا يتوقف على سبب (همز أو سكون). ويمد بمقدار حركتين.</p>
+                        <div class="quran-example">﴿ نُوحِيهَا ﴾</div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="text-[#34d399] font-black text-lg mb-1">المد المتصل</h4>
+                        <p class="text-sm text-gray-300">أن يأتي حرف المد وبعده همزة في (كلمة واحدة). ويمد 4 أو 5 حركات وجوباً.</p>
+                        <div class="quran-example">﴿ السَّمَاءِ ﴾ - ﴿ سِيءَ ﴾</div>
+                    </div>
+                    <div>
+                        <h4 class="text-[#34d399] font-black text-lg mb-1">المد المنفصل</h4>
+                        <p class="text-sm text-gray-300">أن يأتي حرف المد في آخر الكلمة، والهمزة في أول الكلمة التي تليها. ويمد 4 أو 5 حركات جوازاً.</p>
+                        <div class="quran-example">﴿ بِمَا أُنْزِلَ ﴾ - ﴿ فِي أَنفُسِكُمْ ﴾</div>
+                    </div>
+                `
+            }
+        ];
+
+        function renderTajweed() {
+            const container = document.getElementById('tajweedContainer');
+            let html = '';
+            
+            tajweedDB.forEach((item, index) => {
+                html += `
+                    <div class="tajweed-card animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s">
+                        <div class="tajweed-header" onclick="toggleCard(this)">
+                            <div>
+                                <h3 class="font-black text-lg text-white mb-1">${item.title}</h3>
+                                <p class="text-xs text-gray-400 font-bold">${item.desc}</p>
+                            </div>
+                            <div class="tajweed-icon"><i class="fas fa-chevron-down"></i></div>
+                        </div>
+                        <div class="tajweed-content">
+                            <div class="content-inner">
+                                ${item.details}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function toggleCard(element) {
+            const card = element.parentElement;
+            // إذا أردت إغلاق الباقي عند فتح واحد، أزل التعليق عن السطر التالي:
+            // document.querySelectorAll('.tajweed-card').forEach(c => { if(c !== card) c.classList.remove('active'); });
+            card.classList.toggle('active');
+        }
+
+        window.onload = renderTajweed;
+    </script>
+</body>
+  </html>
+  

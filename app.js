@@ -252,4 +252,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if(tog) tog.classList.add('active'); 
     }
 });
-        
+
+// ==================== 7. تشغيل وضع الأوفلاين (بدون إنترنت) ====================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('تم تفعيل وضع عدم الاتصال (Offline) بنجاح'))
+            .catch(err => console.log('خطأ في تفعيل الأوفلاين:', err));
+    });
+}
+    

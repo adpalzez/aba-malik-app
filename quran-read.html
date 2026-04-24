@@ -3,150 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>المصحف الشريف | محراب أبا مالك</title>
+    <title>مصحف أبا مالك | تقليب الصفحات</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+
     <style>
-        :root { --main-teal: #064e3b; --accent-gold: #fbbf24; --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f1f5f9; }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
+        :root { --bg-paper: #f4ece1; --text-dark: #2c2c2c; }
+        body { font-family: 'Cairo', sans-serif; background-color: #1a1a1a; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        .header { background: linear-gradient(180deg, var(--accent-gold) 0%, #000 100%); padding: 20px; border-radius: 0 0 35px 35px; text-align: center; color: white; position: sticky; top: 0; z-index: 50; }
-        .surah-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; text-align: right; cursor: pointer; transition: 0.3s; display: flex; justify-content: space-between; align-items: center; }
-        .surah-card:active { transform: scale(0.96); border-color: var(--accent-gold); }
-        .surah-number { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(251, 191, 36, 0.1); color: var(--accent-gold); border-radius: 50%; font-weight: 900; font-size: 14px; }
+        /* حاوية المصحف */
+        #book-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 10px; perspective: 2000px; }
         
-        /* تصميم صفحة القراءة */
-        #readerView { display: none; padding: 20px; padding-bottom: 100px; }
-        .quran-text { font-family: 'Amiri Quran', serif; font-size: 28px; line-height: 2.2; text-align: justify; direction: rtl; color: #e2e8f0; }
-        .ayah-number { display: inline-flex; align-items: center; justify-content: center; width: 35px; height: 35px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="%23fbbf24" stroke-width="5"/></svg>'); background-size: cover; font-family: 'Cairo', sans-serif; font-size: 14px; color: var(--accent-gold); margin: 0 8px; font-weight: bold; }
-        .bismillah { font-family: 'Amiri Quran', serif; font-size: 30px; text-align: center; color: var(--accent-gold); margin-bottom: 30px; margin-top: 20px; }
+        .page { background-color: var(--bg-paper); width: 100%; height: 100%; box-shadow: inset 0 0 50px rgba(0,0,0,0.1); border-radius: 5px; overflow: hidden; }
         
-        #loader { display: none; text-align: center; padding: 50px; color: var(--accent-gold); }
-        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--accent-gold); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        .page-content { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        
+        .page img { width: 92%; height: 92%; object-fit: contain; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+        /* شريط التحكم السفلي */
+        .controls { background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); padding: 15px; display: flex; justify-content: space-around; align-items: center; color: white; border-top: 1px solid rgba(255,255,255,0.1); }
+        
+        .page-num { background: #c5a059; color: black; padding: 2px 12px; border-radius: 15px; font-weight: 900; font-size: 14px; }
+        
+        .btn-action { width: 45px; height: 45px; border-radius: 50%; border: none; background: rgba(255,255,255,0.1); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .btn-action:active { background: #c5a059; transform: scale(0.9); }
+
+        /* حالة التحميل */
+        #loading { position: fixed; inset: 0; background: #1a1a1a; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #c5a059; }
+        .spinner { border: 4px solid rgba(197, 160, 89, 0.1); border-top: 4px solid #c5a059; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <header class="header shadow-2xl">
-        <div class="flex justify-between items-center mb-2">
-            <button onclick="goBack()" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md"><i class="fas fa-arrow-right"></i></button>
-            <h1 class="text-xl font-black">المصحف الشريف</h1>
-            <div class="w-10"></div> </div>
-        <p id="headerSubtitle" class="text-xs opacity-70 font-bold uppercase">الفهرس الكامل</p>
-    </header>
-
-    <div id="loader">
+    <div id="loading">
         <div class="spinner"></div>
-        <p class="font-bold text-sm">جاري جلب الآيات...</p>
+        <p class="font-bold">جاري تجهيز المصحف الشريف...</p>
     </div>
 
-    <main id="indexView" class="p-5 space-y-3">
-        </main>
-
-    <main id="readerView">
-        <div class="bismillah" id="bismillahText">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-        <div id="surahContent" class="quran-text">
+    <div id="book-container">
+        <div id="myBook" style="display: none;">
             </div>
-    </main>
+    </div>
+
+    <div class="controls">
+        <button class="btn-action" onclick="pageFlip.flipPrev()"><i class="fas fa-chevron-right"></i></button>
+        <div class="flex flex-col items-center">
+            <span class="text-[10px] opacity-60 font-bold mb-1">الصفحة الحالية</span>
+            <span id="currentPageDisplay" class="page-num">1</span>
+        </div>
+        <button class="btn-action" onclick="pageFlip.flipNext()"><i class="fas fa-chevron-left"></i></button>
+    </div>
 
     <script>
-        const indexView = document.getElementById('indexView');
-        const readerView = document.getElementById('readerView');
-        const loader = document.getElementById('loader');
-        const headerSubtitle = document.getElementById('headerSubtitle');
-        const bismillahText = document.getElementById('bismillahText');
-        const surahContent = document.getElementById('surahContent');
+        let pageFlip;
+        const totalPages = 604;
+        const bookElement = document.getElementById('myBook');
 
-        let currentView = 'index'; // 'index' or 'reader'
-
-        // 1. جلب قائمة السور (الفهرس)
-        async function loadSurahList() {
-            try {
-                // استخدام API موثوق للقرآن الكريم
-                const res = await fetch('https://api.alquran.cloud/v1/meta');
-                const data = await res.json();
-                const surahs = data.data.surahs.references;
-                
-                indexView.innerHTML = surahs.map(s => `
-                    <div onclick="openSurah(${s.number}, '${s.name}')" class="surah-card">
-                        <div>
-                            <h2 class="text-lg font-black text-white mb-1">${s.name}</h2>
-                            <p class="text-[10px] text-gray-400 font-bold">آياتها: ${s.numberOfAyahs} • ${s.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</p>
+        // توليد الصفحات برمجياً
+        function createPages() {
+            let html = '';
+            for (let i = 1; i <= totalPages; i++) {
+                // رابط صور المصحف (المدينة المنورة)
+                const imgUrl = `https://pcloud.github.io/quran-ayats/600/${i}.png`;
+                html += `
+                    <div class="page" data-density="hard">
+                        <div class="page-content">
+                            <img src="${imgUrl}" loading="lazy" alt="صفحة ${i}">
                         </div>
-                        <div class="surah-number">${s.number}</div>
                     </div>
-                `).join('');
-            } catch (error) {
-                indexView.innerHTML = '<p class="text-center text-red-500 font-bold mt-10">حدث خطأ في الاتصال. يرجى التأكد من الإنترنت.</p>';
+                `;
             }
+            bookElement.innerHTML = html;
         }
 
-        // 2. فتح السورة وجلب الآيات بالتشكيل العثماني
-        async function openSurah(number, name) {
-            currentView = 'reader';
-            indexView.style.display = 'none';
-            readerView.style.display = 'none';
-            loader.style.display = 'block';
-            headerSubtitle.innerText = `سورة ${name}`;
+        function initPageFlip() {
+            const width = window.innerWidth > 600 ? 500 : window.innerWidth - 40;
+            const height = window.innerHeight - 150;
 
-            try {
-                // جلب النص العثماني للسورة المحددة
-                const res = await fetch(`https://api.alquran.cloud/v1/surah/${number}/quran-uthmani`);
-                const data = await res.json();
-                const ayahs = data.data.ayahs;
+            pageFlip = new St.PageFlip(bookElement, {
+                width: width,
+                height: height,
+                size: "stretch",
+                minWidth: 300,
+                maxWidth: 600,
+                minHeight: 400,
+                maxHeight: 1000,
+                drawShadow: true,
+                flippingTime: 800,
+                usePortrait: true,
+                startPage: 0,
+                showCover: false,
+                mobileScrollSupport: false 
+            });
 
-                // إخفاء البسملة في سورة التوبة (رقم 9) أو الفاتحة (لأنها مضمنة في الآية الأولى)
-                if (number === 9 || number === 1) {
-                    bismillahText.style.display = 'none';
-                } else {
-                    bismillahText.style.display = 'block';
-                }
+            pageFlip.loadFromHTML(document.querySelectorAll(".page"));
 
-                // تنسيق الآيات مع إزالة البسملة من أول آية إذا كانت موجودة (لغير الفاتحة)
-                let htmlContent = '';
-                ayahs.forEach(ayah => {
-                    let text = ayah.text;
-                    if (number !== 1 && ayah.numberInSurah === 1) {
-                        text = text.replace('بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ', '');
-                    }
-                    // تحويل الأرقام الإنجليزية إلى عربية
-                    const arabicNumber = ayah.numberInSurah.toLocaleString('ar-SA');
-                    htmlContent += `${text} <span class="ayah-number">${arabicNumber}</span> `;
-                });
+            // تحديث رقم الصفحة عند التقليب
+            pageFlip.on('flip', (e) => {
+                document.getElementById('currentPageDisplay').innerText = e.data + 1;
+            });
 
-                surahContent.innerHTML = htmlContent;
-                loader.style.display = 'none';
-                readerView.style.display = 'block';
-                window.scrollTo(0, 0);
-            } catch (error) {
-                loader.style.display = 'none';
-                surahContent.innerHTML = '<p class="text-center text-red-500 font-bold">حدث خطأ في تحميل السورة.</p>';
-                readerView.style.display = 'block';
-            }
-        }
-
-        // 3. زر العودة
-        function goBack() {
-            if (currentView === 'reader') {
-                readerView.style.display = 'none';
-                indexView.style.display = 'block';
-                headerSubtitle.innerText = 'الفهرس الكامل';
-                currentView = 'index';
-                window.scrollTo(0, 0);
-            } else {
-                // العودة للمحراب (الصفحة الرئيسية)
-                window.location.href = 'mosque.html';
-            }
+            // إخفاء شاشة التحميل
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                bookElement.style.display = 'block';
+            }, 2000);
         }
 
         // بدء التشغيل
-        loadSurahList();
+        createPages();
+        
+        // التأكد من تحميل المكتبة أولاً
+        window.addEventListener('load', () => {
+            if (typeof St !== 'undefined') {
+                initPageFlip();
+            }
+        });
     </script>
 </body>
-  </html>
-  
+    </html>
+    

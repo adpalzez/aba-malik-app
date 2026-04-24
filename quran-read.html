@@ -3,128 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مصحف أبا مالك | تقليب الصفحات</title>
+    <title>مصحف أبا مالك الاحترافي</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 
     <style>
-        :root { --bg-paper: #f4ece1; --text-dark: #2c2c2c; }
-        body { font-family: 'Cairo', sans-serif; background-color: #1a1a1a; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        :root { --quran-bg: #f4ece1; --text-color: #2c2c2c; --menu-bg: #ffffff; }
+        body.dark-mode { --quran-bg: #1a1a1a; --text-color: #ffffff; --menu-bg: #2c2c2c; }
+        body { font-family: 'Cairo', sans-serif; background-color: #121212; margin: 0; overflow: hidden; transition: 0.3s; }
         
+        /* القائمة الجانبية (مثل الفيديو) */
+        #sideMenu { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: var(--menu-bg); z-index: 10000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -5px 0 25px rgba(0,0,0,0.5); color: var(--text-color); overflow-y: auto; }
+        #sideMenu.open { right: 0; }
+        .menu-item { padding: 15px 20px; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; }
+        .menu-item:active { background: rgba(0,0,0,0.1); }
+        .menu-item i { color: #c5a059; width: 20px; }
+
         /* حاوية المصحف */
-        #book-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 10px; perspective: 2000px; }
-        
-        .page { background-color: var(--bg-paper); width: 100%; height: 100%; box-shadow: inset 0 0 50px rgba(0,0,0,0.1); border-radius: 5px; overflow: hidden; }
-        
-        .page-content { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        
-        .page img { width: 92%; height: 92%; object-fit: contain; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        #book-container { height: calc(100vh - 70px); display: flex; justify-content: center; align-items: center; background: #222; }
+        .page { background-color: var(--quran-bg); box-shadow: inset 0 0 50px rgba(0,0,0,0.1); overflow: hidden; }
+        .page-content { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .page img { width: 95%; height: 95%; object-fit: contain; }
 
-        /* شريط التحكم السفلي */
-        .controls { background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); padding: 15px; display: flex; justify-content: space-around; align-items: center; color: white; border-top: 1px solid rgba(255,255,255,0.1); }
-        
-        .page-num { background: #c5a059; color: black; padding: 2px 12px; border-radius: 15px; font-weight: 900; font-size: 14px; }
-        
-        .btn-action { width: 45px; height: 45px; border-radius: 50%; border: none; background: rgba(255,255,255,0.1); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-        .btn-action:active { background: #c5a059; transform: scale(0.9); }
+        /* التفسير (يظهر أسفل الصفحة) */
+        #tafseerPanel { position: fixed; bottom: -50%; left: 0; width: 100%; height: 40%; background: var(--menu-bg); z-index: 9000; transition: 0.4s; padding: 20px; border-radius: 30px 30px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.3); overflow-y: auto; color: var(--text-color); }
+        #tafseerPanel.open { bottom: 0; }
 
-        /* حالة التحميل */
-        #loading { position: fixed; inset: 0; background: #1a1a1a; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #c5a059; }
-        .spinner { border: 4px solid rgba(197, 160, 89, 0.1); border-top: 4px solid #c5a059; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* شريط التحكم */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: #000; display: flex; justify-content: space-around; align-items: center; color: #fff; z-index: 5000; }
+        .page-indicator { background: #c5a059; color: #000; padding: 5px 15px; border-radius: 20px; font-weight: 900; }
     </style>
 </head>
 <body>
 
-    <div id="loading">
-        <div class="spinner"></div>
-        <p class="font-bold">جاري تجهيز المصحف الشريف...</p>
+    <div id="sideMenu" class="no-scrollbar">
+        <div class="p-6 bg-[#c5a059] text-black font-black text-center mb-4">خيارات المصحف</div>
+        <div class="menu-item" onclick="toggleSearch()"><i class="fas fa-search"></i> البحث في القرآن</div>
+        <div class="menu-item" onclick="showFahras()"><i class="fas fa-list"></i> الفهرس (السور)</div>
+        <div class="menu-item" onclick="toggleTafseer()"><i class="fas fa-book-open"></i> التفسير الميسر</div>
+        <div class="menu-item" onclick="toggleDarkMode()"><i class="fas fa-moon"></i> الوضع الليلي</div>
+        <div class="menu-item" onclick="window.location.href='mosque.html'"><i class="fas fa-home"></i> العودة للمحراب</div>
+    </div>
+
+    <div id="tafseerPanel">
+        <div class="flex justify-between items-center mb-4 border-b pb-2">
+            <h3 class="font-black text-lg">التفسير الميسر</h3>
+            <i class="fas fa-times cursor-pointer" onclick="toggleTafseer()"></i>
+        </div>
+        <p id="tafseerText" class="leading-relaxed">انقر على "التفسير" لعرض شرح الصفحة الحالية...</p>
     </div>
 
     <div id="book-container">
-        <div id="myBook" style="display: none;">
+        <div id="myBook">
             </div>
     </div>
 
-    <div class="controls">
-        <button class="btn-action" onclick="pageFlip.flipPrev()"><i class="fas fa-chevron-right"></i></button>
-        <div class="flex flex-col items-center">
-            <span class="text-[10px] opacity-60 font-bold mb-1">الصفحة الحالية</span>
-            <span id="currentPageDisplay" class="page-num">1</span>
+    <div class="bottom-nav">
+        <button onclick="pageFlip.flipPrev()"><i class="fas fa-chevron-right text-2xl"></i></button>
+        <div class="flex flex-col items-center" onclick="toggleMenu()">
+            <span id="pageLabel" class="page-indicator">1</span>
+            <span class="text-[9px] mt-1 font-bold">القائمة</span>
         </div>
-        <button class="btn-action" onclick="pageFlip.flipNext()"><i class="fas fa-chevron-left"></i></button>
+        <button onclick="pageFlip.flipNext()"><i class="fas fa-chevron-left text-2xl"></i></button>
     </div>
 
     <script>
         let pageFlip;
-        const totalPages = 604;
-        const bookElement = document.getElementById('myBook');
+        const bookElem = document.getElementById('myBook');
 
-        // توليد الصفحات برمجياً
-        function createPages() {
+        // 1. توليد الصفحات (صور عالية الدقة)
+        function buildBook() {
             let html = '';
-            for (let i = 1; i <= totalPages; i++) {
-                // رابط صور المصحف (المدينة المنورة)
+            for (let i = 1; i <= 604; i++) {
                 const imgUrl = `https://pcloud.github.io/quran-ayats/600/${i}.png`;
                 html += `
                     <div class="page" data-density="hard">
                         <div class="page-content">
-                            <img src="${imgUrl}" loading="lazy" alt="صفحة ${i}">
+                            <img src="${imgUrl}" loading="lazy">
                         </div>
-                    </div>
-                `;
+                    </div>`;
             }
-            bookElement.innerHTML = html;
+            bookElem.innerHTML = html;
         }
 
-        function initPageFlip() {
-            const width = window.innerWidth > 600 ? 500 : window.innerWidth - 40;
-            const height = window.innerHeight - 150;
-
-            pageFlip = new St.PageFlip(bookElement, {
-                width: width,
-                height: height,
+        // 2. تشغيل محرك التقليب (Page Flip)
+        function initFlip() {
+            pageFlip = new St.PageFlip(bookElem, {
+                width: window.innerWidth,
+                height: window.innerHeight - 70,
                 size: "stretch",
-                minWidth: 300,
-                maxWidth: 600,
-                minHeight: 400,
-                maxHeight: 1000,
-                drawShadow: true,
-                flippingTime: 800,
-                usePortrait: true,
-                startPage: 0,
                 showCover: false,
-                mobileScrollSupport: false 
+                drawShadow: true,
+                usePortrait: true,
+                mobileScrollSupport: false
             });
-
             pageFlip.loadFromHTML(document.querySelectorAll(".page"));
-
-            // تحديث رقم الصفحة عند التقليب
+            
             pageFlip.on('flip', (e) => {
-                document.getElementById('currentPageDisplay').innerText = e.data + 1;
+                document.getElementById('pageLabel').innerText = e.data + 1;
             });
+        }
 
-            // إخفاء شاشة التحميل
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-                bookElement.style.display = 'block';
-            }, 2000);
+        // 3. الوظائف المطلوبة (الفيديو)
+        function toggleMenu() { document.getElementById('sideMenu').classList.toggle('open'); }
+        
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('quran_dark', document.body.classList.contains('dark-mode'));
+        }
+
+        function toggleTafseer() {
+            document.getElementById('tafseerPanel').classList.toggle('open');
+            // هنا يمكن إضافة جلب التفسير آلياً بناءً على رقم الصفحة
+            document.getElementById('tafseerText').innerText = "هذا التفسير مخصص للصفحة رقم " + (pageFlip.getCurrentPageIndex() + 1);
+        }
+
+        function toggleSearch() {
+            const query = prompt("أدخل الكلمة التي تبحث عنها:");
+            if (query) alert("ميزة البحث تتطلب قاعدة بيانات ضخمة، سيتم ربطها في التحديث القادم.");
+        }
+
+        function showFahras() {
+            alert("الفهرس: سيتم عرض قائمة السور الـ 114 هنا.");
         }
 
         // بدء التشغيل
-        createPages();
-        
-        // التأكد من تحميل المكتبة أولاً
-        window.addEventListener('load', () => {
-            if (typeof St !== 'undefined') {
-                initPageFlip();
-            }
-        });
+        buildBook();
+        window.onload = () => {
+            initFlip();
+            if(localStorage.getItem('quran_dark') === 'true') document.body.classList.add('dark-mode');
+        };
     </script>
 </body>
-    </html>
-    
+</html>

@@ -3,105 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مصحف أبا مالك | الإصدار المستقر</title>
+    <title>مصحف أبا مالك | الإصدار العالمي</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
     <style>
-        :root { --quran-bg: #f4ece1; --text-color: #2c2c2c; }
-        body.dark-mode { --quran-bg: #1a1a1a; --text-color: #ffffff; }
-        body { font-family: 'Cairo', sans-serif; background-color: #121212; margin: 0; overflow: hidden; }
+        :root { --quran-bg: #f4ece1; --text-color: #2c2c2c; --gold: #c5a059; }
+        body.dark-mode { --quran-bg: #121212; --text-color: #e0e0e0; }
+        body { font-family: 'Cairo', sans-serif; background-color: #1a1a1a; margin: 0; overflow: hidden; transition: 0.3s; }
         
-        /* القائمة الجانبية */
-        #sideMenu { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: white; z-index: 10000; transition: 0.4s; box-shadow: -5px 0 25px rgba(0,0,0,0.5); color: #2c2c2c; }
+        /* الفهرس الجانبي */
+        #sideMenu { position: fixed; top: 0; right: -100%; width: 100%; height: 100%; background: var(--quran-bg); z-index: 10000; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); color: var(--text-color); }
         #sideMenu.open { right: 0; }
-        .menu-header { background: #c5a059; color: black; padding: 25px; font-weight: 900; text-align: center; }
-        .menu-item { padding: 15px 20px; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; cursor: pointer; font-weight: bold; }
+        .surah-item { padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .surah-item:active { background: var(--gold); color: white; }
 
-        /* حاوية الصور */
-        .swiper { width: 100%; height: calc(100vh - 70px); background: #222; }
+        /* محرك البحث */
+        .search-box { background: rgba(0,0,0,0.05); border-radius: 15px; padding: 10px 20px; margin: 20px; display: flex; align-items: center; gap: 10px; }
+        .search-box input { background: transparent; border: none; outline: none; width: 100%; color: var(--text-color); }
+
+        /* المصحف */
+        .swiper { width: 100%; height: calc(100vh - 80px); }
         .swiper-slide { display: flex; justify-content: center; align-items: center; background: var(--quran-bg); }
-        .swiper-slide img { max-width: 95%; max-height: 95%; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.2); }
+        .swiper-slide img { max-width: 95%; max-height: 95%; object-fit: contain; }
 
-        /* شريط التحكم */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: #000; display: flex; justify-content: space-around; align-items: center; color: #fff; z-index: 5000; }
-        .page-badge { background: #c5a059; color: black; padding: 4px 15px; border-radius: 15px; font-weight: 900; }
-        
-        #loadingOverlay { position: fixed; inset: 0; background: #121212; z-index: 20000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #c5a059; }
+        /* التحكم السفلي */
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; background: #000; display: flex; justify-content: space-around; align-items: center; color: white; z-index: 5000; }
+        .btn-circle { width: 50px; height: 50px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-circle:active { background: var(--gold); color: black; }
+        .page-num { background: var(--gold); color: black; padding: 2px 12px; border-radius: 20px; font-weight: 900; font-size: 16px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
-    <div id="loadingOverlay">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#c5a059] mb-4"></div>
-        <p class="font-black">جاري تحميل المصحف الشريف...</p>
-    </div>
-
     <div id="sideMenu">
-        <div class="menu-header">إعدادات المصحف</div>
-        <div class="menu-item" onclick="toggleDarkMode()"><i class="fas fa-moon"></i> الوضع الليلي</div>
-        <div class="menu-item" onclick="alert('الفهرس قيد التحديث')"><i class="fas fa-list"></i> فهرس السور</div>
-        <div class="menu-item" onclick="window.location.href='mosque.html'"><i class="fas fa-home"></i> العودة للمحراب</div>
-    </div>
+        <div class="p-6 flex justify-between items-center bg-[#c5a059] text-black">
+            <h2 class="font-black text-xl">فهرس السور</h2>
+            <i class="fas fa-times text-2xl" onclick="toggleMenu()"></i>
+        </div>
+        
+        <div class="search-box">
+            <i class="fas fa-search opacity-50"></i>
+            <input type="number" id="pageInput" placeholder="اذهب إلى صفحة (1 - 604)" onchange="goToPage(this.value)">
+        </div>
 
-    <div class="swiper mySwiper">
-        <div class="swiper-wrapper" id="quranSlider">
+        <div class="overflow-y-auto h-[calc(100%-150px)] no-scrollbar" id="surahList">
             </div>
     </div>
 
-    <div class="bottom-nav">
-        <div id="nextBtn"><i class="fas fa-chevron-right text-2xl"></i></div>
-        <div class="flex flex-col items-center" onclick="toggleMenu()">
-            <span id="pageNumber" class="page-badge">1</span>
-            <span class="text-[10px] mt-1 font-bold">القائمة</span>
-        </div>
-        <div id="prevBtn"><i class="fas fa-chevron-left text-2xl"></i></div>
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper" id="quranPages"></div>
     </div>
 
-    <script>
-        const slider = document.getElementById('quranSlider');
-        
-        function initPages() {
-            let html = '';
-            for (let i = 1; i <= 604; i++) {
-                // رابط مباشر ومجرب لصور المصحف
-                const imgUrl = `https://raw.githubusercontent.com/itxtools/quran-images/master/images/${i}.png`;
-                html += `
-                <div class="swiper-slide">
-                    <img src="${imgUrl}" alt="صفحة ${i}" loading="lazy" 
-                         onerror="this.src='https://via.placeholder.com/600x800?text=يرجى+الانتظار...'">
-                </div>`;
-            }
-            slider.innerHTML = html;
-        }
+    <div class="nav-bar">
+        <div class="btn-circle" onclick="swiper.slideNext()"><i class="fas fa-chevron-right text-xl mb-1"></i>السابق</div>
+        <div class="btn-circle" onclick="toggleMenu()">
+            <span id="currentPageDisplay" class="page-num">1</span>
+            الفهرس
+        </div>
+        <div class="btn-circle" onclick="toggleDarkMode()"><i class="fas fa-moon text-xl mb-1"></i>الوضع</div>
+        <div class="btn-circle" onclick="swiper.slidePrev()"><i class="fas fa-chevron-left text-xl mb-1"></i>التالي</div>
+    </div>
 
-        initPages();
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        const surahs = [
+            {n:"الفاتحة", p:1}, {n:"البقرة", p:2}, {n:"آل عمران", p:50}, {n:"النساء", p:77},
+            {n:"المائدة", p:106}, {n:"الأنعام", p:128}, {n:"الأعراف", p:151}, {n:"الأنفال", p:177},
+            {n:"التوبة", p:187}, {n:"يونس", p:208}, {n:"هود", p:221}, {n:"يوسف", p:235},
+            {n:"الرعد", p:249}, {n:"إبراهيم", p:255}, {n:"الحجر", p:262}, {n:"النحل", p:267},
+            {n:"الإسراء", p:282}, {n:"الكهف", p:293}, {n:"مريم", p:305}, {n:"طه", p:312}
+            // يمكن إضافة باقي السور بنفس النمط
+        ];
+
+        // توليد الفهرس
+        const list = document.getElementById('surahList');
+        surahs.forEach(s => {
+            list.innerHTML += `
+                <div class="surah-item" onclick="goToPage(${s.p})">
+                    <span class="font-bold">${s.n}</span>
+                    <span class="opacity-50 text-xs">صفحة ${s.p}</span>
+                </div>
+            `;
+        });
+
+        // توليد الصفحات (تحميل ذكي)
+        const pagesCont = document.getElementById('quranPages');
+        for (let i = 1; i <= 604; i++) {
+            pagesCont.innerHTML += `
+                <div class="swiper-slide">
+                    <img data-src="https://raw.githubusercontent.com/itxtools/quran-images/master/images/${i}.png" class="swiper-lazy shadow-2xl">
+                    <div class="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
+                </div>`;
+        }
 
         const swiper = new Swiper(".mySwiper", {
             direction: "horizontal",
-            effect: "flip", // تأثير تقليب صفحات حقيقي
-            grabCursor: true,
+            reverseDirection: true, // للقراءة من اليمين لليسار
+            lazy: true,
             on: {
-                init: function() {
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                },
                 slideChange: function () {
-                    document.getElementById('pageNumber').innerText = this.activeIndex + 1;
+                    document.getElementById('currentPageDisplay').innerText = 604 - this.activeIndex;
                 }
-            },
-            navigation: {
-                nextEl: "#nextBtn",
-                prevEl: "#prevBtn",
-            },
+            }
         });
 
         function toggleMenu() { document.getElementById('sideMenu').classList.toggle('open'); }
-        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); toggleMenu(); }
+        
+        function goToPage(p) {
+            if(p >= 1 && p <= 604) {
+                swiper.slideTo(604 - p);
+                toggleMenu();
+            }
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // البدء من صفحة 1
+        swiper.slideTo(603);
     </script>
 </body>
-    </html>
-    
+</html>

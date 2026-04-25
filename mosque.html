@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -27,19 +27,33 @@
         .settings-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-radius: 40px 40px 0 0; transform: translateY(100%); transition: 0.5s; z-index: 5000; padding: 30px; border-top: 1px solid rgba(255,255,255,0.1); max-height: 85vh; overflow-y: auto; }
         .settings-panel.active { transform: translateY(0); }
         
-        .toggle-switch { width: 50px; height: 25px; background: #334155; border-radius: 20px; position: relative; cursor: pointer; }
-        .toggle-switch.active { background: var(--accent-gold); }
-        .toggle-knob { width: 21px; height: 21px; background: white; border-radius: 50%; position: absolute; top: 2px; right: 2px; transition: 0.3s; }
-        .toggle-switch.active .toggle-knob { right: 27px; }
-        
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .prayer-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; min-width: 100px; transition: 0.3s; }
         
         .color-selector { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.3s; }
         .color-selector.active { border-color: white; transform: scale(1.1); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        
+        /* تصميم مخصص لنافذة البحث */
+        #searchModal { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
     </style>
 </head>
 <body class="pb-32">
+
+    <div id="searchModal" class="fixed inset-0 z-[8000] hidden bg-black/90 p-6 animate__animated animate__fadeIn">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-black text-[var(--accent-gold)]">البحث الشامل</h2>
+            <i onclick="toggleGlobalSearch()" class="fas fa-times text-2xl text-white/50 cursor-pointer"></i>
+        </div>
+        <div class="relative mb-6">
+            <input type="text" id="globalSearchInput" oninput="runGlobalSearch(this.value)" 
+                   placeholder="ابحث عن آية، حديث، أو فتوى..." 
+                   class="w-full bg-white/10 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-[var(--accent-gold)] transition text-right">
+            <i class="fas fa-search absolute left-4 top-5 text-white/30"></i>
+        </div>
+        <div id="searchResults" class="space-y-4 overflow-y-auto h-[70vh] no-scrollbar">
+            <p class="text-center text-white/30 mt-10 text-sm">ابدأ الكتابة للبحث في كنوز المملكة...</p>
+        </div>
+    </div>
 
     <div id="tasbihModal">
         <div class="w-full max-w-sm text-center px-6">
@@ -57,66 +71,10 @@
             </div>
             <button onclick="resetTasbih()" class="bg-red-500/10 text-red-500 px-6 py-3 rounded-2xl font-bold text-xs uppercase">تصفير العداد</button>
         </div>
-    </div> <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl mt-4">
-    <div class="flex justify-between items-center">
-        <div>
-            <p class="text-xs font-bold">تنبيهات الأذان والذكر</p>
-            <p class="text-[10px] opacity-50">تلقي إشعارات عند دخول وقت الصلاة</p>
-        </div>
-        <div onclick="requestNotificationPermission()" class="bg-[var(--accent-gold)] text-black px-4 py-2 rounded-xl text-[10px] font-black cursor-pointer">
-            تفعيل الآن
-        </div>
     </div>
-    </div>
- 
 
-    <div id="qiblaContainer" class="fixed inset-0 z-[7000] hidden flex-col items-center justify-between" style="background-color: #eaf5f4; font-family: 'Cairo', sans-serif;">
-        <div class="w-full p-6 flex justify-between items-center text-[#654f43]">
-            <i class="fas fa-cog text-3xl cursor-pointer" onclick="toggleCompass(); toggleSettings();"></i>
-            <div class="flex items-center gap-3 cursor-pointer" onclick="toggleCompass()">
-                <span class="text-2xl font-black">القبلة</span>
-                <i class="fas fa-chevron-right text-3xl"></i>
-            </div>
+    <div id="qiblaContainer" class="fixed inset-0 z-[7000] hidden flex-col items-center justify-between" style="background-color: #eaf5f4;">
         </div>
-
-        <div class="relative flex items-center justify-center w-[300px] h-[300px]">
-            <div id="compassDial" class="absolute inset-0 rounded-full bg-white flex items-center justify-center shadow-2xl transition-transform duration-100 ease-out" style="border: 2px solid #2a7a6c;">
-                <div class="absolute inset-0 rounded-full opacity-30" style="background: repeating-conic-gradient(from 0deg, #2a7a6c 0deg 1deg, transparent 1deg 6deg);"></div>
-                <div class="absolute inset-[6px] rounded-full bg-white"></div>
-                <div class="absolute inset-3 rounded-full border-[8px] border-[#f1f0ea] opacity-80"></div>
-                <div class="absolute inset-8 rounded-full border border-[#2a7a6c]/20" style="background: repeating-radial-gradient(circle, #eaf5f4, transparent 15px);"></div>
-                <div class="absolute inset-14 rounded-full border-[6px] border-[#f1f0ea] opacity-80"></div>
-
-                <span class="absolute top-2 font-black text-[#2a7a6c] text-xs">N</span>
-                <span class="absolute right-3 font-black text-[#2a7a6c] text-sm">E</span>
-                <span class="absolute bottom-2 font-black text-[#2a7a6c] text-xs">S</span>
-                <span class="absolute left-3 font-black text-[#2a7a6c] text-sm">W</span>
-
-                <div id="kaabaMarker" class="absolute inset-0 pointer-events-none">
-                    <div class="absolute flex items-center justify-center" style="top: -15px; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; border-radius: 50%; border: 2px solid #d32f2f; background: #eaf5f4; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                        <div class="w-[22px] h-[24px] bg-[#1a1a1a] border border-gray-600 flex flex-col justify-start items-center rounded-sm pt-[2px]">
-                            <div class="w-full h-1 bg-yellow-500"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="z-10 w-[110px] h-[110px] bg-[#2a7a6c] flex items-center justify-center transition-all duration-300"
-                 style="border-radius: 50% 50% 50% 0; transform: rotate(45deg); box-shadow: inset 0 0 15px rgba(0,0,0,0.15), 0 15px 25px rgba(0,0,0,0.2);">
-                <div id="teardropInner" class="w-[50px] h-[50px] bg-[#eaf5f4] rounded-full flex items-center justify-center shadow-inner transition-colors duration-300" style="transform: rotate(-45deg);">
-                    <i id="teardropIcon" class="fas fa-check text-[#2a7a6c] text-2xl transition-colors duration-300"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="pb-16 text-center text-[#654f43]">
-            <div class="flex items-center justify-center gap-3 mb-2">
-                <i class="fas fa-question-circle text-2xl text-[#2a7a6c]"></i>
-                <span id="headingText" class="text-4xl font-black" dir="ltr" style="font-family: monospace;">---°</span>
-            </div>
-            <p class="text-3xl font-black mt-2">من الشمال</p>
-        </div>
-    </div>
 
     <section class="hero-section p-6 text-center shadow-2xl">
         <div class="flex justify-between items-center mb-6">
@@ -139,6 +97,16 @@
     </section>
 
     <main class="p-5">
+        <div class="bg-white/5 dark:bg-white/5 p-4 rounded-3xl mb-6 border border-white/10 animate__animated animate__fadeIn">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-xs font-black">تنبيهات الأذان والذكر</p>
+                    <p class="text-[10px] opacity-50">تلقي إشعارات عند دخول وقت الصلاة</p>
+                </div>
+                <button onclick="requestNotificationPermission()" class="bg-[var(--accent-gold)] text-black px-4 py-2 rounded-xl text-[10px] font-black shadow-lg">تفعيل الآن</button>
+            </div>
+        </div>
+
         <div class="grid grid-cols-4 gap-4 mb-10 text-center">
             <div onclick="toggleCompass()" class="flex flex-col items-center gap-2 cursor-pointer">
                 <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center shadow-lg text-[var(--accent-gold)] border border-[var(--accent-gold)]"><i class="fas fa-compass text-2xl"></i></div>
@@ -148,14 +116,10 @@
                 <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center shadow-lg text-blue-400 border border-blue-500/20"><i class="fas fa-fingerprint text-2xl"></i></div>
                 <span class="text-[10px] font-black uppercase">المسبحة</span>
             </div>
-            
             <div onclick="window.location.href='quran-read.html'" class="flex flex-col items-center gap-2 cursor-pointer">
-                <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center shadow-lg text-white/50 border border-white/10">
-                    <i class="fas fa-book-quran text-2xl"></i>
-                </div>
+                <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center shadow-lg text-white/50 border border-white/10"><i class="fas fa-book-quran text-2xl"></i></div>
                 <span class="text-[10px] font-black uppercase">المصحف</span>
             </div>
-
             <div onclick="window.location.href='azkar.html'" class="flex flex-col items-center gap-2 cursor-pointer">
                 <div class="w-14 h-14 bg-emerald-600/20 rounded-full flex items-center justify-center shadow-lg text-emerald-400 border border-emerald-500/20"><i class="fas fa-pray text-2xl"></i></div>
                 <span class="text-[10px] font-black uppercase">الأذكار</span>
@@ -164,51 +128,31 @@
 
         <div onclick="window.location.href='hadith.html'" class="bg-gradient-to-l from-yellow-600 to-yellow-800 p-5 rounded-[30px] shadow-lg mb-4 text-white flex items-center justify-between cursor-pointer border border-yellow-500/30 transition-transform active:scale-95">
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-black/30 rounded-full flex items-center justify-center backdrop-blur-md shadow-inner">
-                    <i class="fas fa-book-open text-2xl text-yellow-300"></i>
-                </div>
-                <div class="text-right">
-                    <h3 class="font-black text-xl mb-1">موسوعة الحديث الشريف</h3>
-                    <p class="text-[11px] text-yellow-200 font-bold opacity-90">تطبيق علمي: تصفح آلاف الأحاديث الصحيحة</p>
-                </div>
+                <div class="w-14 h-14 bg-black/30 rounded-full flex items-center justify-center backdrop-blur-md shadow-inner"><i class="fas fa-book-open text-2xl text-yellow-300"></i></div>
+                <div class="text-right"><h3 class="font-black text-xl mb-1">موسوعة الحديث</h3><p class="text-[11px] text-yellow-200 font-bold">تصفح آلاف الأحاديث الصحيحة</p></div>
             </div>
-            <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                <i class="fas fa-chevron-left text-xl"></i>
-            </div>
+            <i class="fas fa-chevron-left opacity-30"></i>
         </div>
 
-        <div onclick="window.location.href='fatawa.html'" class="bg-gradient-to-l from-slate-700 to-slate-900 p-5 rounded-[30px] shadow-lg mb-8 text-white flex items-center justify-between cursor-pointer border border-slate-500/30 transition-transform active:scale-95">
+        <div onclick="window.location.href='fatawa.html'" class="bg-gradient-to-l from-slate-700 to-slate-900 p-5 rounded-[30px] shadow-lg mb-4 text-white flex items-center justify-between cursor-pointer border border-slate-500/30 transition-transform active:scale-95">
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-black/30 rounded-full flex items-center justify-center backdrop-blur-md shadow-inner border border-blue-400/20">
-                    <i class="fas fa-scale-balanced text-2xl text-blue-300"></i>
-                </div>
-                <div class="text-right">
-                    <h3 class="font-black text-xl mb-1">المكتبة والفتاوى</h3>
-                    <p class="text-[11px] text-blue-200 font-bold opacity-90">فقه، عقيدة، وسيرة: مقالات علمية موثوقة</p>
-                </div>
+                <div class="w-14 h-14 bg-black/30 rounded-full flex items-center justify-center backdrop-blur-md shadow-inner border border-blue-400/20"><i class="fas fa-scale-balanced text-2xl text-blue-300"></i></div>
+                <div class="text-right"><h3 class="font-black text-xl mb-1">المكتبة والفتاوى</h3><p class="text-[11px] text-blue-200 font-bold">مقالات علمية موثوقة</p></div>
             </div>
-            <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                <i class="fas fa-chevron-left text-xl"></i>
-            </div>
+            <i class="fas fa-chevron-left opacity-30"></i>
         </div>
-                   <div onclick="window.location.href='tajweed.html'" class="bg-gradient-to-l from-emerald-700 to-emerald-900 p-5 rounded-[30px] shadow-lg mb-8 text-white flex items-center justify-between cursor-pointer border border-emerald-500/30 transition-transform active:scale-95">
+
+        <div onclick="window.location.href='tajweed.html'" class="bg-gradient-to-l from-emerald-700 to-emerald-900 p-5 rounded-[30px] shadow-lg mb-8 text-white flex items-center justify-between cursor-pointer border border-emerald-500/30 transition-transform active:scale-95">
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-black/30 rounded-full flex items-center justify-center backdrop-blur-md shadow-inner border border-emerald-400/20">
-                    <i class="fas fa-book-open-reader text-2xl text-emerald-300"></i>
-                </div>
-                <div class="text-right">
-                    <h3 class="font-black text-xl mb-1">أحكام التجويد الميسرة</h3>
-                    <p class="text-[11px] text-emerald-200 font-bold opacity-90">شرح تفاعلي للأحكام مع أمثلة قرآنية</p>
-                </div>
+                <div class="w-14 h-14 bg-black/30 rounded-full flex items-center justify-center backdrop-blur-md shadow-inner border border-emerald-400/20"><i class="fas fa-book-open-reader text-2xl text-emerald-300"></i></div>
+                <div class="text-right"><h3 class="font-black text-xl mb-1">أحكام التجويد</h3><p class="text-[11px] text-emerald-200 font-bold">شرح تفاعلي للأحكام</p></div>
             </div>
-            <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                <i class="fas fa-chevron-left text-xl"></i>
-            </div>
-                   </div>
-        
-        <section class="bg-[#1e293b] p-6 rounded-[35px] shadow-lg mb-8 border border-white/5">
+            <i class="fas fa-chevron-left opacity-30"></i>
+        </div>
+
+        <section class="bg-white/5 p-6 rounded-[35px] shadow-lg mb-8 border border-white/5">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="font-black text-lg text-white">ورد اليوم</h3>
+                <h3 class="font-black text-lg">ورد اليوم</h3>
                 <span id="progressText" class="text-[var(--accent-gold)] font-black">0%</span>
             </div>
             <div id="wirdList" class="space-y-4"></div>
@@ -218,71 +162,13 @@
     </main>
 
     <div id="settingsPanel" class="settings-panel no-scrollbar">
-        <div class="w-12 h-1.5 bg-gray-200 dark:bg-white/10 rounded-full mx-auto mb-6"></div>
-        
-        <div class="space-y-6 pb-10">
-            <button id="installBtn" onclick="installApp()" class="hidden w-full bg-blue-600 text-white py-5 rounded-3xl font-black shadow-lg flex items-center justify-center gap-3"><i class="fas fa-download"></i> تثبيت التطبيق</button>
-            
-            <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl">
-                <p class="font-bold text-sm mb-3">ألوان المملكة</p>
-                <div class="flex gap-4 justify-center">
-                    <div onclick="changeThemeColor('#fbbf24', this)" class="color-selector bg-yellow-400 active"></div>
-                    <div onclick="changeThemeColor('#10b981', this)" class="color-selector bg-emerald-500"></div>
-                    <div onclick="changeThemeColor('#3b82f6', this)" class="color-selector bg-blue-500"></div>
-                    <div onclick="changeThemeColor('#a855f7', this)" class="color-selector bg-purple-500"></div>
-                </div>
-            </div>
-
-            <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl space-y-4">
-                <p class="font-bold text-sm mb-1 border-b border-gray-200 dark:border-white/10 pb-2">قواعد الأذكار</p>
-                <div class="flex justify-between items-center">
-                    <p class="text-xs font-bold">الاهتزاز عند التسبيح</p>
-                    <div id="vibrateToggle" onclick="toggleVibration()" class="toggle-switch active"><div class="toggle-knob"></div></div>
-                </div>
-                <div class="flex justify-between items-center">
-                    <p class="text-xs font-bold">الوضع الليلي</p>
-                    <div id="darkToggle" onclick="toggleDarkMode()" class="toggle-switch"><div class="toggle-knob"></div></div>
-                </div>
-            </div>
-
-            <button onclick="updateApp()" class="w-full bg-[var(--accent-gold)] text-black py-4 rounded-3xl font-black shadow-lg"><i class="fas fa-sync-alt"></i> تحديث التطبيق (V14.0)</button>
-            <button onclick="requestLocation()" class="w-full bg-white/5 text-gray-500 py-4 rounded-3xl font-bold border border-white/10"><i class="fas fa-location-arrow"></i> تحديث الـ GPS</button>
-            <button onclick="toggleSettings()" class="w-full bg-red-500/10 text-red-500 py-4 rounded-3xl font-bold uppercase">إغلاق</button>
         </div>
+
+    <div onclick="toggleGlobalSearch()" class="fixed bottom-28 left-6 w-14 h-14 bg-[var(--accent-gold)] text-black rounded-full shadow-2xl flex items-center justify-center z-[4000] animate__animated animate__bounceIn">
+        <i class="fas fa-search text-xl"></i>
     </div>
 
-    <script>
-        // 1. نظام الألوان الملكية
-        function changeThemeColor(color, element) {
-            document.documentElement.style.setProperty('--accent-gold', color);
-            localStorage.setItem('aba_theme_color', color);
-            document.querySelectorAll('.color-selector').forEach(el => el.classList.remove('active'));
-            if(element) element.classList.add('active');
-        }
-
-        const savedColor = localStorage.getItem('aba_theme_color');
-        if (savedColor) changeThemeColor(savedColor, null);
-
-        // 2. نظام الاهتزاز في المسبحة
-        let isVibrationOn = localStorage.getItem('aba_vibrate') !== 'false';
-        if (!isVibrationOn) document.getElementById('vibrateToggle').classList.remove('active');
-
-        function toggleVibration() {
-            isVibrationOn = !isVibrationOn;
-            localStorage.setItem('aba_vibrate', isVibrationOn);
-            document.getElementById('vibrateToggle').classList.toggle('active');
-        }
-
-        const oldTasbihCount = window.countTasbih;
-        window.countTasbih = () => {
-            let tc = document.getElementById('tasbihCounter');
-            tc.innerText = parseInt(tc.innerText) + 1;
-            if (isVibrationOn && navigator.vibrate) navigator.vibrate(50);
-        };
-    </script>
-
-    <script src="quran.js"></script>
     <script src="app.js"></script>
 </body>
-    </html>
-    
+ </html>
+ 

@@ -261,4 +261,67 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.log('خطأ في تفعيل الأوفلاين:', err));
     });
 }
+    // ==================== 8. نظام التنبيهات الذكية ====================
+
+// طلب إذن التنبيهات من المستخدم
+async function requestNotificationPermission() {
+    if (!("Notification" in window)) return;
     
+    if (Notification.permission !== "granted") {
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+            console.log("تم تفعيل التنبيهات بنجاح");
+        }
+    }
+}
+
+// وظيفة لإرسال تنبيه فوري
+function sendSmartNotification(title, body) {
+    if (Notification.permission === "granted") {
+        navigator.serviceWorker.ready.then(registration => {
+            registration.showNotification(title, {
+                body: body,
+                icon: 'https://i.ibb.co/pBhzxHdM/1000027317.jpg', // صورتك الشخصية كأيقونة
+                badge: 'https://i.ibb.co/pBhzxHdM/1000027317.jpg',
+                vibrate: [200, 100, 200],
+                tag: 'prayer-time'
+            });
+        });
+                         // ==================== 8. نظام التنبيهات الذكية ====================
+
+// طلب إذن التنبيهات من المستخدم
+async function requestNotificationPermission() {
+    if (!("Notification" in window)) return;
+    
+    if (Notification.permission !== "granted") {
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+            console.log("تم تفعيل التنبيهات بنجاح");
+        }
+    }
+}
+
+// وظيفة لإرسال تنبيه فوري
+function sendSmartNotification(title, body) {
+    if (Notification.permission === "granted") {
+        navigator.serviceWorker.ready.then(registration => {
+            registration.showNotification(title, {
+                body: body,
+                icon: 'https://i.ibb.co/pBhzxHdM/1000027317.jpg', // صورتك الشخصية كأيقونة
+                badge: 'https://i.ibb.co/pBhzxHdM/1000027317.jpg',
+                vibrate: [200, 100, 200],
+                tag: 'prayer-time'
+            });
+        });
+    }
+}
+
+// ربط التنبيه مع مواقيت الصلاة
+// داخل وظيفة startCountdown الموجودة لديك، أضف هذا الجزء:
+if (hrs === 0 && mins === 0 && secs === 0) {
+    sendSmartNotification("حان الآن موعد الصلاة", `حان الآن موعد أذان ${next.n} بتوقيتك المحلي`);
+}
+
+// تشغيل طلب الإذن عند فتح التطبيق
+document.addEventListener('DOMContentLoaded', requestNotificationPermission);
+        

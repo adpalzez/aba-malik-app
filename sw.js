@@ -56,4 +56,11 @@ self.addEventListener('fetch', e => {
       .catch(() => caches.match(e.request))
   );
 });
-                      
+       // الاستماع لحدث الضغط على التنبيه
+self.addEventListener('notificationclick', event => {
+    event.notification.close(); // إغلاق التنبيه
+    event.waitUntil(
+        clients.openWindow('./mosque.html') // فتح المحراب فور الضغط على التنبيه
+    );
+});
+          

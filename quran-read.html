@@ -3,179 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مصحف أبا مالك | الفهرس الكامل</title>
+    <title>مصحف أبا مالك</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
     <style>
-        :root { --gold: #c5a059; --bg-dark: #121212; }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-dark); color: white; margin: 0; overflow: hidden; }
+        body { margin: 0; background-color: #f4ece1; font-family: 'Cairo', sans-serif; overflow: hidden; }
+        .swiper { width: 100vw; height: calc(100vh - 70px); }
+        .swiper-slide { display: flex; justify-content: center; align-items: center; }
+        .swiper-slide img { width: 100%; height: 100%; object-fit: contain; }
         
-        /* الفهرس الجانبي */
-        #sideMenu { position: fixed; top: 0; right: -100%; width: 100%; height: 100%; background: #1a1a1a; z-index: 10000; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; }
-        #sideMenu.open { right: 0; }
-        .surah-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .surah-item:active { background: var(--gold); color: black; }
-
-        /* مشغل الصوت */
-        .audio-player { position: fixed; bottom: 80px; left: 0; width: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); padding: 15px; border-radius: 25px 25px 0 0; border-top: 1px solid rgba(197, 160, 89, 0.3); z-index: 6000; display: none; }
-        .audio-player.active { display: block; animation: slideUp 0.4s ease-out; }
-        
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .play-btn { width: 55px; height: 55px; background: var(--gold); border-radius: 50%; color: black; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; }
-        
-        .swiper { width: 100%; height: calc(100vh - 80px); }
-        .swiper-slide { display: flex; justify-content: center; align-items: center; background: #121212; }
-        .swiper-slide img { max-width: 95%; max-height: 95%; object-fit: contain; }
-
-        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; background: #000; display: flex; justify-content: space-around; align-items: center; z-index: 5000; }
-        .nav-btn { display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: bold; cursor: pointer; }
-        .nav-btn i { font-size: 20px; margin-bottom: 5px; color: var(--gold); }
+        .controls { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: #1a1a1a; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; box-sizing: border-box; z-index: 5000; border-top: 3px solid #c5a059; }
+        .btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .page-badge { background: #c5a059; color: black; padding: 5px 20px; border-radius: 20px; font-weight: 900; font-size: 18px; }
+        .home-btn { color: #c5a059; font-size: 24px; text-decoration: none; }
     </style>
 </head>
 <body>
-
-    <div id="sideMenu">
-        <div class="p-6 bg-[var(--gold)] text-black flex justify-between items-center sticky top-0 z-10">
-            <h2 class="font-black text-xl">فهرس السور</h2>
-            <i class="fas fa-times text-2xl" onclick="toggleMenu()"></i>
-        </div>
-        <div id="surahListContainer"></div>
-    </div>
-
-    <div id="audioPlayer" class="audio-player">
-        <div class="flex items-center justify-between gap-4">
-            <select id="reciterSelect" class="bg-[#222] border border-[var(--gold)] rounded-lg p-1 text-[10px] text-white">
-                <option value="https://www.ourquran.com/audio/pages/page">المصحف المعلم (صفحات)</option>
-            </select>
-            <div class="flex flex-col items-center flex-1">
-                <span class="text-[10px] opacity-60 mb-1" id="audioStatus">جاهز للاستماع</span>
-                <div class="play-btn" id="playPauseBtn" onclick="togglePlay()">
-                    <i class="fas fa-play" id="playIcon"></i>
-                </div>
-            </div>
-            <div class="text-right">
-                <p class="text-xs font-bold text-[var(--gold)]">استماع للصفحة</p>
-                <p id="audioPageNum" class="text-[10px] opacity-50">1</p>
-            </div>
-        </div>
-        <audio id="quranAudio" onended="audioEnded()"></audio>
-    </div>
 
     <div class="swiper mySwiper">
         <div class="swiper-wrapper" id="quranSlider"></div>
     </div>
 
-    <div class="nav-bar">
-        <div class="nav-btn" onclick="swiper.slideNext()"><i class="fas fa-chevron-right"></i>السابق</div>
-        <div class="nav-btn" onclick="toggleAudioPlayer()"><i class="fas fa-volume-up"></i>المكتبة</div>
-        <div class="nav-btn" onclick="toggleMenu()"><i class="fas fa-list"></i>الفهرس</div>
-        <div class="nav-btn" onclick="swiper.slidePrev()"><i class="fas fa-chevron-left"></i>التالي</div>
+    <div class="controls">
+        <button class="btn" onclick="swiper.slideNext()"><i class="fas fa-chevron-right"></i></button>
+        
+        <a href="mosque.html" class="home-btn"><i class="fas fa-home"></i></a>
+        
+        <span id="pageNum" class="page-badge">1</span>
+        
+        <button class="btn" onclick="swiper.slidePrev()"><i class="fas fa-chevron-left"></i></button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        // مصفوفة الـ 114 سورة
-        const surahs = [
-            {n:"الفاتحة", p:1}, {n:"البقرة", p:2}, {n:"آل عمران", p:50}, {n:"النساء", p:77}, {n:"المائدة", p:106},
-            {n:"الأنعام", p:128}, {n:"الأعراف", p:151}, {n:"الأنفال", p:177}, {n:"التوبة", p:187}, {n:"يونس", p:208},
-            {n:"هود", p:221}, {n:"يوسف", p:235}, {n:"الرعد", p:249}, {n:"إبراهيم", p:255}, {n:"الحجر", p:262},
-            {n:"النحل", p:267}, {n:"الإسراء", p:282}, {n:"الكهف", p:293}, {n:"مريم", p:305}, {n:"طه", p:312},
-            {n:"الأنبياء", p:322}, {n:"الحج", p:332}, {n:"المؤمنون", p:342}, {n:"النور", p:350}, {n:"الفرقان", p:359},
-            {n:"الشعراء", p:367}, {n:"النمل", p:377}, {n:"القصص", p:385}, {n:"العنكبوت", p:396}, {n:"الروم", p:404},
-            {n:"لقمان", p:411}, {n:"السجدة", p:415}, {n:"الأحزاب", p:418}, {n:"سبأ", p:428}, {n:"فاطر", p:434},
-            {n:"يس", p:440}, {n:"الصافات", p:446}, {n:"ص", p:453}, {n:"الزمر", p:458}, {n:"غافر", p:467},
-            {n:"فصلت", p:477}, {n:"الشورى", p:483}, {n:"الزخرف", p:489}, {n:"الدخان", p:496}, {n:"الجاثية", p:499},
-            {n:"الأحقاف", p:502}, {n:"محمد", p:507}, {n:"الفتح", p:511}, {n:"الحجرات", p:515}, {n:"ق", p:518},
-            {n:"الذاريات", p:520}, {n:"الطور", p:523}, {n:"النجم", p:526}, {n:"القمر", p:528}, {n:"الرحمن", p:531},
-            {n:"الواقعة", p:534}, {n:"الحديد", p:537}, {n:"المجادلة", p:542}, {n:"الحشر", p:545}, {n:"الممتحنة", p:549},
-            {n:"الصف", p:551}, {n:"الجمعة", p:553}, {n:"المنافقون", p:554}, {n:"التغابن", p:556}, {n:"الطلاق", p:558},
-            {n:"التحريم", p:560}, {n:"الملك", p:562}, {n:"القلم", p:564}, {n:"الحاقة", p:566}, {n:"المعارج", p:568},
-            {n:"نوح", p:570}, {n:"الجن", p:572}, {n:"المزمل", p:574}, {n:"المدثر", p:575}, {n:"القيامة", p:577},
-            {n:"الإنسان", p:578}, {n:"المرسلات", p:580}, {n:"النبأ", p:582}, {n:"النازعات", p:583}, {n:"عبس", p:585},
-            {n:"التكوير", p:586}, {n:"الانفطار", p:587}, {n:"المطففين", p:587}, {n:"الانشقاق", p:589}, {n:"البروج", p:590},
-            {n:"الطارق", p:591}, {n:"الأعلى", p:591}, {n:"الغاشية", p:592}, {n:"الفجر", p:593}, {n:"البلد", p:594},
-            {n:"الشمس", p:595}, {n:"الليل", p:595}, {n:"الضحى", p:596}, {n:"الشرح", p:596}, {n:"التين", p:597},
-            {n:"العلق", p:597}, {n:"القدر", p:598}, {n:"البينة", p:598}, {n:"الزلزلة", p:599}, {n:"العاديات", p:599},
-            {n:"القارعة", p:600}, {n:"التكاثر", p:600}, {n:"العصر", p:601}, {n:"الهمزة", p:601}, {n:"الفيل", p:601},
-            {n:"قريش", p:602}, {n:"الماعون", p:602}, {n:"الكوثر", p:602}, {n:"الكافرون", p:603}, {n:"النصر", p:603},
-            {n:"المسد", p:603}, {n:"الإخلاص", p:604}, {n:"الفلق", p:604}, {n:"الناس", p:604}
-        ];
-
-        const audio = document.getElementById('quranAudio');
-        const playIcon = document.getElementById('playIcon');
-        let isPlaying = false;
-
-        function initApp() {
-            // توليد الصور
-            let imgHtml = '';
-            for (let i = 1; i <= 604; i++) {
-                const imgUrl = `https://raw.githubusercontent.com/itxtools/quran-images/master/images/${i}.png`;
-                imgHtml += `<div class="swiper-slide"><img src="${imgUrl}" loading="lazy"></div>`;
-            }
-            document.getElementById('quranSlider').innerHTML = imgHtml;
-
-            // توليد الفهرس
-            let surahHtml = '';
-            surahs.forEach((s, idx) => {
-                surahHtml += `
-                    <div class="surah-item" onclick="goToPage(${s.p})">
-                        <div class="flex items-center gap-3">
-                            <span class="text-[10px] opacity-40">${idx + 1}</span>
-                            <span class="font-bold">${s.n}</span>
-                        </div>
-                        <span class="text-[10px] opacity-40">صفحة ${s.p}</span>
-                    </div>`;
+        // كود تدمير الذاكرة القديمة إجبارياً
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister(); // مسح الكاش القديم
+                }
             });
-            document.getElementById('surahListContainer').innerHTML = surahHtml;
         }
 
-        initApp();
+        // بناء صفحات المصحف من سيرفر CDN سريع جداً
+        let html = '';
+        for (let i = 1; i <= 604; i++) {
+            // استخدام رابط قوي ومستقر يتجاوز الحجب والبطء
+            const imgUrl = `https://cdn.jsdelivr.net/gh/itxtools/quran-images@master/images/${i}.png`;
+            html += `
+            <div class="swiper-slide">
+                <img src="${imgUrl}" loading="lazy" onerror="this.src='https://via.placeholder.com/600x800?text=جاري+التحميل...'">
+            </div>`;
+        }
+        document.getElementById('quranSlider').innerHTML = html;
 
-        const swiper = new Swiper(".mySwiper", {
-            direction: "horizontal",
+        // تشغيل المصحف
+        var swiper = new Swiper(".mySwiper", {
             on: {
                 slideChange: function () {
-                    const page = this.activeIndex + 1;
-                    document.getElementById('audioPageNum').innerText = page;
-                    if(isPlaying) playAudioForPage(page);
+                    document.getElementById('pageNum').innerText = this.activeIndex + 1;
                 }
             }
         });
-
-        function toggleMenu() { document.getElementById('sideMenu').classList.toggle('open'); }
-        
-        function goToPage(p) {
-            swiper.slideTo(p - 1);
-            toggleMenu();
-        }
-
-        function toggleAudioPlayer() { document.getElementById('audioPlayer').classList.toggle('active'); }
-
-        function togglePlay() {
-            if (isPlaying) {
-                audio.pause();
-                playIcon.classList.replace('fa-pause', 'fa-play');
-                document.getElementById('audioStatus').innerText = "تم الإيقاف";
-            } else {
-                playAudioForPage(swiper.activeIndex + 1);
-            }
-            isPlaying = !isPlaying;
-        }
-
-        function playAudioForPage(page) {
-            const pageStr = String(page).padStart(3, '0');
-            audio.src = `https://www.ourquran.com/audio/pages/page${pageStr}.mp3`;
-            audio.play();
-            playIcon.classList.replace('fa-play', 'fa-pause');
-            document.getElementById('audioStatus').innerText = "تلاوة الصفحة " + page;
-        }
-
-        function audioEnded() { swiper.slideNext(); }
     </script>
 </body>
-        </html>
+    </html>
     

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="no-referrer">
     <title>مصحف أبا مالك</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
@@ -13,22 +14,33 @@
         :root { --quran-bg: #f4ece1; --control-bg: #1a1a1a; --accent: #c5a059; }
         body { margin: 0; background-color: var(--quran-bg); font-family: 'Cairo', sans-serif; overflow: hidden; }
         
-        /* إعداد الحاوية لضمان عدم ظهور مساحات بيضاء */
+        /* إعداد الحاوية */
         .swiper { width: 100vw; height: calc(100vh - 70px); background: var(--quran-bg); }
         .swiper-slide { display: flex; justify-content: center; align-items: center; background: var(--quran-bg); }
         .swiper-slide img { width: 100%; height: 100%; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
         
+        /* شريط التحكم */
         .controls { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: var(--control-bg); 
                     display: flex; justify-content: space-between; align-items: center; padding: 0 20px; 
                     box-sizing: border-box; z-index: 5000; border-top: 3px solid var(--accent); }
         
-        .btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; transition: 0.3s; }
-        .btn:active { color: var(--accent); transform: scale(1.2); }
+        .btn { background: none; border: none; color: white; font-size: 18px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .btn span { font-size: 10px; opacity: 0.8; font-weight: bold; }
         
         .page-badge { background: var(--accent); color: black; padding: 4px 15px; border-radius: 12px; font-weight: 900; font-size: 16px; min-width: 50px; text-align: center; }
         .home-btn { color: var(--accent); font-size: 22px; text-decoration: none; }
         
-        /* شاشة التحميل اللطيفة */
+        /* نافذة الفهرس */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 6000; display: none; justify-content: center; align-items: flex-end; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--quran-bg); width: 100%; max-height: 85vh; border-radius: 35px 35px 0 0; overflow-y: auto; padding: 25px; box-sizing: border-box; }
+        .surah-item { display: flex; justify-content: space-between; padding: 18px; border-bottom: 1px solid rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s; }
+        .surah-item:active { background: var(--accent); color: white; }
+        
+        .search-box { position: sticky; top: -25px; background: var(--quran-bg); padding: 10px 0 20px; display: flex; gap: 10px; z-index: 10; }
+        .search-box input { flex: 1; padding: 15px; border-radius: 15px; border: 2px solid var(--accent); font-family: 'Cairo'; font-weight: bold; outline: none; text-align: center; font-size: 16px; }
+        .go-btn { background: var(--accent); border: none; padding: 0 25px; border-radius: 15px; font-weight: 900; cursor: pointer; }
+
+        /* شاشة التحميل */
         .loading-overlay { position: fixed; inset: 0; background: var(--quran-bg); z-index: 9000; display: flex; justify-content: center; align-items: center; transition: 0.5s; }
     </style>
 </head>
@@ -36,67 +48,119 @@
 
     <div id="loader" class="loading-overlay"><i class="fas fa-book-quran fa-spin text-4xl text-[#c5a059]"></i></div>
 
+    <div id="indexModal" class="modal" onclick="closeIndex()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="search-box">
+                <input type="number" id="pageSearch" placeholder="رقم الصفحة (1 - 604)" min="1" max="604">
+                <button onclick="jumpToPage()" class="go-btn">اذهب</button>
+            </div>
+            <div id="surahList"></div>
+        </div>
+    </div>
+
     <div class="swiper mySwiper">
-        <div class="swiper-wrapper"></div>
+        <div class="swiper-wrapper" id="quranSlider"></div>
     </div>
 
     <div class="controls">
-        <button class="btn" onclick="quranSwiper.slidePrev()"><i class="fas fa-chevron-right"></i></button>
-        
-        <a href="index.html" class="home-btn"><i class="fas fa-house-chimney"></i></a>
-        
+        <button class="btn" onclick="swiper.slidePrev()">
+            <i class="fas fa-chevron-right text-[var(--accent)]"></i>
+            <span>التالي</span>
+        </button>
+
+        <button class="btn" onclick="openIndex()">
+            <i class="fas fa-book-open"></i>
+            <span>الفهرس</span>
+        </button>
+
         <div class="flex flex-col items-center">
             <span id="pageNum" class="page-badge">1</span>
-            <span class="text-[9px] color-white/50 mt-1 uppercase text-white">صفحة</span>
         </div>
-        
-        <button class="btn" onclick="quranSwiper.slideNext()"><i class="fas fa-chevron-left"></i></button>
+
+        <a href="index.html" class="btn home-btn">
+            <i class="fas fa-house-chimney"></i>
+            <span>الرئيسية</span>
+        </a>
+
+        <button class="btn" onclick="swiper.slideNext()">
+            <i class="fas fa-chevron-left text-[var(--accent)]"></i>
+            <span>السابق</span>
+        </button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        // 1. توليد روابط الصور (604 صفحة)
-        const pages = [];
+        // 1. الفهرس الكامل
+        const surahs = [
+            {n:"الفاتحة", p:1}, {n:"البقرة", p:2}, {n:"آل عمران", p:50}, {n:"النساء", p:77}, {n:"المائدة", p:106}, {n:"الأنعام", p:128}, {n:"الأعراف", p:151}, {n:"الأنفال", p:177}, {n:"التوبة", p:187}, {n:"يونس", p:208}, {n:"هود", p:221}, {n:"يوسف", p:235}, {n:"الرعد", p:249}, {n:"إبراهيم", p:255}, {n:"الحجر", p:262}, {n:"النحل", p:267}, {n:"الإسراء", p:282}, {n:"الكهف", p:293}, {n:"مريم", p:305}, {n:"طه", p:312}, {n:"الأنبياء", p:322}, {n:"الحج", p:332}, {n:"المؤمنون", p:342}, {n:"النور", p:350}, {n:"الفرقان", p:359}, {n:"الشعراء", p:367}, {n:"النمل", p:377}, {n:"القصص", p:385}, {n:"العنكبوت", p:396}, {n:"الروم", p:404}, {n:"لقمان", p:411}, {n:"السجدة", p:415}, {n:"الأحزاب", p:418}, {n:"سبأ", p:428}, {n:"فاطر", p:434}, {n:"يس", p:440}, {n:"الصافات", p:446}, {n:"ص", p:453}, {n:"الزمر", p:458}, {n:"غافر", p:467}, {n:"فصلت", p:477}, {n:"الشورى", p:483}, {n:"الزخرف", p:489}, {n:"الدخان", p:496}, {n:"الجاثية", p:499}, {n:"الأحقاف", p:502}, {n:"محمد", p:507}, {n:"الفتح", p:511}, {n:"الحجرات", p:515}, {n:"ق", p:518}, {n:"الذاريات", p:520}, {n:"الطور", p:523}, {n:"النجم", p:526}, {n:"القمر", p:528}, {n:"الرحمن", p:531}, {n:"الواقعة", p:534}, {n:"الحديد", p:537}, {n:"المجادلة", p:542}, {n:"الحشر", p:545}, {n:"الممتحنة", p:549}, {n:"الصف", p:551}, {n:"الجمعة", p:553}, {n:"المنافقون", p:554}, {n:"التغابن", p:556}, {n:"الطلاق", p:558}, {n:"التحريم", p:560}, {n:"الملك", p:562}, {n:"القلم", p:564}, {n:"الحاقة", p:566}, {n:"المعارج", p:568}, {n:"نوح", p:570}, {n:"الجن", p:572}, {n:"المزمل", p:574}, {n:"المدثر", p:575}, {n:"القيامة", p:577}, {n:"الإنسان", p:578}, {n:"المرسلات", p:580}, {n:"النبأ", p:582}, {n:"النازعات", p:583}, {n:"عبس", p:585}, {n:"التكوير", p:586}, {n:"الإنفطار", p:587}, {n:"المطففين", p:587}, {n:"الإنشقاق", p:589}, {n:"البروج", p:590}, {n:"الطارق", p:591}, {n:"الأعلى", p:591}, {n:"الغاشية", p:592}, {n:"الفجر", p:593}, {n:"البلد", p:594}, {n:"الشمس", p:595}, {n:"الليل", p:595}, {n:"الضحى", p:596}, {n:"الشرح", p:596}, {n:"التين", p:597}, {n:"العلق", p:597}, {n:"القدر", p:598}, {n:"البينة", p:598}, {n:"الزلزلة", p:599}, {n:"العاديات", p:599}, {n:"القارعة", p:600}, {n:"التكاثر", p:600}, {n:"العصر", p:601}, {n:"الهمزة", p:601}, {n:"الفيل", p:601}, {n:"قريش", p:602}, {n:"الماعون", p:602}, {n:"الكوثر", p:602}, {n:"الكافرون", p:603}, {n:"النصر", p:603}, {n:"المسد", p:603}, {n:"الإخلاص", p:604}, {n:"الفلق", p:604}, {n:"الناس", p:604}
+        ];
+
+        // 2. نظام مصادر الصور الذكي
+        const sources = [
+            "https://www.alkhatat.com/quran/pages/png/",
+            "https://server10.mp3quran.net/tajweed/pages/",
+            "https://raw.githubusercontent.com/itxtools/quran-images/master/images/"
+        ];
+
+        function pad(n) { return n.toString().padStart(3, '0'); }
+
+        // 3. بناء صفحات المصحف
+        let sliderHtml = '';
         for (let i = 1; i <= 604; i++) {
-            pages.push(`https://cdn.jsdelivr.net/gh/itxtools/quran-images@master/images/${i}.png`);
+            sliderHtml += `
+            <div class="swiper-slide">
+                <img src="${sources[0]}${pad(i)}.png" 
+                     class="quran-img"
+                     loading="lazy" 
+                     onerror="tryBackup(this, ${i}, 1)">
+            </div>`;
+        }
+        document.getElementById('quranSlider').innerHTML = sliderHtml;
+
+        function tryBackup(img, pageIndex, sourceIdx) {
+            if (sourceIdx < sources.length) {
+                img.src = sources[sourceIdx] + pad(pageIndex) + ".png";
+                img.onerror = function() { tryBackup(img, pageIndex, sourceIdx + 1); };
+            } else {
+                img.onerror = null;
+                img.src = "https://raw.githubusercontent.com/itxtools/quran-images/master/images/" + pageIndex + ".png";
+            }
         }
 
-        // 2. استعادة آخر صفحة قرأها المستخدم
-        const lastPage = parseInt(localStorage.getItem('last_quran_page')) || 0;
+        // 4. عرض قائمة السور
+        document.getElementById('surahList').innerHTML = surahs.map(s => `
+            <div class="surah-item" onclick="goToSurah(${s.p})">
+                <span style="font-weight:900">${s.n}</span>
+                <span style="color:var(--accent); font-size:14px">صفحة ${s.p}</span>
+            </div>
+        `).join('');
 
-        // 3. تهيئة Swiper بتقنية Virtual Slides للأداء العالي
-        const quranSwiper = new Swiper(".mySwiper", {
-            initialSlide: lastPage,
-            reverseDirection: false, // لأن المصحف يبدأ من اليمين
-            virtual: {
-                slides: pages,
-                renderExternal: function(data) {
-                    const wrapper = document.querySelector('.swiper-wrapper');
-                    wrapper.innerHTML = data.slides.map(src => `
-                        <div class="swiper-slide" style="left: ${data.offset}px">
-                            <img src="${src}" loading="lazy">
-                        </div>
-                    `).join('');
-                }
-            },
+        // 5. تهيئة Swiper
+        var swiper = new Swiper(".mySwiper", {
+            initialSlide: parseInt(localStorage.getItem('last_quran_page')) || 0,
+            preloadImages: false,
+            lazy: true,
             on: {
                 init: function() {
                     document.getElementById('loader').style.opacity = '0';
                     setTimeout(() => document.getElementById('loader').remove(), 500);
                 },
                 slideChange: function () {
-                    const currentIndex = this.activeIndex;
-                    document.getElementById('pageNum').innerText = currentIndex + 1;
-                    // حفظ الصفحة الحالية تلقائياً
-                    localStorage.setItem('last_quran_page', currentIndex);
+                    document.getElementById('pageNum').innerText = this.activeIndex + 1;
+                    localStorage.setItem('last_quran_page', this.activeIndex);
                 }
             }
         });
 
-        // تحسين: إغلاق القوائم عند لمس المصحف
-        document.addEventListener('click', function() {
-            // يمكن إضافة إخفاء/إظهار شريط الأدوات هنا بلمسة واحدة
-        });
+        // 6. وظائف التحكم
+        function openIndex() { document.getElementById('indexModal').style.display = 'flex'; }
+        function closeIndex() { document.getElementById('indexModal').style.display = 'none'; }
+        function goToSurah(p) { swiper.slideTo(p - 1); closeIndex(); }
+        function jumpToPage() {
+            const p = document.getElementById('pageSearch').value;
+            if (p >= 1 && p <= 604) { swiper.slideTo(p - 1); closeIndex(); }
+        }
     </script>
 </body>
-</html>
+                </html>
+                                                                                  

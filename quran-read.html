@@ -10,65 +10,93 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
     <style>
-        body { margin: 0; background-color: #f4ece1; font-family: 'Cairo', sans-serif; overflow: hidden; }
-        .swiper { width: 100vw; height: calc(100vh - 70px); }
-        .swiper-slide { display: flex; justify-content: center; align-items: center; }
-        .swiper-slide img { width: 100%; height: 100%; object-fit: contain; }
+        :root { --quran-bg: #f4ece1; --control-bg: #1a1a1a; --accent: #c5a059; }
+        body { margin: 0; background-color: var(--quran-bg); font-family: 'Cairo', sans-serif; overflow: hidden; }
         
-        .controls { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: #1a1a1a; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; box-sizing: border-box; z-index: 5000; border-top: 3px solid #c5a059; }
-        .btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-        .page-badge { background: #c5a059; color: black; padding: 5px 20px; border-radius: 20px; font-weight: 900; font-size: 18px; }
-        .home-btn { color: #c5a059; font-size: 24px; text-decoration: none; }
+        /* إعداد الحاوية لضمان عدم ظهور مساحات بيضاء */
+        .swiper { width: 100vw; height: calc(100vh - 70px); background: var(--quran-bg); }
+        .swiper-slide { display: flex; justify-content: center; align-items: center; background: var(--quran-bg); }
+        .swiper-slide img { width: 100%; height: 100%; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        
+        .controls { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: var(--control-bg); 
+                    display: flex; justify-content: space-between; align-items: center; padding: 0 20px; 
+                    box-sizing: border-box; z-index: 5000; border-top: 3px solid var(--accent); }
+        
+        .btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; transition: 0.3s; }
+        .btn:active { color: var(--accent); transform: scale(1.2); }
+        
+        .page-badge { background: var(--accent); color: black; padding: 4px 15px; border-radius: 12px; font-weight: 900; font-size: 16px; min-width: 50px; text-align: center; }
+        .home-btn { color: var(--accent); font-size: 22px; text-decoration: none; }
+        
+        /* شاشة التحميل اللطيفة */
+        .loading-overlay { position: fixed; inset: 0; background: var(--quran-bg); z-index: 9000; display: flex; justify-content: center; align-items: center; transition: 0.5s; }
     </style>
 </head>
 <body>
 
+    <div id="loader" class="loading-overlay"><i class="fas fa-book-quran fa-spin text-4xl text-[#c5a059]"></i></div>
+
     <div class="swiper mySwiper">
-        <div class="swiper-wrapper" id="quranSlider"></div>
+        <div class="swiper-wrapper"></div>
     </div>
 
     <div class="controls">
-        <button class="btn" onclick="swiper.slideNext()"><i class="fas fa-chevron-right"></i></button>
+        <button class="btn" onclick="quranSwiper.slidePrev()"><i class="fas fa-chevron-right"></i></button>
         
-        <a href="mosque.html" class="home-btn"><i class="fas fa-home"></i></a>
+        <a href="index.html" class="home-btn"><i class="fas fa-house-chimney"></i></a>
         
-        <span id="pageNum" class="page-badge">1</span>
+        <div class="flex flex-col items-center">
+            <span id="pageNum" class="page-badge">1</span>
+            <span class="text-[9px] color-white/50 mt-1 uppercase text-white">صفحة</span>
+        </div>
         
-        <button class="btn" onclick="swiper.slidePrev()"><i class="fas fa-chevron-left"></i></button>
+        <button class="btn" onclick="quranSwiper.slideNext()"><i class="fas fa-chevron-left"></i></button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        // كود تدمير الذاكرة القديمة إجبارياً
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for(let registration of registrations) {
-                    registration.unregister(); // مسح الكاش القديم
-                }
-            });
-        }
-
-        // بناء صفحات المصحف من سيرفر CDN سريع جداً
-        let html = '';
+        // 1. توليد روابط الصور (604 صفحة)
+        const pages = [];
         for (let i = 1; i <= 604; i++) {
-            // استخدام رابط قوي ومستقر يتجاوز الحجب والبطء
-            const imgUrl = `https://cdn.jsdelivr.net/gh/itxtools/quran-images@master/images/${i}.png`;
-            html += `
-            <div class="swiper-slide">
-                <img src="${imgUrl}" loading="lazy" onerror="this.src='https://via.placeholder.com/600x800?text=جاري+التحميل...'">
-            </div>`;
+            pages.push(`https://cdn.jsdelivr.net/gh/itxtools/quran-images@master/images/${i}.png`);
         }
-        document.getElementById('quranSlider').innerHTML = html;
 
-        // تشغيل المصحف
-        var swiper = new Swiper(".mySwiper", {
+        // 2. استعادة آخر صفحة قرأها المستخدم
+        const lastPage = parseInt(localStorage.getItem('last_quran_page')) || 0;
+
+        // 3. تهيئة Swiper بتقنية Virtual Slides للأداء العالي
+        const quranSwiper = new Swiper(".mySwiper", {
+            initialSlide: lastPage,
+            reverseDirection: false, // لأن المصحف يبدأ من اليمين
+            virtual: {
+                slides: pages,
+                renderExternal: function(data) {
+                    const wrapper = document.querySelector('.swiper-wrapper');
+                    wrapper.innerHTML = data.slides.map(src => `
+                        <div class="swiper-slide" style="left: ${data.offset}px">
+                            <img src="${src}" loading="lazy">
+                        </div>
+                    `).join('');
+                }
+            },
             on: {
+                init: function() {
+                    document.getElementById('loader').style.opacity = '0';
+                    setTimeout(() => document.getElementById('loader').remove(), 500);
+                },
                 slideChange: function () {
-                    document.getElementById('pageNum').innerText = this.activeIndex + 1;
+                    const currentIndex = this.activeIndex;
+                    document.getElementById('pageNum').innerText = currentIndex + 1;
+                    // حفظ الصفحة الحالية تلقائياً
+                    localStorage.setItem('last_quran_page', currentIndex);
                 }
             }
         });
+
+        // تحسين: إغلاق القوائم عند لمس المصحف
+        document.addEventListener('click', function() {
+            // يمكن إضافة إخفاء/إظهار شريط الأدوات هنا بلمسة واحدة
+        });
     </script>
 </body>
-    </html>
-    
+</html>

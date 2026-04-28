@@ -100,7 +100,6 @@ function startCountdown() {
             if(document.getElementById('mainCountdown')) document.getElementById('mainCountdown').innerText = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
             if(document.getElementById('nextPrayerTitle')) document.getElementById('nextPrayerTitle').innerText = `باقي على موعد ${next.n}`;
             
-            // إرسال التنبيه الذكي عند الصفر تماماً
             if (hrs === 0 && mins === 0 && secs === 0) {
                 sendSmartNotification("حان الآن موعد الصلاة", `نداء الحق يناديك لموعد صلاة ${next.n}`);
             }
@@ -192,7 +191,7 @@ async function runGlobalSearch(query) {
     } catch (e) { resultsCont.innerHTML = '<p class="text-center text-red-400">خطأ في الاتصال</p>'; }
 }
 
-// ==================== 6. التشغيل النهائي ====================
+// ==================== 6. نظام ورد اليوم ====================
 function renderWird() {
     const list = document.getElementById('wirdList'); if (!list) return;
     let myWird = JSON.parse(localStorage.getItem('aba_wird_v12')) || [{ text: "قراءة صفحة من القرآن", done: false }, { text: "أذكار الصباح", done: false }, { text: "الاستغفار (100)", done: false }];
@@ -203,9 +202,39 @@ function renderWird() {
 
 window.toggleWirdAction = (i) => { let myWird = JSON.parse(localStorage.getItem('aba_wird_v12')); myWird[i].done = !myWird[i].done; localStorage.setItem('aba_wird_v12', JSON.stringify(myWird)); renderWird(); };
 
+// ==================== 7. نظام الآية العشوائية والتفسير ====================
+window.getRandomAyah = async () => {
+    const textEl = document.getElementById('ayahText');
+    const tafsirEl = document.getElementById('tafsirText');
+    const surahEl = document.getElementById('surahName');
+    const ayahNumEl = document.getElementById('ayahNumber');
+
+    if(!textEl) return; // لضمان عدم حدوث خطأ إذا لم يكن العنصر موجوداً في الصفحة
+
+    // رقم عشوائي من 1 إلى 6236 آية
+    const randomID = Math.floor(Math.random() * 6236) + 1;
+    const url = `https://api.alquran.cloud/v1/ayah/${randomID}/editions/quran-uthmani,ar.jalalayn`;
+
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if(data.status === "OK") {
+            const ayah = data.data[0];
+            const tafsir = data.data[1];
+            textEl.innerText = `﴿ ${ayah.text} ﴾`;
+            tafsirEl.innerText = tafsir.text;
+            surahEl.innerText = `سورة ${ayah.surah.name}`;
+            ayahNumEl.innerText = ayah.numberInSurah;
+        }
+    } catch (e) { console.log("خطأ في جلب الآية"); }
+};
+
+// ==================== 8. التشغيل النهائي عند تحميل الصفحة ====================
 document.addEventListener('DOMContentLoaded', () => {
-    renderWird(); fetchPrayers();
+    renderWird(); 
+    fetchPrayers();
+    getRandomAyah(); // تشغيل الآية العشوائية عند الفتح
     if (localStorage.getItem('aba_dark') === 'true') document.body.classList.add('dark-mode');
     if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').then(reg => console.log('Offline Active')); }
 });
-                         
+        

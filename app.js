@@ -1,10 +1,15 @@
 // ==================== 1. نظام التثبيت والإعدادات ====================
 let deferredPrompt;
+
+// الاستماع لحدث التثبيت من المتصفح
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault(); 
     deferredPrompt = e;
     const btn = document.getElementById('installBtn');
-    if(btn) btn.classList.remove('hidden');
+    if(btn) {
+        btn.classList.remove('hidden');
+        btn.style.display = 'block'; // التأكد من الظهور
+    }
 });
 
 window.installApp = async () => {
@@ -16,6 +21,9 @@ window.installApp = async () => {
             if(btn) btn.classList.add('hidden');
         }
         deferredPrompt = null;
+    } else {
+        // رسالة مساعدة لمستخدمي الآيفون أو في حال عدم دعم المتصفح للحدث
+        alert("لتثبيت التطبيق على هاتفك:\n١. اضغط على زر المشاركة (Share)\n٢. اختر 'إضافة إلى الشاشة الرئيسية' (Add to Home Screen)");
     }
 };
 
@@ -101,14 +109,13 @@ function startCountdown() {
     }, 1000);
 }
 
-// ==================== 3. محرك البوصلة المطور (الدمج الجديد) ====================
+// ==================== 3. محرك البوصلة المطور ====================
 let isCompassActive = false; 
 window.toggleCompass = async () => {
     const cont = document.getElementById('qiblaContainer'); 
     if(!cont) return;
 
     if (!isCompassActive) {
-        // طلب إذن الحساسات للآيفون
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
             try {
                 const permission = await DeviceOrientationEvent.requestPermission();
@@ -122,7 +129,6 @@ window.toggleCompass = async () => {
         const kaaba = document.getElementById('kaabaMarker');
         if(kaaba) kaaba.style.transform = `rotate(${QIBLA_DEGREE}deg)`;
 
-        // تفعيل المستشعرات (Absolute للاندرويد، العادي للآيفون)
         if ('ondeviceorientationabsolute' in window) {
             window.addEventListener('deviceorientationabsolute', handleOrientation, true);
         } else {
@@ -144,12 +150,11 @@ function handleOrientation(e) {
     if (document.getElementById('compassDial')) document.getElementById('compassDial').style.transform = `rotate(${-heading}deg)`;
     if (document.getElementById('headingText')) document.getElementById('headingText').innerText = heading.toFixed(1) + '°';
     
-    // حساب الفرق للون الأخضر والاهتزاز
     let diff = Math.abs(heading - QIBLA_DEGREE);
     const innerDrop = document.getElementById('teardropInner');
     if(innerDrop) {
         if (diff < 5 || diff > 355) { 
-            innerDrop.style.backgroundColor = '#10b981'; // أخضر زمردي
+            innerDrop.style.backgroundColor = '#10b981'; 
             if (navigator.vibrate) navigator.vibrate(20); 
         } 
         else { innerDrop.style.backgroundColor = '#ffffff'; }

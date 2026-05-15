@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مصحف أبا مالك | الإصدار المكتمل</title>
+    <title>مصحف أبا مالك | النسخة الإمبراطورية المدمجة</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.css" />
@@ -17,18 +17,19 @@
         #sideMenu.open { right: 0; }
         .menu-header { padding: 20px; background: #c5a059; color: black; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
         
-        /* تصميم خانة البحث الجديد */
         .search-box { padding: 15px; background: #111; position: sticky; top: 68px; z-index: 10; border-bottom: 1px solid #333; display: flex; gap: 10px; }
         .search-box input { flex: 1; padding: 12px; border-radius: 10px; background: #222; border: 1px solid #c5a059; color: white; outline: none; font-family: 'Cairo', sans-serif; }
-        .search-box button { background: #c5a059; color: black; border: none; border-radius: 10px; padding: 0 15px; font-size: 18px; cursor: pointer; transition: 0.2s; }
-        .search-box button:active { transform: scale(0.95); }
-        
-        .surah-item { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .surah-item:active { background: rgba(197, 160, 89, 0.2); }
+        .search-box button { background: #c5a059; color: black; border: none; border-radius: 10px; padding: 0 15px; font-size: 18px; cursor: pointer; }
+        .surah-item { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; cursor: pointer; }
 
         /* نافذة التفسير */
-        #tafsirModal { position: fixed; bottom: -100%; left: 0; width: 100%; height: 75vh; background: #1a1a1a; z-index: 6000; border-top: 3px solid #c5a059; border-radius: 25px 25px 0 0; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; padding: 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); }
+        #tafsirModal { position: fixed; bottom: -100%; left: 0; width: 100%; height: 75vh; background: #1a1a1a; z-index: 6000; border-top: 3px solid #c5a059; border-radius: 25px 25px 0 0; transition: 0.4s; overflow-y: auto; padding: 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); }
         #tafsirModal.open { bottom: 0; }
+
+        /* المشغل الصوتي العلوي */
+        .audio-player { position: fixed; top: -100px; left: 0; width: 100%; background: rgba(0,0,0,0.95); padding: 15px; border-bottom: 2px solid #c5a059; z-index: 7000; transition: 0.4s; display: flex; align-items: center; justify-content: space-between; gap: 15px; backdrop-filter: blur(10px); }
+        .audio-player.active { top: 0; }
+        .play-btn { width: 50px; height: 50px; background: #c5a059; border-radius: 50%; color: black; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; }
 
         /* المصحف */
         .swiper { width: 100vw; height: calc(100vh - 80px); background: #fff; }
@@ -36,36 +37,46 @@
         .swiper-slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
         
         /* الشريط السفلي */
-        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; background: #000; display: flex; justify-content: space-around; align-items: center; z-index: 5000; border-top: 2px solid #c5a059; }
-        .btn { background: none; border: none; color: #c5a059; font-size: 20px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; font-family: 'Cairo', sans-serif; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; background: #000; display: flex; justify-content: space-between; align-items: center; z-index: 5000; border-top: 2px solid #c5a059; padding: 0 10px; }
+        .btn { background: none; border: none; color: #c5a059; font-size: 20px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; font-family: 'Cairo', sans-serif; flex: 1;}
         .btn span { font-size: 11px; font-weight: bold; }
-        .page-badge { background: #c5a059; color: #000; padding: 5px 20px; border-radius: 20px; font-weight: 900; font-size: 16px; display: flex; align-items: center; justify-content: center; min-width: 60px;}
+        
+        /* رقم الصفحة العائم */
+        .page-badge { position: fixed; top: 15px; left: 15px; background: rgba(0,0,0,0.7); color: #c5a059; padding: 5px 15px; border-radius: 20px; font-weight: 900; font-size: 16px; border: 1px solid #c5a059; z-index: 4000;}
     </style>
 </head>
 <body>
+
+    <div id="pageNum" class="page-badge">1</div>
+
+    <div id="audioPlayer" class="audio-player">
+        <div class="play-btn" onclick="togglePlay()"><i id="playIcon" class="fas fa-play"></i></div>
+        <div style="flex:1; text-align:center;">
+            <div style="font-size:14px; font-weight:900; color:#c5a059;">المكتبة الصوتية</div>
+            <div id="audioStatus" style="font-size:11px; opacity:0.7;">جاهز للتلاوة</div>
+        </div>
+        <i class="fas fa-times" style="font-size:24px; cursor:pointer; color:white; padding:10px;" onclick="toggleAudio()"></i>
+    </div>
 
     <div id="sideMenu">
         <div class="menu-header">
             <h2 style="margin:0; font-size: 18px; font-weight: 900;">البحث والفهرس</h2>
             <i class="fas fa-times" style="font-size: 24px; cursor: pointer;" onclick="toggleMenu()"></i>
         </div>
-        
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="اكتب للبحث عن آية..." onkeypress="if(event.key === 'Enter') executeSearch()">
+            <input type="text" id="searchInput" placeholder="ابحث عن آية..." onkeypress="if(event.key === 'Enter') executeSearch()">
             <button onclick="executeSearch()"><i class="fas fa-search"></i></button>
         </div>
-
         <div id="searchResults" style="display: none; padding: 15px;"></div>
         <div id="surahListContainer" style="padding-bottom: 20px;"></div>
-        
         <div style="padding: 20px; text-align: center;">
-            <button onclick="hardReset()" style="background: #ef4444; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; width: 100%;"><i class="fas fa-sync"></i> إعادة تهيئة المصحف</button>
+            <button onclick="hardReset()" style="background: #ef4444; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; width: 100%;"><i class="fas fa-sync"></i> مسح الذاكرة المعطلة</button>
         </div>
     </div>
 
     <div id="tafsirModal">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px; position: sticky; top: 0; background: #1a1a1a;">
-            <h2 style="margin: 0; color: #c5a059; font-weight: 900; font-size: 18px;">التفسير الميسر (صفحة <span id="tafsirPageNum"></span>)</h2>
+            <h2 style="margin: 0; color: #c5a059; font-weight: 900;">التفسير الميسر (<span id="tafsirPageNum"></span>)</h2>
             <i class="fas fa-times" style="font-size: 24px; cursor: pointer; color: white;" onclick="toggleTafsir()"></i>
         </div>
         <div id="tafsirContent" style="font-size: 16px; line-height: 2.2;"></div>
@@ -77,11 +88,9 @@
 
     <div class="nav-bar">
         <button class="btn" onclick="swiper.slideNext()"><i class="fas fa-chevron-right"></i><span>السابق</span></button>
+        <button class="btn" onclick="toggleAudio()"><i class="fas fa-volume-up"></i><span>الصوت</span></button>
         <button class="btn" onclick="toggleTafsir()"><i class="fas fa-book-open"></i><span>التفسير</span></button>
-        
-        <span id="pageNum" class="page-badge">1</span>
-        
-        <button class="btn" onclick="toggleMenu()"><i class="fas fa-search"></i><span>البحث</span></button>
+        <button class="btn" onclick="toggleMenu()"><i class="fas fa-search"></i><span>الفهرس</span></button>
         <button class="btn" onclick="swiper.slidePrev()"><i class="fas fa-chevron-left"></i><span>التالي</span></button>
     </div>
 
@@ -113,123 +122,110 @@
             {n:"المسد", p:603}, {n:"الإخلاص", p:604}, {n:"الفلق", p:604}, {n:"الناس", p:604}
         ];
 
+        let audio = new Audio();
+        let isPlaying = false;
+
         function initApp() {
             let html = '';
             for (let i = 1; i <= 604; i++) {
-                const imgUrl = `https://quran.ksu.edu.sa/png_big/${i}.png`;
-                html += `<div class="swiper-slide"><img src="${imgUrl}" loading="lazy"></div>`;
+                html += `<div class="swiper-slide"><img src="https://quran.ksu.edu.sa/png_big/${i}.png" loading="lazy"></div>`;
             }
             document.getElementById('quranSlider').innerHTML = html;
             
             let surahHtml = '';
             surahs.forEach((s) => {
-                surahHtml += `
-                <div class="surah-item" onclick="goToPage(${s.p})">
-                    <span style="font-weight:bold; font-size:15px;">${s.n}</span>
-                    <span style="opacity:0.5; font-size:12px;">صفحة ${s.p}</span>
-                </div>`;
+                surahHtml += `<div class="surah-item" onclick="goToPage(${s.p})"><span style="font-weight:bold;">${s.n}</span><span style="opacity:0.5;">صفحة ${s.p}</span></div>`;
             });
             document.getElementById('surahListContainer').innerHTML = surahHtml;
 
             window.swiper = new Swiper(".mySwiper", {
-                on: { slideChange: function () { document.getElementById('pageNum').innerText = this.activeIndex + 1; } }
+                on: { 
+                    slideChange: function () { 
+                        const currentPage = this.activeIndex + 1;
+                        document.getElementById('pageNum').innerText = currentPage; 
+                        
+                        // مزامنة الصوت والتفسير مع الصفحة الجديدة
+                        if(isPlaying) playCurrentPage();
+                        if(document.getElementById('tafsirModal').classList.contains('open')) loadTafsir(currentPage);
+                    } 
+                }
             });
         }
 
+        // --- الصوت ---
+        function toggleAudio() { document.getElementById('audioPlayer').classList.toggle('active'); }
+        function togglePlay() {
+            if(isPlaying) {
+                audio.pause();
+                document.getElementById('playIcon').className = 'fas fa-play';
+                document.getElementById('audioStatus').innerText = 'تم الإيقاف';
+            } else {
+                playCurrentPage();
+            }
+            isPlaying = !isPlaying;
+        }
+        function playCurrentPage() {
+            const p = String(swiper.activeIndex + 1).padStart(3, '0');
+            audio.src = `https://www.ourquran.com/audio/pages/page${p}.mp3`;
+            audio.play();
+            document.getElementById('playIcon').className = 'fas fa-pause';
+            document.getElementById('audioStatus').innerText = 'تلاوة الصفحة ' + (swiper.activeIndex + 1);
+        }
+        audio.onended = function() { swiper.slideNext(); };
+
+        // --- التحكم الأساسي ---
         function toggleMenu() { document.getElementById('sideMenu').classList.toggle('open'); }
         function goToPage(p) { swiper.slideTo(p - 1); toggleMenu(); }
-
         function hardReset() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(regs => { for(let reg of regs) { reg.unregister(); } });
-            }
-            window.location.href = window.location.pathname + '?reset=' + Math.random();
+            if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(regs => { for(let r of regs) r.unregister(); });
+            window.location.href = window.location.pathname + '?reset=1';
         }
 
-        // ============= محرك البحث المطور =============
+        // --- البحث والتفسير ---
         function executeSearch() {
             const query = document.getElementById('searchInput').value;
             const resCont = document.getElementById('searchResults');
             const listCont = document.getElementById('surahListContainer');
+            if(query.length < 3) return;
+            resCont.style.display = 'block'; listCont.style.display = 'none';
+            resCont.innerHTML = '<div style="text-align:center;"><i class="fas fa-spinner fa-spin" style="color:#c5a059; font-size:30px;"></i></div>';
             
-            if(!query || query.length < 3) {
-                alert("يرجى كتابة 3 أحرف على الأقل للبحث");
-                return;
-            }
-            
-            resCont.style.display = 'block';
-            listCont.style.display = 'none';
-            resCont.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin" style="color:#c5a059; font-size:30px;"></i></div>';
-            
-            // استخدام quran-simple-clean لضمان البحث بدون تشكيل
             fetch(`https://api.alquran.cloud/v1/search/${query}/all/quran-simple-clean`)
             .then(res => res.json())
             .then(data => {
-                if(data.data && data.data.matches && data.data.matches.length > 0) {
-                    let html = `<p style="color:#c5a059; font-size:14px; font-weight:bold; margin-bottom:15px;">وجدنا (${data.data.matches.length}) نتيجة</p>`;
-                    
-                    data.data.matches.slice(0, 20).forEach(m => {
-                        // استخدام رقم الصفحة إذا توفر، أو صفحة السورة كبديل
+                if(data.data && data.data.matches.length > 0) {
+                    let html = `<p style="color:#c5a059; font-weight:bold;">وجدنا (${data.data.matches.length}) نتيجة</p>`;
+                    data.data.matches.slice(0, 15).forEach(m => {
                         const pageNum = m.page || surahs.find(s => s.n === m.surah.name)?.p || 1;
-                        
-                        html += `
-                        <div style="background:#222; padding:15px; border-radius:12px; margin-bottom:10px; cursor:pointer; border:1px solid #333;" onclick="goToPage(${pageNum})">
-                            <p style="margin:0 0 10px 0; font-size:16px; line-height:1.6;">${m.text}</p>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="font-size:11px; color:#c5a059; background:black; padding:4px 10px; border-radius:15px;"><i class="fas fa-book-open"></i> سورة ${m.surah.name}</span>
-                                <span style="font-size:10px; opacity:0.5;">صفحة ${pageNum}</span>
-                            </div>
-                        </div>`;
+                        html += `<div style="background:#222; padding:15px; border-radius:12px; margin-bottom:10px; cursor:pointer;" onclick="goToPage(${pageNum})"><p>${m.text}</p><span style="color:#c5a059; font-size:10px;">سورة ${m.surah.name}</span></div>`;
                     });
-                    
-                    html += `<button onclick="document.getElementById('searchResults').style.display='none'; document.getElementById('surahListContainer').style.display='block'; document.getElementById('searchInput').value='';" style="width:100%; background:#333; color:white; border:none; padding:10px; border-radius:10px; margin-top:10px; cursor:pointer;">العودة للفهرس</button>`;
+                    html += `<button onclick="document.getElementById('searchResults').style.display='none'; document.getElementById('surahListContainer').style.display='block';" style="width:100%; background:#333; color:white; padding:10px; border-radius:10px;">رجوع</button>`;
                     resCont.innerHTML = html;
-                } else {
-                    resCont.innerHTML = `
-                    <p style="text-align:center; opacity:0.5; margin-bottom:20px;">لم نعثر على نتائج، تأكد من الإملاء.</p>
-                    <button onclick="document.getElementById('searchResults').style.display='none'; document.getElementById('surahListContainer').style.display='block';" style="width:100%; background:#c5a059; color:black; border:none; padding:10px; border-radius:10px; cursor:pointer; font-weight:bold;">العودة للفهرس</button>`;
-                }
-            })
-            .catch(e => {
-                resCont.innerHTML = '<p style="text-align:center; color:#ef4444;">خطأ في الاتصال، تأكد من الإنترنت</p>';
+                } else { resCont.innerHTML = '<p>لا توجد نتائج</p>'; }
             });
         }
 
-        // ============= محرك التفسير =============
         function toggleTafsir() {
             const modal = document.getElementById('tafsirModal');
-            if (modal.classList.contains('open')) {
-                modal.classList.remove('open');
-            } else {
-                modal.classList.add('open');
-                loadTafsir(swiper.activeIndex + 1);
-            }
+            if(modal.classList.contains('open')) modal.classList.remove('open');
+            else { modal.classList.add('open'); loadTafsir(swiper.activeIndex + 1); }
         }
 
         async function loadTafsir(page) {
             document.getElementById('tafsirPageNum').innerText = page;
             const content = document.getElementById('tafsirContent');
-            content.innerHTML = '<div style="text-align:center; padding:40px;"><i class="fas fa-spinner fa-spin" style="font-size:30px; color:#c5a059;"></i></div>';
-            
+            content.innerHTML = '<div style="text-align:center;"><i class="fas fa-spinner fa-spin" style="font-size:30px; color:#c5a059;"></i></div>';
             try {
                 const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/ar.muyassar`);
                 const data = await res.json();
                 let html = '';
-                data.data.ayahs.forEach(ayah => {
-                    html += `
-                    <p style="margin-bottom:20px; padding:15px; background:rgba(255,255,255,0.02); border-radius:15px; border-right:3px solid #c5a059;">
-                        <span style="color:#c5a059; font-weight:900; margin-left:5px;">[آية ${ayah.numberInSurah}]</span> 
-                        ${ayah.text}
-                    </p>`;
-                });
+                data.data.ayahs.forEach(ayah => html += `<p style="margin-bottom:20px; border-right:3px solid #c5a059; padding-right:10px;"><span style="color:#c5a059;">[${ayah.numberInSurah}]</span> ${ayah.text}</p>`);
                 content.innerHTML = html;
-            } catch(e) {
-                content.innerHTML = '<p style="text-align:center; color:#ef4444;">تعذر تحميل التفسير. يرجى التحقق من الإنترنت.</p>';
-            }
+            } catch(e) { content.innerHTML = '<p>خطأ في الاتصال.</p>'; }
         }
 
         window.onload = initApp;
     </script>
 </body>
-                                                                                                </html>
-    
+    </html>
+            

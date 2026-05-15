@@ -35,8 +35,6 @@ window.requestLocation = () => navigator.geolocation.getCurrentPosition(p => {
 window.toggleDarkMode = () => { 
     const isDark = document.body.classList.toggle('dark-mode'); 
     localStorage.setItem('aba_dark', isDark); 
-    const toggleBtn = document.getElementById('darkToggle');
-    if(toggleBtn) toggleBtn.classList.toggle('active', isDark); 
 };
 
 // ==================== 2. المواقيت وحساب القبلة الدقيق ====================
@@ -99,27 +97,38 @@ function startCountdown() {
             const hrs = Math.floor(diff/3600000); const mins = Math.floor((diff%3600000)/60000); const secs = Math.floor((diff%60000)/1000);
             if(document.getElementById('mainCountdown')) document.getElementById('mainCountdown').innerText = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
             if(document.getElementById('nextPrayerTitle')) document.getElementById('nextPrayerTitle').innerText = `باقي على موعد ${next.n}`;
-            
-            if (hrs === 0 && mins === 0 && secs === 0) {
-                sendSmartNotification("حان الآن موعد الصلاة", `نداء الحق يناديك لموعد صلاة ${next.n}`);
-            }
         }
     }, 1000);
 }
 
-// ==================== 3. محرك البوصلة ====================
+// ==================== 3. محرك البوصلة المطور (الدمج الجديد) ====================
 let isCompassActive = false; 
 window.toggleCompass = async () => {
     const cont = document.getElementById('qiblaContainer'); 
     if(!cont) return;
+
     if (!isCompassActive) {
+        // طلب إذن الحساسات للآيفون
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            try { const permission = await DeviceOrientationEvent.requestPermission(); if (permission !== 'granted') return; } catch (e) { console.error(e); }
+            try {
+                const permission = await DeviceOrientationEvent.requestPermission();
+                if (permission !== 'granted') {
+                    alert("يجب السماح بحساسات الحركة لتعمل البوصلة");
+                    return;
+                }
+            } catch (e) { console.error(e); }
         }
+
         const kaaba = document.getElementById('kaabaMarker');
         if(kaaba) kaaba.style.transform = `rotate(${QIBLA_DEGREE}deg)`;
-        window.addEventListener('deviceorientationabsolute', handleOrientation, true);
-        window.addEventListener('deviceorientation', handleOrientation, true);
+
+        // تفعيل المستشعرات (Absolute للاندرويد، العادي للآيفون)
+        if ('ondeviceorientationabsolute' in window) {
+            window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+        } else {
+            window.addEventListener('deviceorientation', handleOrientation, true);
+        }
+
         cont.classList.replace('hidden', 'flex');
         isCompassActive = true;
     } else {
@@ -134,11 +143,16 @@ function handleOrientation(e) {
     let heading = e.webkitCompassHeading || (360 - e.alpha);
     if (document.getElementById('compassDial')) document.getElementById('compassDial').style.transform = `rotate(${-heading}deg)`;
     if (document.getElementById('headingText')) document.getElementById('headingText').innerText = heading.toFixed(1) + '°';
+    
+    // حساب الفرق للون الأخضر والاهتزاز
     let diff = Math.abs(heading - QIBLA_DEGREE);
     const innerDrop = document.getElementById('teardropInner');
     if(innerDrop) {
-        if (diff < 3 || diff > 357) { innerDrop.style.backgroundColor = '#2a7a6c'; if (navigator.vibrate) navigator.vibrate(20); } 
-        else { innerDrop.style.backgroundColor = '#eaf5f4'; }
+        if (diff < 5 || diff > 355) { 
+            innerDrop.style.backgroundColor = '#10b981'; // أخضر زمردي
+            if (navigator.vibrate) navigator.vibrate(20); 
+        } 
+        else { innerDrop.style.backgroundColor = '#ffffff'; }
     }
 }
 
@@ -147,51 +161,44 @@ let tCount = 0; let zikrIndex = 0; const azkarList = ["سبحان الله", "ا
 window.openTasbih = () => document.getElementById('tasbihModal').style.display = 'flex';
 window.closeTasbih = () => document.getElementById('tasbihModal').style.display = 'none';
 window.nextZikr = () => { zikrIndex = (zikrIndex + 1) % azkarList.length; document.getElementById('currentZikrText').innerText = azkarList[zikrIndex]; window.resetTasbih(); };
-window.countTasbih = () => { tCount++; document.getElementById('tasbihCounter').innerText = tCount; if (localStorage.getItem('aba_vibrate') !== 'false' && navigator.vibrate) navigator.vibrate(50); };
+window.prevZikr = () => { zikrIndex = (zikrIndex - 1 + azkarList.length) % azkarList.length; document.getElementById('currentZikrText').innerText = azkarList[zikrIndex]; window.resetTasbih(); };
+window.countTasbih = () => { tCount++; document.getElementById('tasbihCounter').innerText = tCount; if (navigator.vibrate) navigator.vibrate(40); };
 window.resetTasbih = () => { tCount = 0; document.getElementById('tasbihCounter').innerText = 0; };
 
-// ==================== 5. التنبيهات والبحث الشامل ====================
+// ==================== 5. الإشعارات والبحث ====================
 window.requestNotificationPermission = async () => {
     if (!("Notification" in window)) return;
     const permission = await Notification.requestPermission();
-    if (permission === "granted") sendSmartNotification("محراب أبا مالك", "تم تفعيل التنبيهات بنجاح");
-};
-
-function sendSmartNotification(title, body) {
-    if (Notification.permission === "granted") {
+    if (permission === "granted") {
         navigator.serviceWorker.ready.then(reg => {
-            reg.showNotification(title, { body: body, icon: 'https://i.ibb.co/pBhzxHdM/1000027317.jpg', vibrate: [200, 100, 200] });
+            reg.showNotification("محراب أبا مالك", { body: "تم تفعيل التنبيهات بنجاح", icon: 'https://i.ibb.co/pBhzxHdM/1000027317.jpg' });
         });
     }
-}
+};
 
 window.toggleGlobalSearch = () => {
     const modal = document.getElementById('searchModal');
     modal.classList.toggle('hidden');
-    if(!modal.classList.contains('hidden')) document.getElementById('globalSearchInput').focus();
 };
 
 async function runGlobalSearch(query) {
     const resultsCont = document.getElementById('searchResults');
-    if (query.length < 3) { resultsCont.innerHTML = '<p class="text-center text-white/30 mt-10">أدخل 3 أحرف...</p>'; return; }
-    resultsCont.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-gold"></i></div>';
+    if (query.length < 3) return;
+    resultsCont.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-yellow-500"></i></div>';
     try {
         const res = await fetch(`https://api.alquran.cloud/v1/search/${query}/all/ar.clean`);
         const data = await res.json();
         let html = '';
         if (data.data && data.data.matches.length > 0) {
             data.data.matches.slice(0, 10).forEach(m => {
-                html += `<div class="bg-white/5 p-4 rounded-2xl border border-white/5 mb-2">
-                    <p class="text-white text-lg font-serif mb-1">${m.text}</p>
-                    <p class="text-[10px] text-yellow-500 font-bold">سورة ${m.surah.name} - آية ${m.numberInSurah}</p>
-                </div>`;
+                html += `<div class="bg-white/5 p-4 rounded-2xl border border-white/5 mb-2"><p class="text-white mb-1">${m.text}</p><p class="text-[10px] text-yellow-500">سورة ${m.surah.name} - آية ${m.numberInSurah}</p></div>`;
             });
             resultsCont.innerHTML = html;
-        } else { resultsCont.innerHTML = '<p class="text-center text-white/30">لا توجد نتائج</p>'; }
+        } else { resultsCont.innerHTML = '<p class="text-center opacity-30">لا توجد نتائج</p>'; }
     } catch (e) { resultsCont.innerHTML = '<p class="text-center text-red-400">خطأ في الاتصال</p>'; }
 }
 
-// ==================== 6. نظام ورد اليوم ====================
+// ==================== 6. ورد اليوم ====================
 function renderWird() {
     const list = document.getElementById('wirdList'); if (!list) return;
     let myWird = JSON.parse(localStorage.getItem('aba_wird_v12')) || [{ text: "قراءة صفحة من القرآن", done: false }, { text: "أذكار الصباح", done: false }, { text: "الاستغفار (100)", done: false }];
@@ -199,42 +206,30 @@ function renderWird() {
     document.getElementById('progressText').innerText = Math.round((myWird.filter(i => i.done).length / myWird.length) * 100) + '%';
     localStorage.setItem('aba_wird_v12', JSON.stringify(myWird));
 }
-
 window.toggleWirdAction = (i) => { let myWird = JSON.parse(localStorage.getItem('aba_wird_v12')); myWird[i].done = !myWird[i].done; localStorage.setItem('aba_wird_v12', JSON.stringify(myWird)); renderWird(); };
 
-// ==================== 7. نظام الآية العشوائية والتفسير ====================
+// ==================== 7. آية عشوائية ====================
 window.getRandomAyah = async () => {
     const textEl = document.getElementById('ayahText');
-    const tafsirEl = document.getElementById('tafsirText');
-    const surahEl = document.getElementById('surahName');
-    const ayahNumEl = document.getElementById('ayahNumber');
-
-    if(!textEl) return; // لضمان عدم حدوث خطأ إذا لم يكن العنصر موجوداً في الصفحة
-
-    // رقم عشوائي من 1 إلى 6236 آية
+    if(!textEl) return;
     const randomID = Math.floor(Math.random() * 6236) + 1;
-    const url = `https://api.alquran.cloud/v1/ayah/${randomID}/editions/quran-uthmani,ar.jalalayn`;
-
     try {
-        const res = await fetch(url);
+        const res = await fetch(`https://api.alquran.cloud/v1/ayah/${randomID}/editions/quran-uthmani,ar.jalalayn`);
         const data = await res.json();
         if(data.status === "OK") {
-            const ayah = data.data[0];
-            const tafsir = data.data[1];
-            textEl.innerText = `﴿ ${ayah.text} ﴾`;
-            tafsirEl.innerText = tafsir.text;
-            surahEl.innerText = `سورة ${ayah.surah.name}`;
-            ayahNumEl.innerText = ayah.numberInSurah;
+            textEl.innerText = `﴿ ${data.data[0].text} ﴾`;
+            document.getElementById('tafsirText').innerText = data.data[1].text;
+            document.getElementById('surahName').innerText = `سورة ${data.data[0].surah.name}`;
+            document.getElementById('ayahNumber').innerText = data.data[0].numberInSurah;
         }
     } catch (e) { console.log("خطأ في جلب الآية"); }
 };
 
-// ==================== 8. التشغيل النهائي عند تحميل الصفحة ====================
+// ==================== 8. التشغيل ====================
 document.addEventListener('DOMContentLoaded', () => {
     renderWird(); 
     fetchPrayers();
-    getRandomAyah(); // تشغيل الآية العشوائية عند الفتح
+    getRandomAyah();
     if (localStorage.getItem('aba_dark') === 'true') document.body.classList.add('dark-mode');
-    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').then(reg => console.log('Offline Active')); }
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
 });
-        

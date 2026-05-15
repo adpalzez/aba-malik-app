@@ -3,114 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="referrer" content="no-referrer">
-    <title>مصحف أبا مالك العقيلي</title>
+    <title>مصحف أبا مالك | الإصدار المكتمل</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --quran-bg: #f4ece1; --control-bg: #1a1a1a; --accent: #c5a059; }
-        body { margin: 0; background-color: var(--quran-bg); font-family: 'Cairo', sans-serif; overflow: hidden; }
+        body { margin: 0; background-color: #121212; color: #fff; font-family: 'Cairo', sans-serif; overflow: hidden; }
         
-        .swiper { width: 100vw; height: calc(100vh - 75px); background: var(--quran-bg); }
+        /* القائمة الجانبية (الفهرس والبحث) */
+        #sideMenu { position: fixed; top: 0; right: -100%; width: 320px; max-width: 100%; height: 100%; background: #1a1a1a; z-index: 10000; transition: right 0.4s ease; overflow-y: auto; box-shadow: -5px 0 25px rgba(0,0,0,0.9); }
+        #sideMenu.open { right: 0; }
+        .menu-header { padding: 20px; background: #c5a059; color: black; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+        
+        /* تصميم خانة البحث الجديد */
+        .search-box { padding: 15px; background: #111; position: sticky; top: 68px; z-index: 10; border-bottom: 1px solid #333; display: flex; gap: 10px; }
+        .search-box input { flex: 1; padding: 12px; border-radius: 10px; background: #222; border: 1px solid #c5a059; color: white; outline: none; font-family: 'Cairo', sans-serif; }
+        .search-box button { background: #c5a059; color: black; border: none; border-radius: 10px; padding: 0 15px; font-size: 18px; cursor: pointer; transition: 0.2s; }
+        .search-box button:active { transform: scale(0.95); }
+        
+        .surah-item { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .surah-item:active { background: rgba(197, 160, 89, 0.2); }
+
+        /* نافذة التفسير */
+        #tafsirModal { position: fixed; bottom: -100%; left: 0; width: 100%; height: 75vh; background: #1a1a1a; z-index: 6000; border-top: 3px solid #c5a059; border-radius: 25px 25px 0 0; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; padding: 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); }
+        #tafsirModal.open { bottom: 0; }
+
+        /* المصحف */
+        .swiper { width: 100vw; height: calc(100vh - 80px); background: #fff; }
         .swiper-slide { display: flex; justify-content: center; align-items: center; }
-        .swiper-slide img { width: 100%; height: 100%; object-fit: contain; }
-
-        .controls { position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; background: var(--control-bg); 
-                    display: flex; justify-content: space-between; align-items: center; padding: 0 15px; 
-                    box-sizing: border-box; z-index: 5000; border-top: 4px solid var(--accent); }
+        .swiper-slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
         
-        .btn { background: none; border: none; color: white; font-size: 18px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .btn span { font-size: 10px; opacity: 0.8; font-weight: bold; }
-        
-        .page-badge { background: var(--accent); color: black; padding: 5px 15px; border-radius: 12px; font-weight: 900; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-
-        /* نافذة الفهرس */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 6000; display: none; justify-content: center; align-items: flex-end; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--quran-bg); width: 100%; max-height: 85vh; border-radius: 35px 35px 0 0; overflow-y: auto; padding: 25px; box-sizing: border-box; }
-        .surah-item { display: flex; justify-content: space-between; padding: 18px; border-bottom: 1px solid rgba(0,0,0,0.05); cursor: pointer; }
-        
-        .search-box { position: sticky; top: -25px; background: var(--quran-bg); padding: 10px 0 20px; display: flex; gap: 10px; z-index: 10; }
-        .search-box input { flex: 1; padding: 15px; border-radius: 15px; border: 2px solid var(--accent); font-family: 'Cairo'; outline: none; text-align: center; }
-        .go-btn { background: var(--accent); border: none; padding: 0 20px; border-radius: 15px; font-weight: 900; }
+        /* الشريط السفلي */
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; background: #000; display: flex; justify-content: space-around; align-items: center; z-index: 5000; border-top: 2px solid #c5a059; }
+        .btn { background: none; border: none; color: #c5a059; font-size: 20px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; font-family: 'Cairo', sans-serif; }
+        .btn span { font-size: 11px; font-weight: bold; }
+        .page-badge { background: #c5a059; color: #000; padding: 5px 20px; border-radius: 20px; font-weight: 900; font-size: 16px; display: flex; align-items: center; justify-content: center; min-width: 60px;}
     </style>
 </head>
 <body>
 
-    <div id="indexModal" class="modal" onclick="closeIndex()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="search-box">
-                <input type="number" id="pageSearch" placeholder="رقم الصفحة (1 - 604)">
-                <button onclick="jumpToPage()" class="go-btn">اذهب</button>
-            </div>
-            <div id="surahList"></div>
+    <div id="sideMenu">
+        <div class="menu-header">
+            <h2 style="margin:0; font-size: 18px; font-weight: 900;">البحث والفهرس</h2>
+            <i class="fas fa-times" style="font-size: 24px; cursor: pointer;" onclick="toggleMenu()"></i>
         </div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="اكتب للبحث عن آية..." onkeypress="if(event.key === 'Enter') executeSearch()">
+            <button onclick="executeSearch()"><i class="fas fa-search"></i></button>
+        </div>
+
+        <div id="searchResults" style="display: none; padding: 15px;"></div>
+        <div id="surahListContainer" style="padding-bottom: 20px;"></div>
+        
+        <div style="padding: 20px; text-align: center;">
+            <button onclick="hardReset()" style="background: #ef4444; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; width: 100%;"><i class="fas fa-sync"></i> إعادة تهيئة المصحف</button>
+        </div>
+    </div>
+
+    <div id="tafsirModal">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px; position: sticky; top: 0; background: #1a1a1a;">
+            <h2 style="margin: 0; color: #c5a059; font-weight: 900; font-size: 18px;">التفسير الميسر (صفحة <span id="tafsirPageNum"></span>)</h2>
+            <i class="fas fa-times" style="font-size: 24px; cursor: pointer; color: white;" onclick="toggleTafsir()"></i>
+        </div>
+        <div id="tafsirContent" style="font-size: 16px; line-height: 2.2;"></div>
     </div>
 
     <div class="swiper mySwiper">
         <div class="swiper-wrapper" id="quranSlider"></div>
     </div>
 
-    <div class="controls">
-        <button class="btn" onclick="swiper.slidePrev()"><i class="fas fa-chevron-right text-[var(--accent)]"></i><span>التالي</span></button>
-        <button class="btn" onclick="openIndex()"><i class="fas fa-book-open"></i><span>الفهرس</span></button>
+    <div class="nav-bar">
+        <button class="btn" onclick="swiper.slideNext()"><i class="fas fa-chevron-right"></i><span>السابق</span></button>
+        <button class="btn" onclick="toggleTafsir()"><i class="fas fa-book-open"></i><span>التفسير</span></button>
+        
         <span id="pageNum" class="page-badge">1</span>
-        <a href="mosque.html" class="btn"><i class="fas fa-home"></i><span>الرئيسية</span></a>
-        <button class="btn" onclick="swiper.slideNext()"><i class="fas fa-chevron-left text-[var(--accent)]"></i><span>السابق</span></button>
+        
+        <button class="btn" onclick="toggleMenu()"><i class="fas fa-search"></i><span>البحث</span></button>
+        <button class="btn" onclick="swiper.slidePrev()"><i class="fas fa-chevron-left"></i><span>التالي</span></button>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.js"></script>
     <script>
-        // 1. الفهرس الكامل
         const surahs = [
-            {n:"الفاتحة", p:1}, {n:"البقرة", p:2}, {n:"آل عمران", p:50}, {n:"النساء", p:77}, {n:"المائدة", p:106}, {n:"الأنعام", p:128}, {n:"الأعراف", p:151}, {n:"الأنفال", p:177}, {n:"التوبة", p:187}, {n:"يونس", p:208}, {n:"هود", p:221}, {n:"يوسف", p:235}, {n:"الرعد", p:249}, {n:"إبراهيم", p:255}, {n:"الحجر", p:262}, {n:"النحل", p:267}, {n:"الإسراء", p:282}, {n:"الكهف", p:293}, {n:"مريم", p:305}, {n:"طه", p:312}, {n:"الأنبياء", p:322}, {n:"الحج", p:332}, {n:"المؤمنون", p:342}, {n:"النور", p:350}, {n:"الفرقان", p:359}, {n:"الشعراء", p:367}, {n:"النمل", p:377}, {n:"القصص", p:385}, {n:"العنكبوت", p:396}, {n:"الروم", p:404}, {n:"لقمان", p:411}, {n:"السجدة", p:415}, {n:"الأحزاب", p:418}, {n:"سبأ", p:428}, {n:"فاطر", p:434}, {n:"يس", p:440}, {n:"الصافات", p:446}, {n:"ص", p:453}, {n:"الزمر", p:458}, {n:"غافر", p:467}, {n:"فصلت", p:477}, {n:"الشورى", p:483}, {n:"الزخرف", p:489}, {n:"الدخان", p:496}, {n:"الجاثية", p:499}, {n:"الأحقاف", p:502}, {n:"محمد", p:507}, {n:"الفتح", p:511}, {n:"الحجرات", p:515}, {n:"ق", p:518}, {n:"الذاريات", p:520}, {n:"الطور", p:523}, {n:"النجم", p:526}, {n:"القمر", p:528}, {n:"الرحمن", p:531}, {n:"الواقعة", p:534}, {n:"الحديد", p:537}, {n:"المجادلة", p:542}, {n:"الحشر", p:545}, {n:"الممتحنة", p:549}, {n:"الصف", p:551}, {n:"الجمعة", p:553}, {n:"المنافقون", p:554}, {n:"التغابن", p:556}, {n:"الطلاق", p:558}, {n:"التحريم", p:560}, {n:"الملك", p:562}, {n:"القلم", p:564}, {n:"الحاقة", p:566}, {n:"المعارج", p:568}, {n:"نوح", p:570}, {n:"الجن", p:572}, {n:"المزمل", p:574}, {n:"المدثر", p:575}, {n:"القيامة", p:577}, {n:"الإنسان", p:578}, {n:"المرسلات", p:580}, {n:"النبأ", p:582}, {n:"النازعات", p:583}, {n:"عبس", p:585}, {n:"التكوير", p:586}, {n:"الإنفطار", p:587}, {n:"المطففين", p:587}, {n:"الإنشقاق", p:589}, {n:"البروج", p:590}, {n:"الطارق", p:591}, {n:"الأعلى", p:591}, {n:"الغاشية", p:592}, {n:"الفجر", p:593}, {n:"البلد", p:594}, {n:"الشمس", p:595}, {n:"الليل", p:595}, {n:"الضحى", p:596}, {n:"الشرح", p:596}, {n:"التين", p:597}, {n:"العلق", p:597}, {n:"القدر", p:598}, {n:"البينة", p:598}, {n:"الزلزلة", p:599}, {n:"العاديات", p:599}, {n:"القارعة", p:600}, {n:"التكاثر", p:600}, {n:"العصر", p:601}, {n:"الهمزة", p:601}, {n:"الفيل", p:601}, {n:"قريش", p:602}, {n:"الماعون", p:602}, {n:"الكوثر", p:602}, {n:"الكافرون", p:603}, {n:"النصر", p:603}, {n:"المسد", p:603}, {n:"الإخلاص", p:604}, {n:"الفلق", p:604}, {n:"الناس", p:604}
+            {n:"الفاتحة", p:1}, {n:"البقرة", p:2}, {n:"آل عمران", p:50}, {n:"النساء", p:77}, {n:"المائدة", p:106},
+            {n:"الأنعام", p:128}, {n:"الأعراف", p:151}, {n:"الأنفال", p:177}, {n:"التوبة", p:187}, {n:"يونس", p:208},
+            {n:"هود", p:221}, {n:"يوسف", p:235}, {n:"الرعد", p:249}, {n:"إبراهيم", p:255}, {n:"الحجر", p:262},
+            {n:"النحل", p:267}, {n:"الإسراء", p:282}, {n:"الكهف", p:293}, {n:"مريم", p:305}, {n:"طه", p:312},
+            {n:"الأنبياء", p:322}, {n:"الحج", p:332}, {n:"المؤمنون", p:342}, {n:"النور", p:350}, {n:"الفرقان", p:359},
+            {n:"الشعراء", p:367}, {n:"النمل", p:377}, {n:"القصص", p:385}, {n:"العنكبوت", p:396}, {n:"الروم", p:404},
+            {n:"لقمان", p:411}, {n:"السجدة", p:415}, {n:"الأحزاب", p:418}, {n:"سبأ", p:428}, {n:"فاطر", p:434},
+            {n:"يس", p:440}, {n:"الصافات", p:446}, {n:"ص", p:453}, {n:"الزمر", p:458}, {n:"غافر", p:467},
+            {n:"فصلت", p:477}, {n:"الشورى", p:483}, {n:"الزخرف", p:489}, {n:"الدخان", p:496}, {n:"الجاثية", p:499},
+            {n:"الأحقاف", p:502}, {n:"محمد", p:507}, {n:"الفتح", p:511}, {n:"الحجرات", p:515}, {n:"ق", p:518},
+            {n:"الذاريات", p:520}, {n:"الطور", p:523}, {n:"النجم", p:526}, {n:"القمر", p:528}, {n:"الرحمن", p:531},
+            {n:"الواقعة", p:534}, {n:"الحديد", p:537}, {n:"المجادلة", p:542}, {n:"الحشر", p:545}, {n:"الممتحنة", p:549},
+            {n:"الصف", p:551}, {n:"الجمعة", p:553}, {n:"المنافقون", p:554}, {n:"التغابن", p:556}, {n:"الطلاق", p:558},
+            {n:"التحريم", p:560}, {n:"الملك", p:562}, {n:"القلم", p:564}, {n:"الحاقة", p:566}, {n:"المعارج", p:568},
+            {n:"نوح", p:570}, {n:"الجن", p:572}, {n:"المزمل", p:574}, {n:"المدثر", p:575}, {n:"القيامة", p:577},
+            {n:"الإنسان", p:578}, {n:"المرسلات", p:580}, {n:"النبأ", p:582}, {n:"النازعات", p:583}, {n:"عبس", p:585},
+            {n:"التكوير", p:586}, {n:"الانفطار", p:587}, {n:"المطففين", p:587}, {n:"الانشقاق", p:589}, {n:"البروج", p:590},
+            {n:"الطارق", p:591}, {n:"الأعلى", p:591}, {n:"الغاشية", p:592}, {n:"الفجر", p:593}, {n:"البلد", p:594},
+            {n:"الشمس", p:595}, {n:"الليل", p:595}, {n:"الضحى", p:596}, {n:"الشرح", p:596}, {n:"التين", p:597},
+            {n:"العلق", p:597}, {n:"القدر", p:598}, {n:"البينة", p:598}, {n:"الزلزلة", p:599}, {n:"العاديات", p:599},
+            {n:"القارعة", p:600}, {n:"التكاثر", p:600}, {n:"العصر", p:601}, {n:"الهمزة", p:601}, {n:"الفيل", p:601},
+            {n:"قريش", p:602}, {n:"الماعون", p:602}, {n:"الكوثر", p:602}, {n:"الكافرون", p:603}, {n:"النصر", p:603},
+            {n:"المسد", p:603}, {n:"الإخلاص", p:604}, {n:"الفلق", p:604}, {n:"الناس", p:604}
         ];
 
-        // وظيفة الترقيم (001)
-        function pad(n) { return n.toString().padStart(3, '0'); }
+        function initApp() {
+            let html = '';
+            for (let i = 1; i <= 604; i++) {
+                const imgUrl = `https://quran.ksu.edu.sa/png_big/${i}.png`;
+                html += `<div class="swiper-slide"><img src="${imgUrl}" loading="lazy"></div>`;
+            }
+            document.getElementById('quranSlider').innerHTML = html;
+            
+            let surahHtml = '';
+            surahs.forEach((s) => {
+                surahHtml += `
+                <div class="surah-item" onclick="goToPage(${s.p})">
+                    <span style="font-weight:bold; font-size:15px;">${s.n}</span>
+                    <span style="opacity:0.5; font-size:12px;">صفحة ${s.p}</span>
+                </div>`;
+            });
+            document.getElementById('surahListContainer').innerHTML = surahHtml;
 
-        // مصادر الصور بالترتيب (من الأقوى للأضعف)
-        const sources = [
-            "https://www.alkhatat.com/quran/pages/png/", // الخطاط (001)
-            "https://server10.mp3quran.net/tajweed/pages/", // MP3Quran (001)
-            "https://raw.githubusercontent.com/itxtools/quran-images/master/images/" // GitHub (1)
-        ];
-
-        // بناء السلايدر
-        let sHtml = '';
-        for (let i = 1; i <= 604; i++) {
-            sHtml += `<div class="swiper-slide"><img src="${sources[0]}${pad(i)}.png" onerror="tryNext(this, ${i}, 1)"></div>`;
+            window.swiper = new Swiper(".mySwiper", {
+                on: { slideChange: function () { document.getElementById('pageNum').innerText = this.activeIndex + 1; } }
+            });
         }
-        document.getElementById('quranSlider').innerHTML = sHtml;
 
-        // وظيفة الطوارئ للصور
-        function tryNext(img, idx, sIdx) {
-            if(sIdx < sources.length) {
-                let p = (sources[sIdx].includes('github')) ? idx : pad(idx);
-                img.src = sources[sIdx] + p + ".png";
-                img.onerror = () => tryNext(img, idx, sIdx + 1);
+        function toggleMenu() { document.getElementById('sideMenu').classList.toggle('open'); }
+        function goToPage(p) { swiper.slideTo(p - 1); toggleMenu(); }
+
+        function hardReset() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(regs => { for(let reg of regs) { reg.unregister(); } });
+            }
+            window.location.href = window.location.pathname + '?reset=' + Math.random();
+        }
+
+        // ============= محرك البحث المطور =============
+        function executeSearch() {
+            const query = document.getElementById('searchInput').value;
+            const resCont = document.getElementById('searchResults');
+            const listCont = document.getElementById('surahListContainer');
+            
+            if(!query || query.length < 3) {
+                alert("يرجى كتابة 3 أحرف على الأقل للبحث");
+                return;
+            }
+            
+            resCont.style.display = 'block';
+            listCont.style.display = 'none';
+            resCont.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin" style="color:#c5a059; font-size:30px;"></i></div>';
+            
+            // استخدام quran-simple-clean لضمان البحث بدون تشكيل
+            fetch(`https://api.alquran.cloud/v1/search/${query}/all/quran-simple-clean`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.data && data.data.matches && data.data.matches.length > 0) {
+                    let html = `<p style="color:#c5a059; font-size:14px; font-weight:bold; margin-bottom:15px;">وجدنا (${data.data.matches.length}) نتيجة</p>`;
+                    
+                    data.data.matches.slice(0, 20).forEach(m => {
+                        // استخدام رقم الصفحة إذا توفر، أو صفحة السورة كبديل
+                        const pageNum = m.page || surahs.find(s => s.n === m.surah.name)?.p || 1;
+                        
+                        html += `
+                        <div style="background:#222; padding:15px; border-radius:12px; margin-bottom:10px; cursor:pointer; border:1px solid #333;" onclick="goToPage(${pageNum})">
+                            <p style="margin:0 0 10px 0; font-size:16px; line-height:1.6;">${m.text}</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:11px; color:#c5a059; background:black; padding:4px 10px; border-radius:15px;"><i class="fas fa-book-open"></i> سورة ${m.surah.name}</span>
+                                <span style="font-size:10px; opacity:0.5;">صفحة ${pageNum}</span>
+                            </div>
+                        </div>`;
+                    });
+                    
+                    html += `<button onclick="document.getElementById('searchResults').style.display='none'; document.getElementById('surahListContainer').style.display='block'; document.getElementById('searchInput').value='';" style="width:100%; background:#333; color:white; border:none; padding:10px; border-radius:10px; margin-top:10px; cursor:pointer;">العودة للفهرس</button>`;
+                    resCont.innerHTML = html;
+                } else {
+                    resCont.innerHTML = `
+                    <p style="text-align:center; opacity:0.5; margin-bottom:20px;">لم نعثر على نتائج، تأكد من الإملاء.</p>
+                    <button onclick="document.getElementById('searchResults').style.display='none'; document.getElementById('surahListContainer').style.display='block';" style="width:100%; background:#c5a059; color:black; border:none; padding:10px; border-radius:10px; cursor:pointer; font-weight:bold;">العودة للفهرس</button>`;
+                }
+            })
+            .catch(e => {
+                resCont.innerHTML = '<p style="text-align:center; color:#ef4444;">خطأ في الاتصال، تأكد من الإنترنت</p>';
+            });
+        }
+
+        // ============= محرك التفسير =============
+        function toggleTafsir() {
+            const modal = document.getElementById('tafsirModal');
+            if (modal.classList.contains('open')) {
+                modal.classList.remove('open');
+            } else {
+                modal.classList.add('open');
+                loadTafsir(swiper.activeIndex + 1);
             }
         }
 
-        // بناء الفهرس
-        document.getElementById('surahList').innerHTML = surahs.map(s => `<div class="surah-item" onclick="goToSurah(${s.p})"><b>${s.n}</b><span style="color:var(--accent)">صفحة ${s.p}</span></div>`).join('');
+        async function loadTafsir(page) {
+            document.getElementById('tafsirPageNum').innerText = page;
+            const content = document.getElementById('tafsirContent');
+            content.innerHTML = '<div style="text-align:center; padding:40px;"><i class="fas fa-spinner fa-spin" style="font-size:30px; color:#c5a059;"></i></div>';
+            
+            try {
+                const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/ar.muyassar`);
+                const data = await res.json();
+                let html = '';
+                data.data.ayahs.forEach(ayah => {
+                    html += `
+                    <p style="margin-bottom:20px; padding:15px; background:rgba(255,255,255,0.02); border-radius:15px; border-right:3px solid #c5a059;">
+                        <span style="color:#c5a059; font-weight:900; margin-left:5px;">[آية ${ayah.numberInSurah}]</span> 
+                        ${ayah.text}
+                    </p>`;
+                });
+                content.innerHTML = html;
+            } catch(e) {
+                content.innerHTML = '<p style="text-align:center; color:#ef4444;">تعذر تحميل التفسير. يرجى التحقق من الإنترنت.</p>';
+            }
+        }
 
-        // تشغيل Swiper
-        var swiper = new Swiper(".mySwiper", {
-            initialSlide: parseInt(localStorage.getItem('aba_page')) || 0,
-            on: { slideChange: function() { 
-                document.getElementById('pageNum').innerText = this.activeIndex + 1;
-                localStorage.setItem('aba_page', this.activeIndex);
-            }}
-        });
-
-        function openIndex() { document.getElementById('indexModal').style.display = 'flex'; }
-        function closeIndex() { document.getElementById('indexModal').style.display = 'none'; }
-        function goToSurah(p) { swiper.slideTo(p-1); closeIndex(); }
-        function jumpToPage() { const p = document.getElementById('pageSearch').value; if(p >= 1 && p <= 604) goToSurah(p); }
+        window.onload = initApp;
     </script>
 </body>
-    </html>
-                                                                         
+                                                                                                </html>
+    

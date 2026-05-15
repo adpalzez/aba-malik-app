@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aba-malik-royal-v21.0'; 
+const CACHE_NAME = 'aba-malik-royal-v20.0'; 
 
 const assets = [
   './',

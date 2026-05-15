@@ -1,27 +1,19 @@
-const CACHE_NAME = 'aba-malik-royal-v20.0'; 
+const CACHE_NAME = 'aba-malik-royal-v21.0'; 
 
-// جميع ملفات التطبيق والمكتبات الخارجية والصور
 const assets = [
   './',
   './index.html',
   './mosque.html', 
-  './quran.js',
   './app.js',
   './manifest.json',
-  './tajweed.html',
-  './fatawa.html',
-  './hadith.html',
-  './azkar.html',
   './quran-read.html',
   'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://i.ibb.co/pBhzxHdM/1000027317.jpg'
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(assets)));
   self.skipWaiting(); 
+  e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(assets)));
 });
 
 self.addEventListener('activate', e => {
@@ -34,7 +26,8 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  if (e.request.url.includes('api.aladhan.com') || e.request.url.includes('api.hadith.gading.dev') || e.request.url.includes('api.alquran.cloud')) {
+  // عدم تخزين روابط الـ API لكي تتحدث مواقيت الصلاة والقرآن دائماً
+  if (e.request.url.includes('api.aladhan.com') || e.request.url.includes('api.alquran.cloud')) {
      return;
   }
   e.respondWith(
@@ -47,9 +40,3 @@ self.addEventListener('fetch', e => {
       .catch(() => caches.match(e.request))
   );
 });
-
-self.addEventListener('notificationclick', event => {
-    event.notification.close(); 
-    event.waitUntil(clients.openWindow('./mosque.html'));
-});
-    

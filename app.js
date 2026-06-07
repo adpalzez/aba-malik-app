@@ -1,5 +1,37 @@
 // ==================== 1. نظام التثبيت والإعدادات ====================
-let deferredPrompt;
+let deferredPrompt;let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // منع المتصفح من إظهار التنبيه التلقائي الافتراضي
+  e.preventDefault();
+  // حفظ الحدث لاستخدامه لاحقاً
+  deferredPrompt = e;
+  // إظهار زر التثبيت الخاص بك في الواجهة
+  if (installBtn) {
+    installBtn.classList.remove('hidden');
+  }
+});
+
+// الدالة التي يتم استدعاؤها عند ضغط الزر (الموجودة في كود الـ HTML الخاص بك)
+function installApp() {
+  if (!deferredPrompt) return;
+  // إظهار نافذة التثبيت للمستخدم
+  deferredPrompt.prompt();
+  // معرفة خيار المستخدم (موافق أم إلغاء)
+  deferredPrompt.userChoice.then((choiceResult) => {
+    if (choiceResult.outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+    } else {
+      console.log('User dismissed the install prompt');
+    }
+    deferredPrompt = null;
+    if (installBtn) {
+      installBtn.classList.add('hidden');
+    }
+  });
+}
+
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault(); 

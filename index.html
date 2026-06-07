@@ -33,7 +33,9 @@
         .quran-font { font-family: 'Amiri', serif; }
     </style>
 </head>
-<body class="pb-32 dark-mode"> <div id="searchModal" class="fixed inset-0 z-[8000] hidden bg-black/90 p-6 animate__animated animate__fadeIn">
+<body class="pb-32 dark-mode"> 
+    
+    <div id="searchModal" class="fixed inset-0 z-[8000] hidden bg-black/90 p-6 animate__animated animate__fadeIn">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-black text-[var(--accent-gold)]">البحث الشامل</h2>
             <i onclick="toggleGlobalSearch()" class="fas fa-times text-2xl text-white/50 cursor-pointer"></i>
@@ -132,13 +134,12 @@
                 <span class="text-[10px] font-black uppercase">الأذكار</span>
             </div>
         </div>
-<button id="startCompassBtn" style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 10px;">
-    تفعيل البوصلة 🧭
-</button>
 
-<div id="compassContainer">
-    <img id="compass" src="compass-image.png" alt="البوصلة" style="width: 200px; transition: transform 0.1s ease-out;">
-</div>
+        <div class="text-center mb-6">
+            <button id="startCompassBtn" onclick="toggleCompass()" class="w-full max-w-xs mx-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2">
+                <i class="fas fa-compass animate-spin-slow"></i> تفعيل البوصلة 🧭
+            </button>
+        </div>
         
         <section id="dailyAyahSection" class="mb-8">
             <div class="bg-gradient-to-br from-[#064e3b] to-[#043d2e] p-6 rounded-[35px] shadow-2xl border-b-4 border-[var(--accent-gold)] relative overflow-hidden">
@@ -230,5 +231,5 @@
 
     <script src="app.js"></script>
 </body>
-    </html>
-    
+                                                                                                                               </html>
+                                                                                                                           

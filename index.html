@@ -31,6 +31,10 @@
         .prayer-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; min-width: 100px; transition: 0.3s; }
         
         .quran-font { font-family: 'Amiri', serif; }
+        
+        /* تأثيرات تدريج البوصلة لتبدو مثل الفيديو المرفق تماماً */
+        .compass-scale-line { position: absolute; width: 2px; height: 10px; background: #94a3b8; top: 4px; left: 50%; transform-origin: center 136px; }
+        .compass-scale-line.long { height: 16px; background: #64748b; }
     </style>
 </head>
 <body class="pb-32 dark-mode"> 
@@ -66,21 +70,43 @@
     </div>
 
     <div id="qiblaContainer" class="hidden">
-        <button onclick="toggleCompass()" class="absolute top-10 left-10 text-white/50 text-3xl"><i class="fas fa-times"></i></button>
-        <h2 class="text-[var(--accent-gold)] font-black text-2xl mb-12">اتجاه القبلة</h2>
-        <div class="relative w-72 h-72 border-4 border-[var(--accent-gold)] rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(251,191,36,0.2)]">
-            <div id="compassDial" class="absolute w-full h-full transition-transform duration-100 ease-out">
-                <div class="absolute top-2 left-1/2 -translate-x-1/2 text-red-500 font-bold text-xl">N</div>
+        <button onclick="toggleCompass()" class="absolute top-10 left-10 text-white/50 text-3xl z-50"><i class="fas fa-times"></i></button>
+        <h2 class="text-[var(--accent-gold)] font-black text-2xl mb-8">اتجاه القبلة</h2>
+        
+        <div class="relative w-80 h-80 bg-[#d1dcde] dark:bg-[#1e293b] rounded-full flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.4)] p-4 border-4 border-white/20">
+            
+            <div id="compassDial" class="absolute w-full h-full rounded-full transition-transform duration-100 ease-out p-6 flex items-center justify-center border border-slate-400/20">
+                
+                <div class="absolute inset-4 rounded-full border border-dashed border-slate-500/30"></div>
+                <div class="absolute inset-8 rounded-full border border-slate-500/20"></div>
+
+                <div class="absolute top-2 font-black text-xl text-red-500">N</div>
+                <div class="absolute top-8 right-16 font-bold text-xs text-slate-600 dark:text-slate-400">NE</div>
+                <div class="absolute right-3 font-black text-xl text-slate-700 dark:text-slate-200">E</div>
+                <div class="absolute bottom-8 right-16 font-bold text-xs text-slate-600 dark:text-slate-400">SE</div>
+                <div class="absolute bottom-2 font-black text-xl text-slate-700 dark:text-slate-200">S</div>
+                <div class="absolute bottom-8 left-16 font-bold text-xs text-slate-600 dark:text-slate-400">SW</div>
+                <div class="absolute left-3 font-black text-xl text-slate-700 dark:text-slate-200">W</div>
+                <div class="absolute top-8 left-16 font-bold text-xs text-slate-600 dark:text-slate-400">NW</div>
             </div>
-            <div id="kaabaMarker" class="absolute w-full h-full transition-transform duration-100 ease-out">
-                <div class="absolute -top-6 left-1/2 -translate-x-1/2 w-10 h-10 bg-black border-2 border-[var(--accent-gold)] rounded-lg flex items-center justify-center">
+
+            <div id="kaabaMarker" class="absolute w-full h-full rounded-full transition-transform duration-100 ease-out z-20 pointer-events-none">
+                <div class="absolute top-1 left-1/2 -translate-x-1/2 w-10 h-10 bg-black border-2 border-[var(--accent-gold)] rounded-xl flex items-center justify-center shadow-lg transform -translate-y-2">
                     <i class="fas fa-cube text-[var(--accent-gold)] text-lg"></i>
                 </div>
             </div>
-            <div id="teardropInner" class="w-6 h-6 bg-white rounded-full z-10 transition-colors shadow-lg"></div>
+
+            <div id="teardropInner" class="w-28 h-28 bg-[#f4f7f8] dark:bg-[#0f172a] rounded-full z-30 flex items-center justify-center shadow-md border-4 border-white transition-all duration-300">
+                <div id="checkIcon" class="w-16 h-16 bg-slate-400 rounded-full flex items-center justify-center text-white text-3xl shadow-inner transition-colors duration-300">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
         </div>
-        <p id="headingText" class="text-white text-4xl font-black mt-12 font-mono">0°</p>
-        <p class="text-white/50 text-sm mt-6 text-center px-8 leading-relaxed">قم بتحريك الهاتف على شكل رقم 8 لمعايرة البوصلة<br><span class="text-emerald-400 font-bold">اللون الأخضر يعني الاتجاه الصحيح</span></p>
+
+        <p id="headingText" class="text-white text-5xl font-black mt-10 font-mono tracking-wide">0.0°</p>
+        <p class="text-[var(--accent-gold)] text-sm font-bold mt-1 tracking-widest">من الشمال</p>
+        
+        <p class="text-white/40 text-xs mt-6 text-center px-8 leading-relaxed">قم بتحريك الهاتف بشكل دائري على شكل رقم 8 للمعايرة<br><span class="text-emerald-400 font-bold">يتحول المركز للون الأخضر عند ضبط اتجاه القبلة</span></p>
     </div>
 
     <section class="hero-section p-6 text-center shadow-2xl">
@@ -137,7 +163,7 @@
 
         <div class="text-center mb-6">
             <button id="startCompassBtn" onclick="toggleCompass()" class="w-full max-w-xs mx-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2">
-                <i class="fas fa-compass animate-spin-slow"></i> تفعيل البوصلة 🧭
+                <i class="fas fa-compass"></i> تفعيل البوصلة 🧭
             </button>
         </div>
         
@@ -231,5 +257,5 @@
 
     <script src="app.js"></script>
 </body>
-                                                                                                                               </html>
-                                                                                                                           
+                                                                                                                                                                                </html>
+    

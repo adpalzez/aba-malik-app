@@ -1,5 +1,5 @@
-// ==================== 1. نظام التثبيت والإعدادات ====================
-let deferredPrompt;let deferredPrompt;
+// ==================== 1. نظام التثبيت والإعدادات والـ PWA ====================
+let deferredPrompt;
 const installBtn = document.getElementById('installBtn');
 
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -10,37 +10,8 @@ window.addEventListener('beforeinstallprompt', (e) => {
   // إظهار زر التثبيت الخاص بك في الواجهة
   if (installBtn) {
     installBtn.classList.remove('hidden');
+    installBtn.style.display = 'block';
   }
-});
-
-// الدالة التي يتم استدعاؤها عند ضغط الزر (الموجودة في كود الـ HTML الخاص بك)
-function installApp() {
-  if (!deferredPrompt) return;
-  // إظهار نافذة التثبيت للمستخدم
-  deferredPrompt.prompt();
-  // معرفة خيار المستخدم (موافق أم إلغاء)
-  deferredPrompt.userChoice.then((choiceResult) => {
-    if (choiceResult.outcome === 'accepted') {
-      console.log('User accepted the install prompt');
-    } else {
-      console.log('User dismissed the install prompt');
-    }
-    deferredPrompt = null;
-    if (installBtn) {
-      installBtn.classList.add('hidden');
-    }
-  });
-}
-
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); 
-    deferredPrompt = e;
-    const btn = document.getElementById('installBtn');
-    if(btn) {
-        btn.classList.remove('hidden');
-        btn.style.display = 'block';
-    }
 });
 
 window.installApp = async () => {
@@ -48,12 +19,11 @@ window.installApp = async () => {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         if (outcome === 'accepted') {
-            const btn = document.getElementById('installBtn');
-            if(btn) btn.classList.add('hidden');
+            if (installBtn) installBtn.classList.add('hidden');
         }
         deferredPrompt = null;
     } else {
-        alert("لتثبيت التطبيق على هاتفك:\n١. اضغط على زر المشاركة (Share)\n٢. اختر 'إضافة إلى الشاشة الرئيسية' (Add to Home Screen)");
+        alert("لتثبيت التطبيق على هاتفك:\n١. اضغط على زر المشاركة (Share) في المتصفح\n٢. اختر 'إضافة إلى الشاشة الرئيسية' (Add to Home Screen)");
     }
 };
 
@@ -68,6 +38,8 @@ window.requestLocation = () => navigator.geolocation.getCurrentPosition(p => {
     localStorage.setItem('lat', p.coords.latitude); 
     localStorage.setItem('lon', p.coords.longitude); 
     location.reload(); 
+}, err => {
+    alert("يرجى تفعيل نظام تحديد المواقع (GPS) في الهاتف لضبط المواقيت والقبلة بدقة.");
 });
 
 window.toggleDarkMode = () => { 
@@ -134,7 +106,6 @@ async function fetchPrayers() {
         const data = await res.json(); 
         prayerTimes = data.data.timings;
         
-        // تحديث شبكة مواقيت الصلاة الأساسية إن وجدت في الصفحة
         const grid = document.getElementById('prayerGrid');
         if(grid) {
             grid.innerHTML = [
@@ -143,7 +114,6 @@ async function fetchPrayers() {
             ].map(p => `<div class="prayer-card p-5 text-center min-w-[100px] shadow-sm"><p class="text-[10px] font-bold text-yellow-500 mb-2">${p.n}</p><p class="font-black text-xl">${p.t}</p></div>`).join('');
         }
         
-        // تحديث عناصر الساعات المنفردة (مثل id="time-Fajr") إن وجدت
         const prayersArray = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
         prayersArray.forEach(p => {
             const el = document.getElementById(`time-${p}`);
@@ -183,21 +153,22 @@ function startCountdown() {
     }, 1000);
 }
 
-// ==================== 4. محرك البوصلة المطور ====================
+// ==================== 4. محرك البوصلة المطور والمصحح ====================
 let isCompassActive = false; 
 window.toggleCompass = async () => {
     const cont = document.getElementById('qiblaContainer'); 
     if(!cont) return;
 
     if (!isCompassActive) {
+        // التحقق من متصفحات iOS وطلب الإذن الصريح للحساسات
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
             try {
                 const permission = await DeviceOrientationEvent.requestPermission();
                 if (permission !== 'granted') {
-                    alert("يجب السماح بحساسات الحركة لتعمل البوصلة");
+                    alert("يجب السماح بحساسات الحركة من إعدادات المتصفح لتعمل البوصلة");
                     return;
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("خطأ في طلب إذن الحساسات:", e); }
         }
 
         const kaaba = document.getElementById('kaabaMarker');
@@ -210,17 +181,21 @@ window.toggleCompass = async () => {
         }
 
         cont.classList.replace('hidden', 'flex');
+        cont.style.display = 'flex';
         isCompassActive = true;
     } else {
-        window.removeEventListener('deviceorientationabsolute', handleOrientation); 
-        window.removeEventListener('deviceorientation', handleOrientation);
+        window.removeEventListener('deviceorientationabsolute', handleOrientation, true); 
+        window.removeEventListener('deviceorientation', handleOrientation, true);
         cont.classList.replace('flex', 'hidden');
+        cont.style.display = 'none';
         isCompassActive = false;
     }
 };
 
 function handleOrientation(e) {
     let heading = e.webkitCompassHeading || (360 - e.alpha);
+    if (!heading) return;
+
     if (document.getElementById('compassDial')) document.getElementById('compassDial').style.transform = `rotate(${-heading}deg)`;
     if (document.getElementById('headingText')) document.getElementById('headingText').innerText = heading.toFixed(1) + '°';
     
@@ -228,7 +203,7 @@ function handleOrientation(e) {
     const innerDrop = document.getElementById('teardropInner');
     if(innerDrop) {
         if (diff < 5 || diff > 355) { 
-            innerDrop.style.backgroundColor = '#10b981'; 
+            innerDrop.style.backgroundColor = '#10b981'; // اللون الأخضر عند الاتجاه الصحيح
             if (navigator.vibrate) navigator.vibrate(20); 
         } 
         else { innerDrop.style.backgroundColor = '#ffffff'; }
@@ -237,8 +212,14 @@ function handleOrientation(e) {
 
 // ==================== 5. المسبحة الرقمية ====================
 let tCount = 0; let zikrIndex = 0; const azkarList = ["سبحان الله", "الحمد لله", "لا إله إلا الله", "الله أكبر"];
-window.openTasbih = () => document.getElementById('tasbihModal').style.display = 'flex';
-window.closeTasbih = () => document.getElementById('tasbihModal').style.display = 'none';
+window.openTasbih = () => {
+    const modal = document.getElementById('tasbihModal');
+    if(modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
+};
+window.closeTasbih = () => {
+    const modal = document.getElementById('tasbihModal');
+    if(modal) { modal.style.display = 'none'; modal.classList.add('hidden'); }
+};
 window.nextZikr = () => { zikrIndex = (zikrIndex + 1) % azkarList.length; document.getElementById('currentZikrText').innerText = azkarList[zikrIndex]; window.resetTasbih(); };
 window.prevZikr = () => { zikrIndex = (zikrIndex - 1 + azkarList.length) % azkarList.length; document.getElementById('currentZikrText').innerText = azkarList[zikrIndex]; window.resetTasbih(); };
 window.countTasbih = () => { tCount++; document.getElementById('tasbihCounter').innerText = tCount; if (navigator.vibrate) navigator.vibrate(40); };
@@ -314,9 +295,12 @@ document.addEventListener('DOMContentLoaded', () => {
     getRandomAyah();
     
     if (localStorage.getItem('aba_dark') === 'true') document.body.classList.add('dark-mode');
-    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
+    if ('serviceWorker' in navigator) { 
+        navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log("Service Worker Registered Successfully"))
+        .catch(err => console.log("Service Worker Failed", err)); 
+    }
     
-    // تحديث أزرار المتابعة بناءً على التخزين المحلي
     const followButtons = document.querySelectorAll('[id^="followBtn-"]');
     followButtons.forEach(btn => {
         const targetId = btn.id.split('-')[1];
@@ -324,4 +308,4 @@ document.addEventListener('DOMContentLoaded', () => {
         updateFollowUI(targetId, isFollowing);
     });
 });
-        
+  

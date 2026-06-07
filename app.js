@@ -1,14 +1,13 @@
 // ==================== 1. نظام التثبيت والإعدادات ====================
 let deferredPrompt;
 
-// الاستماع لحدث التثبيت من المتصفح
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault(); 
     deferredPrompt = e;
     const btn = document.getElementById('installBtn');
     if(btn) {
         btn.classList.remove('hidden');
-        btn.style.display = 'block'; // التأكد من الظهور
+        btn.style.display = 'block';
     }
 });
 
@@ -22,7 +21,6 @@ window.installApp = async () => {
         }
         deferredPrompt = null;
     } else {
-        // رسالة مساعدة لمستخدمي الآيفون أو في حال عدم دعم المتصفح للحدث
         alert("لتثبيت التطبيق على هاتفك:\n١. اضغط على زر المشاركة (Share)\n٢. اختر 'إضافة إلى الشاشة الرئيسية' (Add to Home Screen)");
     }
 };
@@ -45,7 +43,40 @@ window.toggleDarkMode = () => {
     localStorage.setItem('aba_dark', isDark); 
 };
 
-// ==================== 2. المواقيت وحساب القبلة الدقيق ====================
+// ==================== 2. نظام المتابعة ومشاركة المحتوى ====================
+window.toggleFollow = (targetId) => {
+    let isFollowing = localStorage.getItem(`follow_${targetId}`) === 'true';
+    isFollowing = !isFollowing;
+    localStorage.setItem(`follow_${targetId}`, isFollowing);
+    updateFollowUI(targetId, isFollowing);
+};
+
+function updateFollowUI(targetId, isFollowing) {
+    const btn = document.getElementById(`followBtn-${targetId}`);
+    if (!btn) return;
+    if (isFollowing) {
+        btn.innerHTML = 'تمت المتابعة';
+        btn.className = "bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all";
+    } else {
+        btn.innerHTML = 'متابعة';
+        btn.className = "bg-[var(--accent-gold)] text-black px-4 py-2 rounded-xl text-xs font-bold transition-all";
+    }
+}
+
+window.shareAppContent = async (title, text, url) => {
+    if (navigator.share) {
+        try {
+            await navigator.share({ title: title, text: text, url: url });
+        } catch (err) {
+            console.log("تم إلغاء المشاركة أو حدث خطأ");
+        }
+    } else {
+        navigator.clipboard.writeText(url);
+        alert("تم نسخ رابط المحتوى بنجاح!");
+    }
+};
+
+// ==================== 3. المواقيت وحساب القبلة الدقيق ====================
 let prayerTimes = {};
 let QIBLA_DEGREE = 136.2;
 
@@ -67,9 +98,11 @@ async function fetchPrayers() {
     QIBLA_DEGREE = calculateQibla(parseFloat(lat), parseFloat(lon));
 
     try {
-        const res = await fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=5`);
+        const res = await fetch(`https://api.aladhan.com/v1/timings/${Math.floor(Date.now() / 1000)}?latitude=${lat}&longitude=${lon}&method=5`);
         const data = await res.json(); 
         prayerTimes = data.data.timings;
+        
+        // تحديث شبكة مواقيت الصلاة الأساسية إن وجدت في الصفحة
         const grid = document.getElementById('prayerGrid');
         if(grid) {
             grid.innerHTML = [
@@ -77,10 +110,19 @@ async function fetchPrayers() {
                 {n:'العصر', t:prayerTimes.Asr}, {n:'المغرب', t:prayerTimes.Maghrib}, {n:'العشاء', t:prayerTimes.Isha}
             ].map(p => `<div class="prayer-card p-5 text-center min-w-[100px] shadow-sm"><p class="text-[10px] font-bold text-yellow-500 mb-2">${p.n}</p><p class="font-black text-xl">${p.t}</p></div>`).join('');
         }
+        
+        // تحديث عناصر الساعات المنفردة (مثل id="time-Fajr") إن وجدت
+        const prayersArray = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+        prayersArray.forEach(p => {
+            const el = document.getElementById(`time-${p}`);
+            if (el) el.innerText = prayerTimes[p];
+        });
+
         if(document.getElementById('hijriDate')) document.getElementById('hijriDate').innerText = `${data.data.date.hijri.day} ${data.data.date.hijri.month.ar}`;
         if(document.getElementById('gregDate')) document.getElementById('gregDate').innerText = data.data.date.gregorian.date;
+        
         startCountdown();
-    } catch (e) { console.log("خطأ في جلب المواقيت"); }
+    } catch (e) { console.log("خطأ في جلب المواقيت", e); }
 }
 
 function startCountdown() {
@@ -109,7 +151,7 @@ function startCountdown() {
     }, 1000);
 }
 
-// ==================== 3. محرك البوصلة المطور ====================
+// ==================== 4. محرك البوصلة المطور ====================
 let isCompassActive = false; 
 window.toggleCompass = async () => {
     const cont = document.getElementById('qiblaContainer'); 
@@ -161,7 +203,7 @@ function handleOrientation(e) {
     }
 }
 
-// ==================== 4. المسبحة ====================
+// ==================== 5. المسبحة الرقمية ====================
 let tCount = 0; let zikrIndex = 0; const azkarList = ["سبحان الله", "الحمد لله", "لا إله إلا الله", "الله أكبر"];
 window.openTasbih = () => document.getElementById('tasbihModal').style.display = 'flex';
 window.closeTasbih = () => document.getElementById('tasbihModal').style.display = 'none';
@@ -170,7 +212,7 @@ window.prevZikr = () => { zikrIndex = (zikrIndex - 1 + azkarList.length) % azkar
 window.countTasbih = () => { tCount++; document.getElementById('tasbihCounter').innerText = tCount; if (navigator.vibrate) navigator.vibrate(40); };
 window.resetTasbih = () => { tCount = 0; document.getElementById('tasbihCounter').innerText = 0; };
 
-// ==================== 5. الإشعارات والبحث ====================
+// ==================== 6. الإشعارات والبحث الشامل ====================
 window.requestNotificationPermission = async () => {
     if (!("Notification" in window)) return;
     const permission = await Notification.requestPermission();
@@ -183,11 +225,12 @@ window.requestNotificationPermission = async () => {
 
 window.toggleGlobalSearch = () => {
     const modal = document.getElementById('searchModal');
-    modal.classList.toggle('hidden');
+    if(modal) modal.classList.toggle('hidden');
 };
 
 async function runGlobalSearch(query) {
     const resultsCont = document.getElementById('searchResults');
+    if (!resultsCont) return;
     if (query.length < 3) return;
     resultsCont.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-yellow-500"></i></div>';
     try {
@@ -203,17 +246,19 @@ async function runGlobalSearch(query) {
     } catch (e) { resultsCont.innerHTML = '<p class="text-center text-red-400">خطأ في الاتصال</p>'; }
 }
 
-// ==================== 6. ورد اليوم ====================
+// ==================== 7. ورد اليوم ====================
 function renderWird() {
     const list = document.getElementById('wirdList'); if (!list) return;
     let myWird = JSON.parse(localStorage.getItem('aba_wird_v12')) || [{ text: "قراءة صفحة من القرآن", done: false }, { text: "أذكار الصباح", done: false }, { text: "الاستغفار (100)", done: false }];
     list.innerHTML = myWird.map((item, i) => `<div class="flex items-center justify-between p-4 bg-white/5 rounded-3xl border border-white/5 mb-2"><div class="flex items-center gap-4"><div onclick="toggleWirdAction(${i})" class="w-8 h-8 rounded-full border-2 flex items-center justify-center cursor-pointer ${item.done ? 'bg-yellow-600 border-yellow-600' : 'border-white/20'}">${item.done ? '<i class="fas fa-check text-white text-xs"></i>' : ''}</div><span class="text-sm font-bold ${item.done ? 'line-through opacity-30 text-yellow-500' : 'text-white'}">${item.text}</span></div></div>`).join('');
-    document.getElementById('progressText').innerText = Math.round((myWird.filter(i => i.done).length / myWird.length) * 100) + '%';
+    
+    const progText = document.getElementById('progressText');
+    if (progText) progText.innerText = Math.round((myWird.filter(i => i.done).length / myWird.length) * 100) + '%';
     localStorage.setItem('aba_wird_v12', JSON.stringify(myWird));
 }
 window.toggleWirdAction = (i) => { let myWird = JSON.parse(localStorage.getItem('aba_wird_v12')); myWird[i].done = !myWird[i].done; localStorage.setItem('aba_wird_v12', JSON.stringify(myWird)); renderWird(); };
 
-// ==================== 7. آية عشوائية ====================
+// ==================== 8. آية عشوائية وتفسيرها ====================
 window.getRandomAyah = async () => {
     const textEl = document.getElementById('ayahText');
     if(!textEl) return;
@@ -223,18 +268,28 @@ window.getRandomAyah = async () => {
         const data = await res.json();
         if(data.status === "OK") {
             textEl.innerText = `﴿ ${data.data[0].text} ﴾`;
-            document.getElementById('tafsirText').innerText = data.data[1].text;
-            document.getElementById('surahName').innerText = `سورة ${data.data[0].surah.name}`;
-            document.getElementById('ayahNumber').innerText = data.data[0].numberInSurah;
+            if(document.getElementById('tafsirText')) document.getElementById('tafsirText').innerText = data.data[1].text;
+            if(document.getElementById('surahName')) document.getElementById('surahName').innerText = `سورة ${data.data[0].surah.name}`;
+            if(document.getElementById('ayahNumber')) document.getElementById('ayahNumber').innerText = data.data[0].numberInSurah;
         }
     } catch (e) { console.log("خطأ في جلب الآية"); }
 };
 
-// ==================== 8. التشغيل ====================
+// ==================== 9. التشغيل النهائي عند التحميل ====================
 document.addEventListener('DOMContentLoaded', () => {
     renderWird(); 
     fetchPrayers();
     getRandomAyah();
+    
     if (localStorage.getItem('aba_dark') === 'true') document.body.classList.add('dark-mode');
     if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
+    
+    // تحديث أزرار المتابعة بناءً على التخزين المحلي
+    const followButtons = document.querySelectorAll('[id^="followBtn-"]');
+    followButtons.forEach(btn => {
+        const targetId = btn.id.split('-')[1];
+        const isFollowing = localStorage.getItem(`follow_${targetId}`) === 'true';
+        updateFollowUI(targetId, isFollowing);
+    });
 });
+        
